@@ -1,4 +1,4 @@
-# Ponto 1B — DevSecOps
+# Ponto 2 — DevSecOps
 
 ## Objetivo
 
