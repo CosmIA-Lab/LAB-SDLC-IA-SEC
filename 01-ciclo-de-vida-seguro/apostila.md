@@ -6,36 +6,31 @@ Entender o SDLC seguro: o que é, as seis fases, as técnicas de cada fase, e co
 
 ---
 
-## 1. O que é o SDLC
+## 1. Overview visual — o ciclo completo
 
-SDLC = **Software Development Life Cycle** — ciclo de vida de desenvolvimento de software.
+```mermaid
+flowchart LR
+    A["1. Requisitos<br/>Ativos e ameaças"] --> B["2. Design<br/>Least privilege<br/>Defense in depth"]
+    B --> C["3. Implementação<br/>Codificação segura<br/>SAST no commit"]
+    C --> D["4. Verificação<br/>SAST, DAST<br/>SCA, pentest"]
+    D --> E["5. Operação<br/>CVEs<br/>Resposta a incidentes"]
+    E --> F["6. Descontinuação<br/>Remoção segura<br/>de dados"]
+    F -.->|"novo ciclo"| A
+```
 
-É o caminho completo que um software percorre, da ideia até a aposentadoria. Não é ferramenta, é processo.
-
-Fases clássicas:
-
-1. Requisitos
-2. Design
-3. Implementação
-4. Verificação
-5. Operação
-6. Descontinuação
-
-O SDLC responde uma pergunta: **o que fazer em cada fase**.
+A lógica central: quanto mais cedo a segurança entra, mais barato é corrigir. Uma falha no commit custa horas; a mesma em produção custa dias ou semanas.
 
 ---
 
 ## 2. As seis fases do SDLC seguro
 
-O SDLC seguro é o mesmo ciclo, com segurança embutida em cada fase — não um teste no final.
+O SDLC seguro é o mesmo ciclo de vida de software, com segurança embutida em cada fase — não um teste no final.
 
 ### Fase 1 — Requisitos
 
 **Técnica:** identificação de ativos + análise de ameaças + especificação de requisitos de segurança.
 
-- Ativos: dados de clientes, credenciais, dinheiro, chaves de API, código-fonte.
-- Ameaças: acesso indevido, alteração, destruição, indisponibilidade.
-- Saída: lista de requisitos — "o que o sistema deve garantir", não "como fazer".
+Definir o que precisa ser protegido e por quê. Ativos: dados de clientes, credenciais, dinheiro, chaves de API, código-fonte. Ameaças: acesso indevido, alteração, destruição, indisponibilidade. A saída é uma lista de requisitos — "o que o sistema deve garantir", não "como fazer".
 
 Exemplo de requisito: "todo acesso exige autenticação", "dados sensíveis criptografados em trânsito".
 
@@ -43,10 +38,7 @@ Exemplo de requisito: "todo acesso exige autenticação", "dados sensíveis crip
 
 **Técnica:** arquitetura segura com princípios de design.
 
-- **Least privilege:** cada componente recebe só o mínimo de acesso necessário.
-- **Defense in depth:** várias camadas de proteção; uma falha não derruba tudo.
-- **Fail secure:** em caso de erro, o sistema nega acesso (não abre).
-- **Zero trust:** nunca confiar automaticamente, verificar sempre.
+Aplicar least privilege — cada componente recebe só o mínimo de acesso necessário — e defense in depth — várias camadas de proteção, para que uma falha não derrube tudo. Também fail secure — em caso de erro, o sistema nega acesso — e zero trust — nunca confiar automaticamente, verificar sempre.
 
 É a fase mais barata para corrigir erro: mudar um desenho custa menos que reescrever código.
 
@@ -54,34 +46,25 @@ Exemplo de requisito: "todo acesso exige autenticação", "dados sensíveis crip
 
 **Técnica:** codificação segura.
 
-- Evitar padrões conhecidos de falha: buffer overflow, SQL injection, uso de funções inseguras.
-- Revisão de código com olhar de segurança.
-- SAST rodando em cada commit.
+Evitar padrões conhecidos de falha: buffer overflow, SQL injection, uso de funções inseguras. Revisão de código com olhar de segurança. SAST rodando em cada commit.
 
 ### Fase 4 — Verificação
 
 **Técnica:** testes de segurança.
 
-- **SAST:** analisa código-fonte sem executá-lo.
-- **DAST:** testa a aplicação rodando, como um atacante.
-- **SCA:** verifica dependências de terceiros.
-- **Pentest:** simula ataque real.
+SAST analisa o código-fonte sem executá-lo. DAST testa a aplicação rodando, como um atacante. SCA verifica dependências de terceiros. Pentest simula ataque real.
 
 ### Fase 5 — Operação
 
 **Técnica:** monitoramento e resposta.
 
-- Rastrear CVEs e saber quais afetam o que roda.
-- Resposta a incidentes.
-- Patch management sem derrubar o serviço.
+Rastrear CVEs e saber quais afetam o que roda. Resposta a incidentes. Patch management sem derrubar o serviço.
 
 ### Fase 6 — Descontinuação
 
 **Técnica:** descomissionamento seguro.
 
-- Remoção segura de dados.
-- Revogação de credenciais.
-- Transferência controlada.
+Remoção segura de dados. Revogação de credenciais. Transferência controlada.
 
 ---
 
