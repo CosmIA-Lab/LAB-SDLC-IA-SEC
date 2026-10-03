@@ -1,7 +1,5 @@
 # Ponto 1B — DevSecOps
 
-Apostila única: [apostila.md](apostila.md)
+Conteúdo movido para a apostila única do ponto 1: `01-ciclo-de-vida-seguro/apostila.md`.
 
-Conteúdo: DevSecOps, shift-left e shift-right, pipeline de CI/CD com segurança, ferramentas (SAST, DAST, SCA, fuzzing, secrets scanning), SDLC seguro vs DevSecOps.
-
-O ponto 1A (ciclo de vida seguro) está em `01-ciclo-de-vida-seguro/`.
+O ponto 2 (modelagem de ameaças) continua em `02-modelagem-de-ameacas/`.
