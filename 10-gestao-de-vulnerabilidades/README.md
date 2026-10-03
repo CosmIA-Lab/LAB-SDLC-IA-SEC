@@ -1,9 +1,5 @@
 # Ponto 10 — Gestão de vulnerabilidades
 
-## Conteúdo
+Apostila única: [apostila.md](apostila.md)
 
-- [ ] CVEs e CVSS
-- [ ] Patch management
-- [ ] Bug bounty e responsible disclosure
-- [ ] Resposta a incidentes
-- [ ] Monitoramento contínuo
+Conteúdo: CVEs, CVSS, priorização, patch management, resposta a incidentes, disclosure.

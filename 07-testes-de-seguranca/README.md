@@ -1,9 +1,5 @@
-# Ponto 7 — Testes de segurança SAST, DAST, SCA e fuzzing
+# Ponto 7 — Testes de segurança (SAST, DAST, SCA, fuzzing)
 
-## Conteúdo
+Apostila única: [apostila.md](apostila.md)
 
-- [ ] SAST
-- [ ] DAST
-- [ ] SCA
-- [ ] Fuzzing
-- [ ] Comparação entre as abordagens
+Conteúdo: SAST, DAST, SCA, fuzzing, pentest, quando usar cada um.

@@ -1,9 +1,5 @@
 # Ponto 8 — Segurança da cadeia de suprimentos de software
 
-## Conteúdo
+Apostila única: [apostila.md](apostila.md)
 
-- [ ] Dependências e pacotes
-- [ ] Typosquatting
-- [ ] SBOM
-- [ ] Ataques a pacotes: SolarWinds, Log4Shell
-- [ ] Gestão de vulnerabilidades em dependências
+Conteúdo: dependências, SBOM, supply chain attacks, pacotes comprometidos, pinning de versões.
