@@ -3,8 +3,10 @@
 SDLC é a sigla em inglês para **Software Development Life Cycle** —
 ciclo de vida de desenvolvimento de software.
 
-É o processo completo que um software percorre, da ideia até a
-aposentadoria. As fases clássicas são:
+Pensa assim: é o caminho completo que um software percorre, da ideia
+até a aposentadoria. Não é uma ferramenta, é o processo.
+
+As fases clássicas são:
 
 1. Requisitos
 2. Design
@@ -13,13 +15,10 @@ aposentadoria. As fases clássicas são:
 5. Operação
 6. Descontinuação
 
-O SDLC responde a pergunta: **o que fazer em cada fase**.
+Ou seja, o SDLC responde uma pergunta só: **o que fazer em cada fase**.
 
-## Conceito-chave
-
-O SDLC é um processo, não uma ferramenta. Ele descreve as etapas
-pelo qual qualquer software passa — desde um site simples até um
-monólito de milhões de registros.
+Vale para qualquer coisa — desde um site simples até um monólito com
+milhões de registros em produção.
 
 ## Próximo capítulo
 
