@@ -1,8 +1,5 @@
 # Ponto 9 — Segurança de APIs, microsserviços e contêineres
 
-## Conteúdo
+Apostila única: [apostila.md](apostila.md)
 
-- [ ] Segurança de APIs: autenticação, rate limiting, validação
-- [ ] Microsserviços: service mesh, mTLS
-- [ ] Contêineres: Docker, Kubernetes, isolamento
-- [ ] Secrets management
+Conteúdo: segurança de APIs, autenticação em APIs, microsserviços, contêineres, Docker, Kubernetes.
