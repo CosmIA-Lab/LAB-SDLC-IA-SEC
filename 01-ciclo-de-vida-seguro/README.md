@@ -1,16 +1,7 @@
-# Ponto 1 — Ciclo de vida de desenvolvimento seguro e DevSecOps
+# Ponto 1A — Ciclo de vida de desenvolvimento seguro
 
-## Objetivo
+Apostila única: [apostila.md](apostila.md)
 
-Entender o que é o SDLC seguro, suas seis fases, e como o DevSecOps
-executa esse ciclo de forma contínua e automatizada.
+Conteúdo: SDLC, as seis fases com técnicas, custo de corrigir cedo.
 
-## Apostila
-
-Tudo em um arquivo só: [apostila.md](apostila.md)
-
-## Referências
-
-- Microsoft SDL — learn.microsoft.com (procure "Security Development Lifecycle")
-- NIST SSDF — nist.gov/publications/sp-800-218
-- OWASP SAMM — owaspsamm.org
+O ponto 1B (DevSecOps) está em `02-devsecops/`.
