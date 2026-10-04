@@ -128,6 +128,19 @@ Catálogo útil para não inventar requisito do zero: OWASP ASVS — lista de co
 
 É a fase mais barata para corrigir erro: mudar um desenho custa menos que reescrever código.
 
+```mermaid
+flowchart TB
+    D["Fase 2 — Design<br/>Arquitetura segura com princípios de design"]
+    D --> LP["Least privilege<br/>mínimo de acesso por componente"]
+    D --> DID["Defense in depth<br/>várias camadas; uma falha não derruba tudo"]
+    D --> FS["Fail secure<br/>erro nega acesso, nunca libera"]
+    D --> ZT["Zero trust<br/>verificar sempre, nunca confiar por padrão"]
+    LP --> R["Regra de ouro<br/>design errado custa uma reunião<br/>código errado custa meses"]
+    DID --> R
+    FS --> R
+    ZT --> R
+```
+
 #### Princípios de design seguro
 
 - **Least privilege** — cada componente recebe só o mínimo de acesso necessário.
