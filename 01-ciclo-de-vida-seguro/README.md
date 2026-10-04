@@ -124,11 +124,31 @@ Catálogo útil para não inventar requisito do zero: OWASP ASVS — lista de co
 
 ### Fase 2 — Design
 
-**Técnica:** arquitetura segura com princípios de design.
-
-Aplicar least privilege — cada componente recebe só o mínimo de acesso necessário — e defense in depth — várias camadas de proteção, para que uma falha não derrube tudo. Também fail secure — em caso de erro, o sistema nega acesso — e zero trust — nunca confiar automaticamente, verificar sempre.
+**Técnica central:** arquitetura segura com princípios de design.
 
 É a fase mais barata para corrigir erro: mudar um desenho custa menos que reescrever código.
+
+#### Princípios de design seguro
+
+- **Least privilege** — cada componente recebe só o mínimo de acesso necessário.
+  - Exemplo: microsserviço de pagamentos só lê o banco de pagamentos; não lê o de usuários.
+- **Defense in depth** — várias camadas de proteção, para que uma falha não derrube tudo.
+  - Exemplo: WAF + SAST + pentest; se uma camada falha, as outras seguram.
+- **Fail secure** — em caso de erro, o sistema nega acesso.
+  - Exemplo: se o serviço de autenticação cair, o login é bloqueado — não liberado.
+  - O oposto é o fail open: erro libera tudo por conveniência.
+- **Zero trust** — nunca confiar automaticamente, verificar sempre.
+  - Exemplo: mesmo dentro da rede interna, cada requisição é autenticada e autorizada.
+  - Acabou a ideia de "quem tá dentro da rede é confiável".
+
+#### Tópicos para memorizar
+
+- **Técnica:** arquitetura segura com princípios de design
+- **Princípio 1 — Least privilege:** mínimo de acesso por componente
+- **Princípio 2 — Defense in depth:** várias camadas; uma falha não derruba tudo
+- **Princípio 3 — Fail secure:** erro nega acesso (nunca libera)
+- **Princípio 4 — Zero trust:** verificar sempre, nunca confiar por padrão
+- **Regra de ouro:** design errado custa uma reunião; código errado custa meses
 
 ### Fase 3 — Implementação
 
@@ -297,7 +317,7 @@ Um não substitui o outro: o DevSecOps é a forma de executar o SDLC seguro em e
 | Fase / Conceito | Técnica |
 |---|---|
 | Requisitos | Ativos, classificação, CIA, abuse case, critério verificável |
-| Design | Least privilege + defense in depth |
+| Design | Arquitetura segura: least privilege, defense in depth, fail secure, zero trust |
 | Implementação | Codificação segura |
 | Verificação | SAST, DAST, SCA, pentest |
 | Operação | Monitorar CVEs + resposta a incidentes |
