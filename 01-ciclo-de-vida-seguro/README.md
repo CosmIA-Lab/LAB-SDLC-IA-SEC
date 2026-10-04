@@ -42,85 +42,32 @@ flowchart LR
     F --> G[Rastreio]
 ```
 
-#### 1. Identificação de ativos
+```mermaid
+flowchart TB
+    F1["Fase 1 — Requisitos<br/>o que o sistema deve garantir"]
+    F1 --> A["Ativos<br/>dados, segredos, funções, infra"]
+    F1 --> CL["Classificação<br/>Público, Interno, Confidencial, Restrito"]
+    F1 --> CIA["CIA<br/>Confidencialidade, Integridade, Disponibilidade"]
+    F1 --> R["Requisitos<br/>funcionais, não funcionais, restrições"]
+    F1 --> AC["Abuse cases<br/>o que o ator NÃO deve conseguir fazer"]
+    F1 --> CA["Critérios de aceite<br/>teste que passa ou falha"]
+    F1 --> RT["Rastreio<br/>ativo → requisito → controle → teste"]
+    R --> CA
+    AC --> CA
+    CA --> RT
+```
 
-Ativo é qualquer coisa que, se perdida, alterada ou exposta, gera dano.
+#### Tópicos para memorizar
 
-- Dados: cadastro, pagamento, credencial, log
-- Segredos: senha, token, chave de API, certificado
-- Funções: transferir dinheiro, aprovar usuário, exportar relatório
-- Infra: repositório, pipeline, banco, backup
-
-Sem lista de ativos, o resto da fase vira requisito genérico.
-
-#### 2. Classificação de dados
-
-Nem todo dado pede o mesmo controle. Classificar antes de escrever requisito evita proteger tudo igual — ou não proteger o que importa.
-
-| Classe | Exemplo | Controle típico |
-|---|---|---|
-| Público | página de produto | integridade |
-| Interno | métrica de uso | acesso autenticado |
-| Confidencial | CPF, e-mail | acesso mínimo + trilha |
-| Restrito | senha, cartão, chave | criptografia + não logar |
-
-#### 3. CIA — a lente do requisito
-
-Todo requisito de segurança protege pelo menos uma propriedade:
-
-- **Confidencialidade** — só quem deve ver, vê
-- **Integridade** — o dado não muda sem autorização
-- **Disponibilidade** — o serviço responde quando precisa
-
-Pergunta útil: "se isso falhar, o que quebra — sigilo, corretude ou uptime?"
-
-#### 4. Três tipos de requisito
-
-- **Funcional de segurança:** o sistema faz algo. Ex.: "login exige segundo fator".
-- **Não funcional:** qualidade mensurável. Ex.: "sessão expira em 15 minutos de inatividade".
-- **Restrição:** limite imposto. Ex.: "senha nunca aparece em log".
-
-Requisito ruim: "o sistema deve ser seguro". Requisito bom: "toda rota autenticada rejeita token expirado com 401".
-
-#### 5. Abuse case
-
-Caso de uso invertido: o que um ator não deve conseguir fazer.
-
-- Caso de uso: cliente consulta o próprio extrato
-- Abuse case: cliente consulta extrato de outro cliente
-
-O abuse case vira requisito negativo: "a consulta de extrato só retorna registros do dono da sessão".
-
-#### 6. Critério de aceite verificável
-
-Cada requisito precisa de um teste que passa ou falha.
-
-| Requisito | Critério |
-|---|---|
-| Dado sensível em trânsito | TLS obrigatório; HTTP redireciona |
-| Segredo fora do código | pipeline falha se achar token commitado |
-| Ação crítica auditável | log tem quem, o quê e quando, sem a senha |
-
-#### 7. Premissas e fora de escopo
-
-Escrever o que o sistema assume e o que não promete. Ex.: "o canal entre browser e API é HTTPS; a rede interna não é tratada como confiável". Premissa escondida vira falha de design depois.
-
-#### 8. Rastreabilidade
-
-Cada requisito liga a um controle e a um teste.
-
-`ativo → requisito → controle no design → teste na verificação`
-
-Se não dá para apontar o teste, o requisito não entrou no ciclo.
-
-#### Saídas da fase
-
-- Lista de ativos classificados
-- Requisitos de segurança, cada um testável
-- Abuse cases dos fluxos críticos
-- Premissas e fora de escopo
-
-Catálogo útil para não inventar requisito do zero: OWASP ASVS — lista de controles verificáveis por nível.
+- **Técnica:** ativos, classificação, CIA, requisitos verificáveis
+- **Ativos:** dados, segredos, funções, infra
+- **Classificação:** Público, Interno, Confidencial, Restrito
+- **CIA:** Confidencialidade, Integridade, Disponibilidade
+- **Tipos de requisito:** funcional, não funcional, restrição
+- **Abuse case:** caso de uso invertido — o que não deve acontecer
+- **Critério de aceite:** requisito sem teste não serve
+- **Rastreio:** ativo → requisito → controle → teste
+- **Regra de ouro:** requisito ruim = "seja seguro"; requisito bom = "rota autenticada rejeita token expirado com 401"
 
 ### Fase 2 — Design
 
