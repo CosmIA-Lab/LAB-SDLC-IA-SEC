@@ -57,16 +57,25 @@ flowchart TB
     CA --> RT
 ```
 
+#### Princípios
+
+- **Verificabilidade** — se o requisito não dá para testar, ele não serve.
+- **Rastreabilidade** — cada requisito liga a um controle e a um teste: ativo → requisito → controle → teste.
+- **Negação explícita** — abuse case: o que um ator não deve conseguir fazer vira requisito negativo.
+
+#### Técnicas
+
+- **Identificação de ativos** — dados, segredos, funções, infra.
+- **Classificação de dados** — Público, Interno, Confidencial, Restrito.
+- **CIA** — Confidencialidade, Integridade, Disponibilidade: a lente do requisito.
+- **Tipos de requisito** — funcional, não funcional, restrição.
+- **Critério de aceite** — cada requisito precisa de um teste que passa ou falha.
+- **Premissas e fora de escopo** — escrever o que o sistema assume e o que não promete.
+
 #### Tópicos para memorizar
 
 - **Técnica:** ativos, classificação, CIA, requisitos verificáveis
-- **Ativos:** dados, segredos, funções, infra
-- **Classificação:** Público, Interno, Confidencial, Restrito
-- **CIA:** Confidencialidade, Integridade, Disponibilidade
-- **Tipos de requisito:** funcional, não funcional, restrição
-- **Abuse case:** caso de uso invertido — o que não deve acontecer
-- **Critério de aceite:** requisito sem teste não serve
-- **Rastreio:** ativo → requisito → controle → teste
+- **Princípio:** verificável, rastreável, negação explícita
 - **Regra de ouro:** requisito ruim = "seja seguro"; requisito bom = "rota autenticada rejeita token expirado com 401"
 
 ### Fase 2 — Design
@@ -88,7 +97,7 @@ flowchart TB
     ZT --> R
 ```
 
-#### Princípios de design seguro
+#### Princípios
 
 - **Least privilege** — cada componente recebe só o mínimo de acesso necessário.
   - Exemplo: microsserviço de pagamentos só lê o banco de pagamentos; não lê o de usuários.
@@ -100,6 +109,11 @@ flowchart TB
 - **Zero trust** — nunca confiar automaticamente, verificar sempre.
   - Exemplo: mesmo dentro da rede interna, cada requisição é autenticada e autorizada.
   - Acabou a ideia de "quem tá dentro da rede é confiável".
+
+#### Técnicas
+
+- **Diagrama de fluxo de dados** — base para aplicar os princípios a cada elemento do sistema.
+- **Análise de superfície de ataque** — listar pontos de entrada e priorizar por risco.
 
 #### Tópicos para memorizar
 
