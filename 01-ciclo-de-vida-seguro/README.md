@@ -28,11 +28,99 @@ O SDLC seguro é o mesmo ciclo de vida de software, com segurança embutida em c
 
 ### Fase 1 — Requisitos
 
-**Técnica:** identificação de ativos + análise de ameaças + especificação de requisitos de segurança.
+**Técnica central:** identificar ativos, classificar dados e escrever requisitos de segurança verificáveis.
 
-Definir o que precisa ser protegido e por quê. Ativos: dados de clientes, credenciais, dinheiro, chaves de API, código-fonte. Ameaças: acesso indevido, alteração, destruição, indisponibilidade. A saída é uma lista de requisitos — "o que o sistema deve garantir", não "como fazer".
+A fase responde "o que o sistema deve garantir", não "como implementar". Se o requisito não dá para testar, ele não serve.
 
-Exemplo de requisito: "todo acesso exige autenticação", "dados sensíveis criptografados em trânsito".
+```mermaid
+flowchart LR
+    A[Ativos] --> B[Classificação]
+    B --> C[CIA]
+    C --> D[Requisitos]
+    D --> E[Abuse cases]
+    E --> F[Critérios de aceite]
+    F --> G[Rastreio]
+```
+
+#### 1. Identificação de ativos
+
+Ativo é qualquer coisa que, se perdida, alterada ou exposta, gera dano.
+
+- Dados: cadastro, pagamento, credencial, log
+- Segredos: senha, token, chave de API, certificado
+- Funções: transferir dinheiro, aprovar usuário, exportar relatório
+- Infra: repositório, pipeline, banco, backup
+
+Sem lista de ativos, o resto da fase vira requisito genérico.
+
+#### 2. Classificação de dados
+
+Nem todo dado pede o mesmo controle. Classificar antes de escrever requisito evita proteger tudo igual — ou não proteger o que importa.
+
+| Classe | Exemplo | Controle típico |
+|---|---|---|
+| Público | página de produto | integridade |
+| Interno | métrica de uso | acesso autenticado |
+| Confidencial | CPF, e-mail | acesso mínimo + trilha |
+| Restrito | senha, cartão, chave | criptografia + não logar |
+
+#### 3. CIA — a lente do requisito
+
+Todo requisito de segurança protege pelo menos uma propriedade:
+
+- **Confidencialidade** — só quem deve ver, vê
+- **Integridade** — o dado não muda sem autorização
+- **Disponibilidade** — o serviço responde quando precisa
+
+Pergunta útil: "se isso falhar, o que quebra — sigilo, corretude ou uptime?"
+
+#### 4. Três tipos de requisito
+
+- **Funcional de segurança:** o sistema faz algo. Ex.: "login exige segundo fator".
+- **Não funcional:** qualidade mensurável. Ex.: "sessão expira em 15 minutos de inatividade".
+- **Restrição:** limite imposto. Ex.: "senha nunca aparece em log".
+
+Requisito ruim: "o sistema deve ser seguro". Requisito bom: "toda rota autenticada rejeita token expirado com 401".
+
+#### 5. Abuse case
+
+Caso de uso invertido: o que um ator não deve conseguir fazer.
+
+- Caso de uso: cliente consulta o próprio extrato
+- Abuse case: cliente consulta extrato de outro cliente
+
+O abuse case vira requisito negativo: "a consulta de extrato só retorna registros do dono da sessão".
+
+#### 6. Critério de aceite verificável
+
+Cada requisito precisa de um teste que passa ou falha.
+
+| Requisito | Critério |
+|---|---|
+| Dado sensível em trânsito | TLS obrigatório; HTTP redireciona |
+| Segredo fora do código | pipeline falha se achar token commitado |
+| Ação crítica auditável | log tem quem, o quê e quando, sem a senha |
+
+#### 7. Premissas e fora de escopo
+
+Escrever o que o sistema assume e o que não promete. Ex.: "o canal entre browser e API é HTTPS; a rede interna não é tratada como confiável". Premissa escondida vira falha de design depois.
+
+#### 8. Rastreabilidade
+
+Cada requisito liga a um controle e a um teste.
+
+`ativo → requisito → controle no design → teste na verificação`
+
+Se não dá para apontar o teste, o requisito não entrou no ciclo.
+
+#### Saídas da fase
+
+- Lista de ativos classificados
+- Requisitos de segurança, cada um testável
+- Abuse cases dos fluxos críticos
+- Premissas e fora de escopo
+
+Catálogo útil para não inventar requisito do zero: OWASP ASVS — lista de controles verificáveis por nível.
 
 ### Fase 2 — Design
 
@@ -208,7 +296,7 @@ Um não substitui o outro: o DevSecOps é a forma de executar o SDLC seguro em e
 
 | Fase / Conceito | Técnica |
 |---|---|
-| Requisitos | Identificar ativos e ameaças |
+| Requisitos | Ativos, classificação, CIA, abuse case, critério verificável |
 | Design | Least privilege + defense in depth |
 | Implementação | Codificação segura |
 | Verificação | SAST, DAST, SCA, pentest |
@@ -225,3 +313,4 @@ Um não substitui o outro: o DevSecOps é a forma de executar o SDLC seguro em e
 - Microsoft SDL — learn.microsoft.com (procure "Security Development Lifecycle")
 - NIST SSDF — nist.gov/publications/sp-800-218
 - OWASP SAMM — owaspsamm.org
+- OWASP ASVS — catálogo de requisitos verificáveis
