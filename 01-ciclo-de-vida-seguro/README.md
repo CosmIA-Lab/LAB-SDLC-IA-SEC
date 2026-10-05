@@ -28,55 +28,54 @@ O SDLC seguro é o mesmo ciclo de vida de software, com segurança embutida em c
 
 ### Fase 1 — Requisitos
 
-**Técnica central:** identificar ativos, classificar dados e escrever requisitos de segurança verificáveis.
-
-A fase responde "o que o sistema deve garantir", não "como implementar". Se o requisito não dá para testar, ele não serve.
+Ordem: objetivo → princípios → técnicas → saída.
 
 ```mermaid
 flowchart LR
-    A[Ativos] --> B[Classificação]
-    B --> C[CIA]
-    C --> D[Requisitos]
-    D --> E[Abuse cases]
-    E --> F[Critérios de aceite]
-    F --> G[Rastreio]
+    O["Objetivo<br/>o que garantir"] --> P["Princípios<br/>verificável, rastreável"]
+    P --> T["Técnicas<br/>abuse, misuse, attack tree"]
+    T --> S["Saída<br/>requisito com teste"]
 ```
 
-```mermaid
-flowchart TB
-    F1["Fase 1 — Requisitos<br/>o que o sistema deve garantir"]
-    F1 --> A["Ativos<br/>dados, segredos, funções, infra"]
-    F1 --> CL["Classificação<br/>Público, Interno, Confidencial, Restrito"]
-    F1 --> CIA["CIA<br/>Confidencialidade, Integridade, Disponibilidade"]
-    F1 --> R["Requisitos<br/>funcionais, não funcionais, restrições"]
-    F1 --> AC["Abuse cases<br/>o que o ator NÃO deve conseguir fazer"]
-    F1 --> CA["Critérios de aceite<br/>teste que passa ou falha"]
-    F1 --> RT["Rastreio<br/>ativo → requisito → controle → teste"]
-    R --> CA
-    AC --> CA
-    CA --> RT
-```
+#### Objetivo
+
+Identificar ativos, classificar dados e escrever requisitos de segurança verificáveis. Responde o que o sistema deve garantir, não como implementar.
+
+| Atividade | O que é | Não é técnica |
+|---|---|---|
+| Ativos | dados, segredos, funções, infra | passo do método |
+| Classificação | Público, Interno, Confidencial, Restrito | passo do método |
+| CIA | Confidencialidade, Integridade, Disponibilidade | lente do requisito |
+| Tipo de requisito | funcional, não funcional, restrição | forma de escrever |
+| Premissas | o que assume e o que não promete | limite de escopo |
 
 #### Princípios
 
-- **Verificabilidade** — se o requisito não dá para testar, ele não serve.
-- **Rastreabilidade** — cada requisito liga a um controle e a um teste: ativo → requisito → controle → teste.
-- **Negação explícita** — abuse case: o que um ator não deve conseguir fazer vira requisito negativo.
+| Princípio | Regra |
+|---|---|
+| Verificabilidade | se não dá para testar, não serve |
+| Rastreabilidade | ativo → requisito → controle → teste |
+| Negação explícita | o que não deve acontecer vira requisito negativo |
+
+Regra de ouro: ruim = "seja seguro". Bom = "rota autenticada rejeita token expirado com 401".
 
 #### Técnicas
 
-- **Identificação de ativos** — dados, segredos, funções, infra.
-- **Classificação de dados** — Público, Interno, Confidencial, Restrito.
-- **CIA** — Confidencialidade, Integridade, Disponibilidade: a lente do requisito.
-- **Tipos de requisito** — funcional, não funcional, restrição.
-- **Critério de aceite** — cada requisito precisa de um teste que passa ou falha.
-- **Premissas e fora de escopo** — escrever o que o sistema assume e o que não promete.
+Técnicas de elicitação da literatura. Ativo e classificação alimentam a técnica; não são a técnica.
 
-#### Tópicos para memorizar
+| Técnica | Quem | O que faz |
+|---|---|---|
+| Abuse case | McDermott e Fox, 1999 | outsider tenta quebrar, roubar ou derrubar |
+| Misuse case | Sindre e Opdahl, 2000 | insider faz o que não deve; inverte o caso de uso |
+| Confuse case | extensão dos misuse cases | insider erra sem intenção |
+| Attack tree | Schneier | objetivo na raiz; cada ramo é um caminho |
+| Bug bar | Microsoft SDL | limiar do que não pode ir para release |
 
-- **Técnica:** ativos, classificação, CIA, requisitos verificáveis
-- **Princípio:** verificável, rastreável, negação explícita
-- **Regra de ouro:** requisito ruim = "seja seguro"; requisito bom = "rota autenticada rejeita token expirado com 401"
+Apoio, não técnica: OWASP ASVS é catálogo de requisito testável. SQUARE (Mead, SEI) é o processo que escolhe a técnica.
+
+#### Saída
+
+Requisito com critério de aceite. Sem teste, não entrou no ciclo.
 
 ### Fase 2 — Design
 
@@ -290,7 +289,7 @@ Um não substitui o outro: o DevSecOps é a forma de executar o SDLC seguro em e
 
 | Fase / Conceito | Técnica |
 |---|---|
-| Requisitos | Ativos, classificação, CIA, abuse case, critério verificável |
+| Requisitos | Abuse case, misuse case, confuse case, attack tree, bug bar |
 | Design | Arquitetura segura: least privilege, defense in depth, fail secure, zero trust |
 | Implementação | Codificação segura |
 | Verificação | SAST, DAST, SCA, pentest |
@@ -308,3 +307,6 @@ Um não substitui o outro: o DevSecOps é a forma de executar o SDLC seguro em e
 - NIST SSDF — nist.gov/publications/sp-800-218
 - OWASP SAMM — owaspsamm.org
 - OWASP ASVS — catálogo de requisitos verificáveis
+- Misuse cases — Sindre e Opdahl, Requirements Engineering, 2005
+- Abuse cases — McDermott e Fox, 1999
+- SQUARE — Mead, SEI
