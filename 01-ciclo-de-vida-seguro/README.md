@@ -79,73 +79,99 @@ Requisito com critério de aceite. Sem teste, não entrou no ciclo.
 
 ### Fase 2 — Design
 
-**Técnica central:** arquitetura segura com princípios de design.
-
-É a fase mais barata para corrigir erro: mudar um desenho custa menos que reescrever código.
+Ordem: objetivo → princípios → técnicas → saída.
 
 ```mermaid
-flowchart TB
-    D["Fase 2 — Design<br/>Arquitetura segura com princípios de design"]
-    D --> LP["Least privilege<br/>mínimo de acesso por componente"]
-    D --> DID["Defense in depth<br/>várias camadas; uma falha não derruba tudo"]
-    D --> FS["Fail secure<br/>erro nega acesso, nunca libera"]
-    D --> ZT["Zero trust<br/>verificar sempre, nunca confiar por padrão"]
-    LP --> R["Regra de ouro<br/>design errado custa uma reunião<br/>código errado custa meses"]
-    DID --> R
-    FS --> R
-    ZT --> R
+flowchart LR
+    O["Objetivo<br/>desenho seguro<br/>antes do código"] --> P["Princípios<br/>least privilege<br/>defense in depth<br/>fail secure<br/>zero trust"]
+    P --> T["Técnicas<br/>DFD<br/>superfície de ataque"]
+    T --> S["Saída<br/>desenho com
+mitigações"]
 ```
+
+É a fase mais barata para corrigir erro: mudar um desenho custa uma reunião; reescrever código custa meses.
+
+#### Objetivo
+
+Definir a arquitetura segura do sistema antes de escrever código: onde os dados fluem, onde entram as ameaças, e quais controles mitigam cada uma.
+
+| Atividade | O que é | Não é técnica |
+|---|---|---|
+| Diagrama de fluxo de dados | processos, armazenamentos, fluxos | passo do método |
+| Superfície de ataque | pontos de entrada do sistema | passo do método |
+| Mitigação | controle que reduz a ameaça | resultado, não método |
 
 #### Princípios
 
-- **Least privilege** — cada componente recebe só o mínimo de acesso necessário.
-  - Exemplo: microsserviço de pagamentos só lê o banco de pagamentos; não lê o de usuários.
-- **Defense in depth** — várias camadas de proteção, para que uma falha não derrube tudo.
-  - Exemplo: WAF + SAST + pentest; se uma camada falha, as outras seguram.
-- **Fail secure** — em caso de erro, o sistema nega acesso.
-  - Exemplo: se o serviço de autenticação cair, o login é bloqueado — não liberado.
-  - O oposto é o fail open: erro libera tudo por conveniência.
-- **Zero trust** — nunca confiar automaticamente, verificar sempre.
-  - Exemplo: mesmo dentro da rede interna, cada requisição é autenticada e autorizada.
-  - Acabou a ideia de "quem tá dentro da rede é confiável".
+| Princípio | Regra |
+|---|---|
+| Least privilege | mínimo de acesso por componente |
+| Defense in depth | várias camadas; uma falha não derruba tudo |
+| Fail secure | erro nega acesso, nunca libera |
+| Zero trust | verificar sempre, nunca confiar por padrão |
+
+Regra de ouro: design errado custa uma reunião; código errado custa meses.
 
 #### Técnicas
 
-- **Diagrama de fluxo de dados** — base para aplicar os princípios a cada elemento do sistema.
-- **Análise de superfície de ataque** — listar pontos de entrada e priorizar por risco.
+| Técnica | Quem | O que faz |
+|---|---|---|
+| Diagrama de fluxo de dados (DFD) | DeMarco, 1979 | processos, armazenamentos e fluxos; base para aplicar os princípios |
+| Análise de superfície de ataque | Manadhata e Wing, 2004 | lista pontos de entrada e prioriza por risco |
 
-#### Tópicos para memorizar
+Apoio, não técnica: STRIDE (Microsoft) é a taxonomia de ameaças que alimenta a análise. Modelagem de ameaças é o ponto 2 do programa.
 
-- **Técnica:** arquitetura segura com princípios de design
-- **Princípio 1 — Least privilege:** mínimo de acesso por componente
-- **Princípio 2 — Defense in depth:** várias camadas; uma falha não derruba tudo
-- **Princípio 3 — Fail secure:** erro nega acesso (nunca libera)
-- **Princípio 4 — Zero trust:** verificar sempre, nunca confiar por padrão
-- **Regra de ouro:** design errado custa uma reunião; código errado custa meses
+#### Saída
+
+Desenho com ameaças mapeadas e mitigações definidas. Sem mitigação, o desenho não saiu da fase.
 
 ### Fase 3 — Implementação
 
-**Técnica:** codificação segura.
+**Objetivo:** escrever código sem os padrões de falha conhecidos.
 
-Evitar padrões conhecidos de falha: buffer overflow, SQL injection, uso de funções inseguras. Revisão de código com olhar de segurança. SAST rodando em cada commit.
+| Atividade | O que é | Não é técnica |
+|---|---|---|
+| Codificação segura | evitar buffer overflow, SQL injection, funções inseguras | prática, não método nomeado |
+| Revisão de código | olhar de segurança no pull request | atividade |
+
+**Técnica:** nenhuma técnica nomeada nesta fase — a técnica de verificação (SAST) roda no commit e cobre a implementação.
 
 ### Fase 4 — Verificação
 
-**Técnica:** testes de segurança.
+**Objetivo:** encontrar falhas antes de produção, com evidência.
 
-SAST analisa o código-fonte sem executá-lo. DAST testa a aplicação rodando, como um atacante. SCA verifica dependências de terceiros. Pentest simula ataque real.
+| Atividade | O que é | Não é técnica |
+|---|---|---|
+| SAST | analisa código-fonte sem executar | ferramenta |
+| DAST | testa a aplicação rodando, como atacante | ferramenta |
+| SCA | verifica dependências de terceiros | ferramenta |
+| Pentest | simula ataque real | atividade |
+
+**Técnicas:** SAST, DAST, SCA e pentest são as técnicas de verificação — cada uma com método e ferramenta próprios. Detalhamento no ponto 7.
 
 ### Fase 5 — Operação
 
-**Técnica:** monitoramento e resposta.
+**Objetivo:** detectar e responder a falhas em produção sem derrubar o serviço.
 
-Rastrear CVEs e saber quais afetam o que roda. Resposta a incidentes. Patch management sem derrubar o serviço.
+| Atividade | O que é | Não é técnica |
+|---|---|---|
+| Rastreio de CVEs | saber quais afetam o que roda | atividade |
+| Resposta a incidentes | conter, erradicar, recuperar | processo |
+| Patch management | corrigir sem downtime | atividade |
+
+**Técnica:** nenhuma técnica nomeada nesta fase — o monitoramento é prática operacional, não método de elicitação ou análise.
 
 ### Fase 6 — Descontinuação
 
-**Técnica:** descomissionamento seguro.
+**Objetivo:** encerrar o sistema sem vazar dados nem deixar credenciais ativas.
 
-Remoção segura de dados. Revogação de credenciais. Transferência controlada.
+| Atividade | O que é | Não é técnica |
+|---|---|---|
+| Remoção segura de dados | apagar ou anonimizar sem resíduo |
+| Revogação de credenciais | invalidar tokens, chaves, senhas |
+| Transferência controlada | passar dados para o sistema sucessor |
+
+**Técnica:** nenhuma técnica nomeada nesta fase — é checklist de encerramento.
 
 ---
 
@@ -287,17 +313,17 @@ Um não substitui o outro: o DevSecOps é a forma de executar o SDLC seguro em e
 
 ## 9. Técnicas para memorizar
 
-| Fase / Conceito | Técnica |
-|---|---|
-| Requisitos | Abuse case, misuse case, confuse case, attack tree, bug bar |
-| Design | Arquitetura segura: least privilege, defense in depth, fail secure, zero trust |
-| Implementação | Codificação segura |
-| Verificação | SAST, DAST, SCA, pentest |
-| Operação | Monitorar CVEs + resposta a incidentes |
-| Descontinuação | Remoção segura de dados |
-| DevSecOps | Dev + Sec + Ops integrados no pipeline |
-| Shift-left | Segurança no início do ciclo |
-| Shift-right | Monitoramento em produção |
+| Fase / Conceito | Objetivo | Princípio | Técnica |
+|---|---|---|---|
+| Requisitos | requisito verificável | verificável, rastreável, negação explícita | abuse case, misuse case, confuse case, attack tree, bug bar |
+| Design | desenho seguro antes do código | least privilege, defense in depth, fail secure, zero trust | DFD, superfície de ataque |
+| Implementação | código sem falha conhecida | — | — (SAST no commit cobre) |
+| Verificação | falha encontrada com evidência | — | SAST, DAST, SCA, pentest |
+| Operação | falha detectada e respondida | — | — (monitoramento operacional) |
+| Descontinuação | encerramento sem vazamento | — | — (checklist) |
+| DevSecOps | segurança no pipeline | responsabilidade compartilhada | Dev + Sec + Ops integrados |
+| Shift-left | segurança no início do ciclo | — | — |
+| Shift-right | monitoramento em produção | — | — |
 
 ---
 
@@ -310,3 +336,5 @@ Um não substitui o outro: o DevSecOps é a forma de executar o SDLC seguro em e
 - Misuse cases — Sindre e Opdahl, Requirements Engineering, 2005
 - Abuse cases — McDermott e Fox, 1999
 - SQUARE — Mead, SEI
+- DFD — DeMarco, 1979
+- Superfície de ataque — Manadhata e Wing, 2004
