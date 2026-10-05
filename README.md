@@ -4,8 +4,40 @@ Laboratório pessoal de estudo.
 
 ## Como usar
 
-A apostila é gradual: cada pasta é um ponto do programa, e cada ponto tem
-capítulos numerados. Leia na ordem — cada capítulo assume o anterior.
+A apostila é gradual: cada pasta é um ponto do programa. Leia na ordem — cada ponto assume o anterior.
+
+A escrita e a leitura seguem o mesmo molde. Se a frase não cabe num bloco, ela não entra.
+
+## Metodologia
+
+Ordem fixa, em todo ponto e em toda fase:
+
+```mermaid
+flowchart LR
+    O[Objetivo] --> A[Atividades]
+    A --> P[Princípios]
+    P --> T[Técnicas]
+    T --> S[Saída]
+    S --> Apoio
+```
+
+| Bloco | Pergunta | O que não entra |
+|---|---|---|
+| Objetivo | O que esta fase tem que entregar? | Passo, ferramenta, princípio |
+| Atividades | O que se faz para chegar lá? | Nome de método da literatura |
+| Princípios | Que regra não pode quebrar? | Exemplo longo, ferramenta |
+| Técnicas | Qual método nomeado da literatura se usa? | Atividade genérica |
+| Saída | O que existe no fim, e como se testa? | Intenção |
+| Apoio | Catálogo ou processo que não é a técnica | Mesmo nível da técnica |
+
+Regras:
+
+- Uma linha por célula. Exemplo só se a linha sozinha mentir.
+- Fonte só na técnica: quem e ano.
+- Sem nome na literatura, não se chama técnica.
+- Objetivo do ponto fica no topo. Objetivo da fase fica dentro da fase.
+- Diagrama repete o molde. Não desenha o fluxo antigo.
+- Apresentação segue o README. Se divergir, o README manda.
 
 ## Pontos
 
