@@ -2,41 +2,51 @@
 
 Laboratório pessoal de estudo.
 
+Aprendizado baseado em objetivo, princípios e técnicas. Cada ponto e cada fase usa as mesmas três seções, nessa ordem.
+
 ## Como usar
 
 A apostila é gradual: cada pasta é um ponto do programa. Leia na ordem — cada ponto assume o anterior.
 
-A escrita e a leitura seguem o mesmo molde. Se a frase não cabe num bloco, ela não entra.
+Leia cada seção até fechar a pergunta dela. Se a frase não cabe numa seção, ela não entra.
 
 ## Metodologia
 
-Ordem fixa, em todo ponto e em toda fase:
-
 ```mermaid
 flowchart LR
-    O[Objetivo] --> A[Atividades]
-    A --> P[Princípios]
-    P --> T[Técnicas]
-    T --> S[Saída]
-    S --> Apoio
+    O[1. Objetivo] --> P[2. Princípios]
+    P --> T[3. Técnicas]
 ```
 
-| Bloco | Pergunta | O que não entra |
+### 1. Objetivo
+
+O que esta fase tem que entregar.
+
+Não entra passo, ferramenta nem princípio. Atividade (ativos, classificação, CIA) fica aqui: é o que se faz para chegar na entrega, não um método nomeado.
+
+### 2. Princípios
+
+Que regra não pode quebrar.
+
+Uma regra por linha. Exemplo só se a linha sozinha mentir. Ferramenta não entra.
+
+### 3. Técnicas
+
+Qual método nomeado da literatura se usa.
+
+Fonte na linha: quem e ano. Sem nome na literatura, não é técnica. Catálogo (ASVS) e processo (SQUARE) ficam no rodapé da seção, não na tabela.
+
+| Seção | Pergunta | Não entra |
 |---|---|---|
-| Objetivo | O que esta fase tem que entregar? | Passo, ferramenta, princípio |
-| Atividades | O que se faz para chegar lá? | Nome de método da literatura |
-| Princípios | Que regra não pode quebrar? | Exemplo longo, ferramenta |
-| Técnicas | Qual método nomeado da literatura se usa? | Atividade genérica |
-| Saída | O que existe no fim, e como se testa? | Intenção |
-| Apoio | Catálogo ou processo que não é a técnica | Mesmo nível da técnica |
+| Objetivo | O que entregar? | Princípio, técnica, ferramenta |
+| Princípios | Que regra não quebra? | Exemplo longo, ferramenta |
+| Técnicas | Qual método nomeado? | Atividade genérica |
 
 Regras:
 
-- Uma linha por célula. Exemplo só se a linha sozinha mentir.
-- Fonte só na técnica: quem e ano.
-- Sem nome na literatura, não se chama técnica.
+- Uma linha por célula.
 - Objetivo do ponto fica no topo. Objetivo da fase fica dentro da fase.
-- Diagrama repete o molde. Não desenha o fluxo antigo.
+- Diagrama repete as três seções.
 - Apresentação segue o README. Se divergir, o README manda.
 
 ## Pontos
