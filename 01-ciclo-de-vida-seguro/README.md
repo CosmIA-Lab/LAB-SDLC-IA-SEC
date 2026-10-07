@@ -41,13 +41,25 @@ flowchart LR
 
 Identificar ativos, classificar dados e escrever requisitos de segurança verificáveis. Responde o que o sistema deve garantir, não como implementar.
 
-| Atividade | O que é | Não é técnica |
-|---|---|---|
-| Ativos | dados, segredos, funções, infra | passo do método |
-| Classificação | Público, Interno, Confidencial, Restrito | passo do método |
-| CIA | Confidencialidade, Integridade, Disponibilidade | lente do requisito |
-| Tipo de requisito | funcional, não funcional, restrição | forma de escrever |
-| Premissas | o que assume e o que não promete | limite de escopo |
+**O que se faz:**
+
+| Atividade | O que é |
+|---|---|
+| Identificar ativos | dados, segredos, funções, infra — o que vale proteger |
+| Classificar dados | Público, Interno, Confidencial, Restrito |
+| Escrever requisitos | traduzir ativo e classificação em comportamento testável |
+
+**O que se produz:**
+
+| Produto | O que é |
+|---|---|
+| Tipo de requisito | funcional, não funcional, restrição |
+| Premissas | o que assume e o que não promete |
+| Critério de aceite | o teste que prova que o requisito funciona |
+
+**A lente da classificação:**
+
+CIA — Confidencialidade, Integridade, Disponibilidade. Não é atividade nem produto: é o critério que você aplica ao classificar cada dado.
 
 #### Princípios
 
@@ -95,11 +107,11 @@ mitigações"]
 
 Definir a arquitetura segura do sistema antes de escrever código: onde os dados fluem, onde entram as ameaças, e quais controles mitigam cada uma.
 
-| Atividade | O que é | Não é técnica |
-|---|---|---|
-| Diagrama de fluxo de dados | processos, armazenamentos, fluxos | passo do método |
-| Superfície de ataque | pontos de entrada do sistema | passo do método |
-| Mitigação | controle que reduz a ameaça | resultado, não método |
+| Atividade | O que é |
+|---|---|
+| Diagrama de fluxo de dados | processos, armazenamentos, fluxos |
+| Superfície de ataque | pontos de entrada do sistema |
+| Mitigação | controle que reduz a ameaça |
 
 #### Princípios
 
@@ -129,10 +141,10 @@ Desenho com ameaças mapeadas e mitigações definidas. Sem mitigação, o desen
 
 **Objetivo:** escrever código sem os padrões de falha conhecidos.
 
-| Atividade | O que é | Não é técnica |
-|---|---|---|
-| Codificação segura | evitar buffer overflow, SQL injection, funções inseguras | prática, não método nomeado |
-| Revisão de código | olhar de segurança no pull request | atividade |
+| Atividade | O que é |
+|---|---|
+| Codificação segura | evitar buffer overflow, SQL injection, funções inseguras |
+| Revisão de código | olhar de segurança no pull request |
 
 **Técnica:** nenhuma técnica nomeada nesta fase — a técnica de verificação (SAST) roda no commit e cobre a implementação.
 
@@ -140,12 +152,12 @@ Desenho com ameaças mapeadas e mitigações definidas. Sem mitigação, o desen
 
 **Objetivo:** encontrar falhas antes de produção, com evidência.
 
-| Atividade | O que é | Não é técnica |
-|---|---|---|
-| SAST | analisa código-fonte sem executar | ferramenta |
-| DAST | testa a aplicação rodando, como atacante | ferramenta |
-| SCA | verifica dependências de terceiros | ferramenta |
-| Pentest | simula ataque real | atividade |
+| Atividade | O que é |
+|---|---|
+| SAST | analisa código-fonte sem executar |
+| DAST | testa a aplicação rodando, como atacante |
+| SCA | verifica dependências de terceiros |
+| Pentest | simula ataque real |
 
 **Técnicas:** SAST, DAST, SCA e pentest são as técnicas de verificação — cada uma com método e ferramenta próprios. Detalhamento no ponto 7.
 
@@ -153,11 +165,11 @@ Desenho com ameaças mapeadas e mitigações definidas. Sem mitigação, o desen
 
 **Objetivo:** detectar e responder a falhas em produção sem derrubar o serviço.
 
-| Atividade | O que é | Não é técnica |
-|---|---|---|
-| Rastreio de CVEs | saber quais afetam o que roda | atividade |
-| Resposta a incidentes | conter, erradicar, recuperar | processo |
-| Patch management | corrigir sem downtime | atividade |
+| Atividade | O que é |
+|---|---|
+| Rastreio de CVEs | saber quais afetam o que roda |
+| Resposta a incidentes | conter, erradicar, recuperar |
+| Patch management | corrigir sem downtime |
 
 **Técnica:** nenhuma técnica nomeada nesta fase — o monitoramento é prática operacional, não método de elicitação ou análise.
 
@@ -165,8 +177,8 @@ Desenho com ameaças mapeadas e mitigações definidas. Sem mitigação, o desen
 
 **Objetivo:** encerrar o sistema sem vazar dados nem deixar credenciais ativas.
 
-| Atividade | O que é | Não é técnica |
-|---|---|---|
+| Atividade | O que é |
+|---|---|
 | Remoção segura de dados | apagar ou anonimizar sem resíduo |
 | Revogação de credenciais | invalidar tokens, chaves, senhas |
 | Transferência controlada | passar dados para o sistema sucessor |
