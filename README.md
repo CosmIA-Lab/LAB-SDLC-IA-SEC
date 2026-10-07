@@ -22,7 +22,7 @@ flowchart LR
 
 O que esta fase tem que entregar.
 
-Não entra passo, ferramenta nem princípio. Atividade (ativos, classificação, CIA) fica aqui: é o que se faz para chegar na entrega, não um método nomeado.
+Não entra passo, ferramenta nem princípio. Atividade fica aqui: é o que se faz para chegar na entrega, não um método nomeado.
 
 ### 2. Princípios
 
@@ -34,7 +34,7 @@ Uma regra por linha. Exemplo só se a linha sozinha mentir. Ferramenta não entr
 
 Qual método nomeado da literatura se usa.
 
-Fonte na linha: quem e ano. Sem nome na literatura, não é técnica. Catálogo (ASVS) e processo (SQUARE) ficam no rodapé da seção, não na tabela.
+Fonte na linha: quem e ano. Sem nome na literatura, não é técnica. Catálogo e processo ficam no rodapé da seção, não na tabela.
 
 | Seção | Pergunta | Não entra |
 |---|---|---|
@@ -53,21 +53,19 @@ Regras:
 
 Três camadas, da regra à execução:
 
-| Camada | Pergunta | Exemplo |
-|---|---|---|
-| Princípio | Que regra não quebra? | Least privilege: mínimo de acesso por componente |
-| Técnica | Qual método nomeado revela onde aplicar? | DFD: mostra os componentes e fluxos do sistema |
-| Mecanismo | O que executa a regra? | RBAC: papel, permissão, recurso |
+| Camada | Pergunta |
+|---|---|
+| Princípio | Que regra não quebra? |
+| Técnica | Qual método nomeado revela onde aplicar? |
+| Mecanismo | O que executa a regra? |
 
 Regras:
 
 - Princípio é regra de restrição, não procedimento. Diz o que não pode falhar; não diz como fazer.
 - Técnica é método com nome na literatura, com fonte (quem, ano). Sem nome, não é técnica.
-- Mecanismo é a implementação concreta: RBAC, ACL, IAM, try/catch.
-- Nem toda técnica tem mecanismo (attack tree, abuse case são técnicas puras). Nem todo mecanismo tem técnica associada.
+- Mecanismo é a implementação concreta.
+- Nem toda técnica tem mecanismo. Nem todo mecanismo tem técnica associada.
 - A tríade funciona quando os três existem; quando falta um, registra só o que tem.
-
-Exemplo completo: least privilege é a regra, o DFD é a técnica que identifica o serviço de pagamentos, e RBAC é o mecanismo que concede só as permissões mínimas a ele.
 
 ## Estrutura de raciocínio: rastreabilidade
 
@@ -96,6 +94,14 @@ Regras:
 - Ativo, classificação e requisito são a estrutura de raciocínio da fase de requisitos — não são técnicas.
 - A classificação é a ponte entre o ativo e o requisito: define o nível de sensibilidade e o tratamento obrigatório.
 - Sem a corrente completa, o requisito não é rastreável: ninguém sabe de onde veio nem como provar que funciona.
+
+## Método de estudo
+
+O README guarda estruturas de raciocínio e processos de aprendizagem — não exemplos específicos. Exemplos vivem nos exercícios e nas pastas dos pontos.
+
+- **Retrieval practice**: fechar o material e tentar lembrar de cabeça. Se travar, reler só aquele ponto e tentar de novo no dia seguinte.
+- **Pergunta em vez de definição**: cada conceito vira pergunta. "O que é ativo?" vira "o que vale proteger nesse sistema?" — a resposta é sempre concreta.
+- **Estrutura antes de conteúdo**: primeiro o molde (objetivo, princípios, técnicas), depois o preenchimento. O molde é o que se memoriza; o conteúdo é o que se aplica.
 
 ## Pontos
 
