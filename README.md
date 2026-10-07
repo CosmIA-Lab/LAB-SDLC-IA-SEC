@@ -49,6 +49,26 @@ Regras:
 - Diagrama repete as três seções.
 - Apresentação segue o README. Se divergir, o README manda.
 
+## Hierarquia de estudo: princípio, técnica, mecanismo
+
+Três camadas, da regra à execução:
+
+| Camada | Pergunta | Exemplo |
+|---|---|---|
+| Princípio | Que regra não quebra? | Least privilege: mínimo de acesso por componente |
+| Técnica | Qual método nomeado revela onde aplicar? | DFD: mostra os componentes e fluxos do sistema |
+| Mecanismo | O que executa a regra? | RBAC: papel, permissão, recurso |
+
+Regras:
+
+- Princípio é regra de restrição, não procedimento. Diz o que não pode falhar; não diz como fazer.
+- Técnica é método com nome na literatura, com fonte (quem, ano). Sem nome, não é técnica.
+- Mecanismo é a implementação concreta: RBAC, ACL, IAM, try/catch.
+- Nem toda técnica tem mecanismo (attack tree, abuse case são técnicas puras). Nem todo mecanismo tem técnica associada.
+- A tríade funciona quando os três existem; quando falta um, registra só o que tem.
+
+Exemplo completo: least privilege é a regra, o DFD é a técnica que identifica o serviço de pagamentos, e RBAC é o mecanismo que concede só as permissões mínimas a ele.
+
 ## Pontos
 
 1. [Ciclo de vida de desenvolvimento seguro e DevSecOps](01-ciclo-de-vida-seguro/README.md)
