@@ -69,6 +69,34 @@ Regras:
 
 Exemplo completo: least privilege é a regra, o DFD é a técnica que identifica o serviço de pagamentos, e RBAC é o mecanismo que concede só as permissões mínimas a ele.
 
+## Estrutura de raciocínio: rastreabilidade
+
+A cadeia que liga o que proteger ao que prova que protege:
+
+```mermaid
+flowchart LR
+    A[Ativo] --> C[Classificação]
+    C --> R[Requisito]
+    R --> K[Controle]
+    K --> T[Teste]
+```
+
+Três perguntas, uma por elo:
+
+| Elo | Pergunta | Responde |
+|---|---|---|
+| Ativo | O que vale proteger? | O quê |
+| Classificação | O quanto proteger? | Quanto |
+| Requisito | O que o sistema deve fazer? | Como |
+
+A cadeia completa fecha o circuito: ativo → classificação → requisito → controle → teste. O teste é o que prova que o requisito funciona, e é o elo que volta pro ativo.
+
+Regras:
+
+- Ativo, classificação e requisito são a estrutura de raciocínio da fase de requisitos — não são técnicas.
+- A classificação é a ponte entre o ativo e o requisito: define o nível de sensibilidade e o tratamento obrigatório.
+- Sem a corrente completa, o requisito não é rastreável: ninguém sabe de onde veio nem como provar que funciona.
+
 ## Pontos
 
 1. [Ciclo de vida de desenvolvimento seguro e DevSecOps](01-ciclo-de-vida-seguro/README.md)
