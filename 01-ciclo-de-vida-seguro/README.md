@@ -73,15 +73,15 @@ Regra de ouro: ruim = "seja seguro". Bom = "rota autenticada rejeita token expir
 
 #### Técnicas
 
-Técnicas de elicitação da literatura. Ativo e classificação alimentam a técnica; não são a técnica.
+As técnicas são lentes diferentes para achar falhas. Cada uma faz uma pergunta ao sistema e o requisito nasce da resposta.
 
-| Técnica | Quem | O que faz |
-|---|---|---|
-| Abuse case | McDermott e Fox, 1999 | outsider tenta quebrar, roubar ou derrubar |
-| Misuse case | Sindre e Opdahl, 2000 | insider faz o que não deve; inverte o caso de uso |
-| Confuse case | extensão dos misuse cases | insider erra sem intenção |
-| Attack tree | Schneier | objetivo na raiz; cada ramo é um caminho |
-| Bug bar | Microsoft SDL | limiar do que não pode ir para release |
+| Técnica | Quem | Pergunta que faz | Como funciona | Exemplo |
+|---|---|---|---|---|
+| Abuse case | McDermott e Fox, 1999 | O que um atacante externo faria? | Inverte o caso de uso normal: desenha o fluxo legítimo e depois o fluxo do atacante | Caso de uso: usuário faz login. Abuse case: atacante tenta login com senha vazada. Requisito: bloqueia após três tentativas falhas |
+| Misuse case | Sindre e Opdahl, 2000 | O que um insider faria? | Insider com acesso legítimo fazendo o que não deve; aparece no mesmo diagrama do caso de uso | Funcionário exporta a base de clientes. Requisito: exportação exige aprovação de dois níveis |
+| Confuse case | extensão dos misuse cases | O que acontece quando alguém erra sem intenção? | O sistema não é à prova de engano; cobre erro humano | Usuário digita CEP inválido. Requisito: formulário rejeita com mensagem clara |
+| Attack tree | Schneier | Qual é o objetivo do atacante e quais os caminhos? | Parte do objetivo na raiz; cada ramo é um caminho pra chegar lá | Raiz: roubar dados de cartão. Ramos: SQL injection, upload sem validação, sessão sem expiração. Cada ramo vira um requisito |
+| Bug bar | Microsoft SDL | O que não pode ir pra release? | Define o limiar antes de escrever qualquer requisito; é requisito de processo, não de produto | Nenhuma falha crítica conhecida vai pra release |
 
 Apoio, não técnica: OWASP ASVS é catálogo de requisito testável. SQUARE (Mead, SEI) é o processo que escolhe a técnica.
 
