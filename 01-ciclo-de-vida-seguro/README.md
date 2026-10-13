@@ -2,27 +2,97 @@
 
 ## Objetivo
 
-Entender o SDLC seguro: o que é, as seis fases, as técnicas de cada fase, e como o DevSecOps executa esse ciclo de forma contínua e automatizada.
+Entender o SDLC seguro: o que é, as cinco fases, as técnicas de cada fase, e como o DevSecOps executa esse ciclo de forma contínua e automatizada.
+
+Referência principal: Janca, Tanya. *Alice and Bob Learn Application Security*. Wiley, 2020. O ciclo, os nomes das fases e as atividades de cada fase seguem a Figura I-1 e a Figura 7-1 do livro.
 
 ---
 
-## 1. Overview visual — o ciclo completo
+## 1. Pushing Left — a ideia que sustenta o ciclo
+
+*Pushing Left* é empurrar a segurança para a esquerda do ciclo: para as fases iniciais, antes do código existir.
+
+### A regra
+
+Quanto mais tarde a falha é corrigida, mais cara ela fica. Falha encontrada no requisito custa uma frase reescrita; a mesma falha em produção custa incidente, investigação e notificação de clientes.
+
+### Por quê
+
+- No requisito e no design, não existe código escrito — corrigir é mudar um documento.
+- No commit, o código é pequeno e o contexto está fresco.
+- Em produção, a falha já afetou dados, clientes ou receita.
+
+### Falha de design e bug de implementação
+
+Janca separa os dois, e a distinção decide em que fase a correção cabe:
+
+| Tipo | O que é | Onde nasce | Custo de corrigir |
+|---|---|---|---|
+| Falha (flaw) | erro no desenho; o sistema faz o que foi desenhado, e o desenho está errado | Requisitos, Design | alto depois de codificado |
+| Bug | erro na implementação; o desenho está certo e o código não cumpre | Código | menor, localizado |
+
+Regra de ouro: bug se corrige com patch; falha se corrige com reprojeto.
+
+### Exemplo
+
+SQL injection corrigida no pull request: reescreve a query, adiciona teste. Fim.
+
+A mesma em produção: incidente, investigação forense, notificação de clientes, patch emergencial fora do horário.
+
+---
+
+## 2. Fundamentos — o que vale em todas as fases
+
+Os princípios não são uma fase. São transversais: valem do requisito à manutenção, e cada fase apenas os aplica.
+
+| Princípio | Regra |
+|---|---|
+| CIA | confidencialidade, integridade e disponibilidade são o que se protege |
+| Assume breach | presumir que a invasão já aconteceu e desenhar para conter o dano |
+| Defense in depth | várias camadas; uma falha não derruba tudo |
+| Least privilege | mínimo de acesso por componente e por pessoa |
+| Zero trust | verificar sempre, nunca confiar por padrão ("never trust, always verify") |
+| Fail secure | erro nega acesso, nunca libera |
+| Redução da superfície de ataque | menos porta aberta, menos coisa para defender |
+| Sem segurança por obscuridade | esconder não é proteger; o segredo é a chave, não o desenho |
+| Sem segredo em código | credencial em código-fonte é credencial vazada |
+| Segurança usável | controle que atrapalha é controle que o usuário contorna |
+| Ameaça interna | quem tem acesso legítimo também é vetor |
+| Cadeia de suprimentos | código que você não escreveu também é seu risco |
+
+Detalhamento dos princípios de arquitetura: ponto 3. Cadeia de suprimentos: ponto 8.
+
+---
+
+## 3. Overview visual — o ciclo completo
 
 ```mermaid
 flowchart LR
-    A["1. Requisitos<br/>Ativos e ameaças"] --> B["2. Design<br/>Least privilege<br/>Defense in depth"]
-    B --> C["3. Implementação<br/>Codificação segura<br/>SAST no commit"]
-    C --> D["4. Verificação<br/>SAST, DAST<br/>SCA, pentest"]
-    D --> E["5. Operação<br/>CVEs<br/>Resposta a incidentes"]
-    E --> F["6. Descontinuação<br/>Remoção segura<br/>de dados"]
-    F -.->|"novo ciclo"| A
+    A["1. Requisitos<br/>Ativos e ameaças"] --> B["2. Design<br/>Modelagem de ameaças<br/>Design review"]
+    B --> C["3. Código<br/>Codificação segura<br/>Code review, SAST"]
+    C --> D["4. Testes<br/>Pentest, DAST<br/>SCA, secret scanning"]
+    D --> E["5. Deploy e manutenção<br/>WAF, RASP, monitoramento<br/>Resposta a incidentes"]
+    E -.->|"novo ciclo"| A
 ```
 
-A lógica central: quanto mais cedo a segurança entra, mais barato é corrigir. Uma falha no commit custa horas; a mesma em produção custa dias ou semanas.
+As cinco fases existem em qualquer metodologia — Waterfall, Agile ou DevOps. O que muda é a duração e a frequência de cada volta, não a existência das fases.
+
+### De onde vem cada fase
+
+| Fase (Janca) | Nome anterior neste material | Fonte |
+|---|---|---|
+| Requisitos | Requisitos | Figura I-1, cap. 2 |
+| Design | Design | Figura I-1, cap. 3 |
+| Código | Implementação | Figura I-1, cap. 4 e 5 |
+| Testes | Verificação | Figura I-1, cap. 6 |
+| Deploy e manutenção | Operação | Figura 7-1, cap. 6 e 9 |
+| Descontinuação | Descontinuação | não está no livro; Microsoft SDL e NIST SSDF |
+
+A fase de Operação deixou de ser separada: na Figura 7-1 o deploy e a manutenção são a mesma fase, porque as atividades de segurança são as mesmas (monitorar, alertar, responder).
 
 ---
 
-## 2. As seis fases do SDLC seguro
+## 4. As cinco fases do SDLC seguro
 
 O SDLC seguro é o mesmo ciclo de vida de software, com segurança embutida em cada fase — não um teste no final.
 
@@ -48,6 +118,10 @@ Identificar ativos, classificar dados e escrever requisitos de segurança verifi
 | Identificar ativos | dados, segredos, funções, infra — o que vale proteger |
 | Classificar dados | Público, Interno, Confidencial, Restrito |
 | Escrever requisitos | traduzir ativo e classificação em comportamento testável |
+| Security user story | o requisito escrito no formato que o time ágil já usa |
+| Revisão da stack | avaliar linguagem, framework e serviços antes de adotar |
+
+As duas últimas vêm da Figura 7-1. A revisão da stack é a primeira decisão de segurança do projeto: framework que trata saída por padrão elimina uma classe inteira de falha antes da primeira linha de código.
 
 **O que se produz:**
 
@@ -83,7 +157,7 @@ As técnicas são lentes diferentes para achar falhas. Cada uma faz uma pergunta
 | Attack tree | Schneier | Qual é o objetivo do atacante e quais os caminhos? | Parte do objetivo na raiz; cada ramo é um caminho pra chegar lá | Raiz: roubar dados de cartão. Ramos: SQL injection, upload sem validação, sessão sem expiração. Cada ramo vira um requisito |
 | Bug bar | Microsoft SDL | O que não pode ir pra release? | Define o limiar antes de escrever qualquer requisito; é requisito de processo, não de produto | Nenhuma falha crítica conhecida vai pra release |
 
-Apoio, não técnica: OWASP ASVS é catálogo de requisito testável. SQUARE (Mead, SEI) é o processo que escolhe a técnica.
+Apoio, não técnica: OWASP ASVS é o catálogo de requisito testável — serve como checklist quando a elicitação termina, para achar o que ninguém lembrou. SQUARE (Mead, SEI) é o processo que escolhe a técnica.
 
 #### Saída
 
@@ -96,12 +170,11 @@ Ordem: objetivo → princípios → técnicas → saída.
 ```mermaid
 flowchart LR
     O["Objetivo<br/>desenho seguro<br/>antes do código"] --> P["Princípios<br/>least privilege<br/>defense in depth<br/>fail secure<br/>zero trust"]
-    P --> T["Técnicas<br/>DFD<br/>superfície de ataque"]
-    T --> S["Saída<br/>desenho com
-mitigações"]
+    P --> T["Técnicas<br/>modelagem de ameaças<br/>DFD, superfície de ataque"]
+    T --> S["Saída<br/>desenho com mitigações"]
 ```
 
-É a fase mais barata para corrigir erro: mudar um desenho custa uma reunião; reescrever código custa meses.
+É a fase mais barata para corrigir erro: mudar um desenho custa uma reunião; reescrever código custa meses. É também onde nasce a falha de design — a que patch nenhum corrige.
 
 #### Objetivo
 
@@ -109,9 +182,14 @@ Definir a arquitetura segura do sistema antes de escrever código: onde os dados
 
 | Atividade | O que é |
 |---|---|
+| Modelagem de ameaças | levantar o que pode dar errado e decidir o que fazer com cada ameaça |
+| Design review | revisão do desenho por alguém que não o escreveu |
 | Diagrama de fluxo de dados | processos, armazenamentos, fluxos |
 | Superfície de ataque | pontos de entrada do sistema |
 | Mitigação | controle que reduz a ameaça |
+| Separação de ambientes | produção não empresta dado para teste nem desenvolvimento |
+
+Separação dos dados de produção é regra de desenho, não de operação: dado real em ambiente de teste é vazamento com data marcada, porque o teste não tem o controle que a produção tem.
 
 #### Princípios
 
@@ -128,52 +206,176 @@ Regra de ouro: design errado custa uma reunião; código errado custa meses.
 
 | Técnica | Quem | O que faz |
 |---|---|---|
-| Diagrama de fluxo de dados (DFD) | DeMarco, 1979 | processos, armazenamentos e fluxos; base para aplicar os princípios |
+| Modelagem de ameaças | Shostack, 2014 | responde quatro perguntas: o que estamos construindo, o que pode dar errado, o que fazemos a respeito, fizemos um bom trabalho |
+| Diagrama de fluxo de dados (DFD) | DeMarco, 1979 | processos, armazenamentos e fluxos; é o insumo da modelagem de ameaças |
 | Análise de superfície de ataque | Manadhata e Wing, 2004 | lista pontos de entrada e prioriza por risco |
 
-Apoio, não técnica: STRIDE (Microsoft) é a taxonomia de ameaças que alimenta a análise. Modelagem de ameaças é o ponto 2 do programa.
+Apoio, não técnica: STRIDE (Microsoft) e PASTA são as taxonomias que alimentam a modelagem. Detalhamento da modelagem de ameaças: ponto 2.
 
 #### Saída
 
 Desenho com ameaças mapeadas e mitigações definidas. Sem mitigação, o desenho não saiu da fase.
 
-### Fase 3 — Implementação
+### Fase 3 — Código
 
-**Objetivo:** escrever código sem os padrões de falha conhecidos.
+Ordem: objetivo → princípios → técnicas → saída.
+
+```mermaid
+flowchart LR
+    O["Objetivo<br/>código sem<br/>falha conhecida"] --> P["Princípios<br/>never trust input<br/>nada hard coded"]
+    P --> T["Técnicas<br/>code review<br/>SAST, linting"]
+    T --> S["Saída<br/>código revisado<br/>e com teste"]
+```
+
+É o capítulo mais longo do livro, e a fase onde o requisito e o desenho viram comportamento real.
+
+#### Objetivo
+
+Escrever código que não repita os padrões de falha conhecidos, e provar isso antes do merge.
 
 | Atividade | O que é |
 |---|---|
-| Codificação segura | evitar buffer overflow, SQL injection, funções inseguras |
-| Revisão de código | olhar de segurança no pull request |
+| Codificação segura | escolher a construção segura do framework em vez da insegura |
+| Validação de entrada | tratar todo dado externo como hostil até prova em contrário |
+| Tratamento de erro e log | falhar sem vazar detalhe; registrar o que permite investigar depois |
+| Code review | olhar de segurança no pull request |
+| SAST no commit | análise estática rodando antes do merge |
+| Linting | padrão de código que elimina construção perigosa |
+| Teste unitário de segurança | teste que prova o requisito negativo da fase 1 |
 
-**Técnica:** nenhuma técnica nomeada nesta fase — a técnica de verificação (SAST) roda no commit e cobre a implementação.
+#### Princípios
 
-### Fase 4 — Verificação
-
-**Objetivo:** encontrar falhas antes de produção, com evidência.
-
-| Atividade | O que é |
+| Princípio | Regra |
 |---|---|
-| SAST | analisa código-fonte sem executar |
+| Never trust, always verify | todo dado que vem de fora é não confiável, inclusive de outro sistema seu |
+| Nada hard coded | senha, token e chave ficam em cofre, nunca no código |
+| Verbo e rota corretos | cada operação usa o método HTTP que corresponde ao efeito dela |
+| Identidade e sessão não se improvisam | usar o mecanismo do framework, nunca escrever o seu |
+| Bounds checking | todo limite de tamanho e de índice é verificado |
+| Erro não é mensagem de ajuda ao atacante | stack trace não vai para o usuário |
+
+Regra de ouro: se você está escrevendo criptografia, autenticação ou sessão do zero, pare — já existe implementação revisada.
+
+#### Técnicas
+
+| Técnica | Quem | O que faz |
+|---|---|---|
+| Inspeção formal de código | Fagan, 1976 | revisão estruturada com papéis e checklist; é a raiz do code review moderno |
+| Secure code review | OWASP Code Review Guide | revisão focada nos controles de segurança, manual ou apoiada por SAST |
+| SAST | ver ponto 7 | analisa o código-fonte sem executar, no commit |
+
+Apoio, não técnica: OWASP Top 10 e CWE são catálogos de padrão de falha. Detalhamento das vulnerabilidades web: ponto 4. Codificação segura e erros de memória: ponto 5. AuthN, AuthZ e sessão: ponto 6.
+
+#### Saída
+
+Código revisado, com teste que prova o requisito e sem achado crítico em aberto.
+
+### Fase 4 — Testes
+
+Ordem: objetivo → princípios → técnicas → saída.
+
+```mermaid
+flowchart LR
+    O["Objetivo<br/>falha encontrada<br/>com evidência"] --> P["Princípios<br/>testar o sistema<br/>inteiro"]
+    P --> T["Técnicas<br/>SAST, DAST, SCA<br/>pentest, fuzzing"]
+    T --> S["Saída<br/>achado com<br/>severidade e prova"]
+```
+
+#### Objetivo
+
+Encontrar falhas antes de produção, com evidência que permita corrigir.
+
+A fase não testa só o código. Janca cobre sete alvos, e esquecer um deixa buraco:
+
+| Alvo | O que se verifica |
+|---|---|
+| Código | padrão de falha conhecido no fonte |
+| Aplicação | comportamento da aplicação rodando |
+| Infraestrutura | sistema operacional, serviço exposto, configuração |
+| Banco de dados | permissão, conta de serviço, dado em repouso |
+| APIs | autenticação, autorização e exposição de dado por endpoint |
+| Integrações | o que entra e sai de sistemas de terceiros |
+| Rede | segmentação, porta aberta, tráfego em claro |
+
+#### Princípios
+
+| Princípio | Regra |
+|---|---|
+| Evidência | achado sem prova de reprodução não é achado |
+| Severidade antes da correção | o bug bar da fase 1 decide o que bloqueia a release |
+| Cobertura do sistema, não do código | testar os sete alvos, não só o fonte |
+
+#### Técnicas
+
+| Técnica | O que faz |
+|---|---|
+| SAST | analisa o código-fonte sem executar |
 | DAST | testa a aplicação rodando, como atacante |
 | SCA | verifica dependências de terceiros |
-| Pentest | simula ataque real |
+| Fuzzing | envia entrada malformada e observa se quebra |
+| Secret scanning | procura credencial vazada no repositório |
+| Pentest | simula ataque real, geralmente por time externo |
 
-**Técnicas:** SAST, DAST, SCA e pentest são as técnicas de verificação — cada uma com método e ferramenta próprios. Detalhamento no ponto 7.
+Detalhamento das técnicas e ferramentas: ponto 7. Dependências e SCA: ponto 8.
 
-### Fase 5 — Operação
+#### Saída
 
-**Objetivo:** detectar e responder a falhas em produção sem derrubar o serviço.
+Achado com severidade, prova de reprodução e decisão: corrige agora, aceita o risco ou bloqueia a release.
+
+### Fase 5 — Deploy e manutenção
+
+Ordem: objetivo → princípios → técnicas → saída.
+
+```mermaid
+flowchart LR
+    O["Objetivo<br/>detectar e responder<br/>em produção"] --> P["Princípios<br/>assume breach<br/>monitorar sempre"]
+    P --> T["Técnicas<br/>WAF, RASP<br/>resposta a incidentes"]
+    T --> S["Saída<br/>incidente contido<br/>e lição aplicada"]
+```
+
+#### Objetivo
+
+Colocar em produção sem abrir brecha, e detectar e responder ao que aparecer depois, sem derrubar o serviço.
 
 | Atividade | O que é |
 |---|---|
+| Deploy seguro | release só com verificação aprovada e segredo fora do artefato |
+| WAF | filtra requisição maliciosa antes de chegar na aplicação |
+| RASP | proteção dentro da própria aplicação em execução |
+| Monitoramento e log | registrar o que permite perceber o ataque acontecendo |
+| Alerta | avisar alguém que pode agir, no tempo de agir |
+| Resposta a incidentes | conter, erradicar, recuperar, aprender |
 | Rastreio de CVEs | saber quais afetam o que roda |
-| Resposta a incidentes | conter, erradicar, recuperar |
 | Patch management | corrigir sem downtime |
+| Varredura contínua | o que estava seguro ontem pode não estar hoje |
+| Inventário | não se protege o que não se sabe que existe |
 
-**Técnica:** nenhuma técnica nomeada nesta fase — o monitoramento é prática operacional, não método de elicitação ou análise.
+#### Princípios
 
-### Fase 6 — Descontinuação
+| Princípio | Regra |
+|---|---|
+| Assume breach | operar como se o atacante já estivesse dentro |
+| Log sem segredo | o log registra o evento, nunca a credencial nem o dado sensível |
+| Detecção vale o que vale a resposta | alerta que ninguém lê é alerta que não existe |
+
+Regra de ouro: simulação (fire drill) antes do incidente — plano de resposta que nunca foi ensaiado falha no dia.
+
+#### Técnicas
+
+| Técnica | O que faz |
+|---|---|
+| Resposta a incidentes (NIST SP 800-61) | processo de contenção, erradicação, recuperação e lição aprendida |
+| Gestão de vulnerabilidades | ciclo de identificar, priorizar, corrigir e verificar |
+
+Detalhamento da gestão de vulnerabilidades: ponto 10.
+
+#### Saída
+
+Produção monitorada, incidente contido e a lição virando requisito do próximo ciclo.
+
+### Fase extra — Descontinuação
+
+Não está no ciclo da Janca. Vem do Microsoft SDL e do NIST SSDF, e entra aqui porque o sistema que sai do ar continua guardando dado e credencial.
 
 **Objetivo:** encerrar o sistema sem vazar dados nem deixar credenciais ativas.
 
@@ -187,27 +389,23 @@ Desenho com ameaças mapeadas e mitigações definidas. Sem mitigação, o desen
 
 ---
 
-## 3. Por que segurança cedo custa menos
+## 5. Atividades de segurança por fase (Figura 7-1)
 
-### A regra
+O resumo do livro, em uma tabela. É o mapa de onde cada ferramenta entra.
 
-Uma falha no commit custa horas. A mesma falha em produção custa dias ou semanas.
+| Fase | Atividades de segurança |
+|---|---|
+| Requisitos | requisitos de segurança, security user stories, revisão segura da stack |
+| Design | modelagem de ameaças, design review, princípios de design seguro aplicados |
+| Código | code review, SAST, DAST, SCA, linting, testes unitários de segurança, codificação segura |
+| Testes | pentest, DAST, code review, SAST, SCA, secret scanning |
+| Deploy e manutenção | WAF, RASP, monitoramento, log, alerta, resposta a incidentes |
 
-### Por quê
-
-- No commit, o código é pequeno e o contexto está fresco.
-- Em produção, a falha já afetou dados, clientes ou receita.
-- Corrigir em produção exige investigação, rollback e comunicação com impactados.
-
-### Exemplo
-
-SQL injection corrigida no pull request: reescreve a query, adiciona teste. Fim.
-
-A mesma em produção: incidente, investigação forense, notificação de clientes, patch emergencial fora do horário.
+Repare que SAST, DAST, SCA e code review aparecem em duas fases. Não é redundância: no Código roda rápido e por commit, para dar retorno ao desenvolvedor; nos Testes roda completo e com evidência, para decidir a release.
 
 ---
 
-## 4. O que é DevSecOps
+## 6. O que é DevSecOps
 
 DevSecOps = **Development + Security + Operations**.
 
@@ -229,9 +427,9 @@ Modelo tradicional: o time de segurança recebia o sistema pronto, fazia um pent
 
 ---
 
-## 5. Shift-left e shift-right
+## 7. Shift-left e shift-right
 
-Duas práticas centrais do DevSecOps.
+Duas práticas centrais do DevSecOps. Shift-left é o *Pushing Left* da seção 1 aplicado ao pipeline.
 
 ### Shift-left
 
@@ -247,7 +445,7 @@ Shift-left previne. Shift-right detecta. Um sem o outro deixa buracos: só shift
 
 ---
 
-## 6. Pipeline de CI/CD com segurança
+## 8. Pipeline de CI/CD com segurança
 
 O pipeline é a sequência automatizada de etapas do commit ao deploy. Com segurança embutida, cada etapa ganha uma verificação.
 
@@ -267,7 +465,7 @@ Se uma verificação falhar, o pipeline para. Nada vai para produção com falha
 
 ---
 
-## 7. Ferramentas do DevSecOps
+## 9. Ferramentas do DevSecOps
 
 Cada letra do DevSecOps tem ferramentas correspondentes.
 
@@ -299,13 +497,17 @@ Procura credenciais vazadas no código: senhas, tokens, chaves de API.
 
 Exemplos: GitGuardian, gitleaks, trufflehog.
 
+### WAF e RASP
+
+WAF filtra requisição antes de chegar na aplicação. RASP protege de dentro da aplicação em execução. Nenhum dos dois corrige a falha: compram tempo até o patch.
+
 ---
 
-## 8. SDLC seguro vs DevSecOps
+## 10. SDLC seguro vs DevSecOps
 
 ### SDLC seguro
 
-É o **processo**: as seis fases com segurança embutida. Responde "o que fazer em cada fase".
+É o **processo**: as cinco fases com segurança embutida. Responde "o que fazer em cada fase".
 
 ### DevSecOps
 
@@ -323,16 +525,17 @@ Um não substitui o outro: o DevSecOps é a forma de executar o SDLC seguro em e
 
 ---
 
-## 9. Técnicas para memorizar
+## 11. Técnicas para memorizar
 
 | Fase / Conceito | Objetivo | Princípio | Técnica |
 |---|---|---|---|
 | Requisitos | requisito verificável | verificável, rastreável, negação explícita | abuse case, misuse case, confuse case, attack tree, bug bar |
-| Design | desenho seguro antes do código | least privilege, defense in depth, fail secure, zero trust | DFD, superfície de ataque |
-| Implementação | código sem falha conhecida | — | — (SAST no commit cobre) |
-| Verificação | falha encontrada com evidência | — | SAST, DAST, SCA, pentest |
-| Operação | falha detectada e respondida | — | — (monitoramento operacional) |
+| Design | desenho seguro antes do código | least privilege, defense in depth, fail secure, zero trust | modelagem de ameaças, DFD, superfície de ataque |
+| Código | código sem falha conhecida | never trust input, nada hard coded, bounds checking | inspeção de Fagan, secure code review, SAST, linting |
+| Testes | falha encontrada com evidência | evidência, severidade, cobertura dos sete alvos | SAST, DAST, SCA, fuzzing, secret scanning, pentest |
+| Deploy e manutenção | falha detectada e respondida | assume breach, log sem segredo | resposta a incidentes, gestão de vulnerabilidades |
 | Descontinuação | encerramento sem vazamento | — | — (checklist) |
+| Pushing Left | corrigir onde é barato | falha ≠ bug | — |
 | DevSecOps | segurança no pipeline | responsabilidade compartilhada | Dev + Sec + Ops integrados |
 | Shift-left | segurança no início do ciclo | — | — |
 | Shift-right | monitoramento em produção | — | — |
@@ -341,12 +544,17 @@ Um não substitui o outro: o DevSecOps é a forma de executar o SDLC seguro em e
 
 ## Referências
 
+- **Janca, Tanya. *Alice and Bob Learn Application Security*. Wiley, 2020** — referência principal. Figura I-1 (o SDLC e suas cinco fases), Figura 7-1 (atividades de segurança por fase), cap. 1 (fundamentos), cap. 2 (requisitos), cap. 3 (design seguro), cap. 4 (código seguro), cap. 5 (armadilhas comuns), cap. 6 (testes e deploy), cap. 7 (programa de AppSec), cap. 9 (bons hábitos)
 - Microsoft SDL — learn.microsoft.com (procure "Security Development Lifecycle")
 - NIST SSDF — nist.gov/publications/sp-800-218
+- NIST SP 800-61 — resposta a incidentes
 - OWASP SAMM — owaspsamm.org
 - OWASP ASVS — catálogo de requisitos verificáveis
+- OWASP Code Review Guide — secure code review
 - Misuse cases — Sindre e Opdahl, Requirements Engineering, 2005
 - Abuse cases — McDermott e Fox, 1999
 - SQUARE — Mead, SEI
 - DFD — DeMarco, 1979
 - Superfície de ataque — Manadhata e Wing, 2004
+- Modelagem de ameaças — Shostack, 2014
+- Inspeção de código — Fagan, 1976
