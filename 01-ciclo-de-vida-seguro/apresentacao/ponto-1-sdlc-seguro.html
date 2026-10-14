@@ -88,6 +88,26 @@
   .out { margin-top: 22px; font-size: 22px; padding: 14px 20px; border: 2px dashed var(--line); border-radius: 12px; }
   .out b { color: var(--m); }
 
+  /* figura holística */
+  .holo { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+  .brk { text-align: center; font-size: 15px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; padding: 8px 0; border-radius: 10px; }
+  .brk.end { background: var(--m); color: #fff; }
+  .brk.mid { background: #e4dfd3; color: var(--muted); }
+  .hc { background: var(--card); border: 2px solid var(--line); border-radius: 12px; padding: 14px 12px; display: flex; flex-direction: column; gap: 10px; }
+  .hc.end { border-color: var(--m); box-shadow: 0 0 0 2px var(--m) inset; }
+  .hc.mid { opacity: .62; }
+  .hc h4 { font-size: 19px; line-height: 1.15; min-height: 44px; }
+  .hc .tg { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; font-weight: 800; color: var(--t); }
+  .hc .mg { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; font-weight: 800; color: var(--m); margin-top: auto; }
+  .hc ul { list-style: none; display: grid; gap: 6px; }
+  .hc li { font-size: 15px; line-height: 1.25; }
+  .hc li small { display: block; font-size: 12px; color: var(--muted); }
+  .hc .mech { font-size: 14px; line-height: 1.3; }
+  .legend { margin-top: 16px; font-size: 20px; color: var(--muted); text-align: center; }
+  .badge { display: inline-block; background: var(--m); color: #fff; border-radius: 6px; padding: 2px 10px; margin-left: 10px; font-size: 14px; letter-spacing: .1em; vertical-align: middle; }
+  .todo { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .todo .col li { font-size: 21px; }
+
   table { border-collapse: collapse; width: 100%; font-size: 23px; }
   th, td { text-align: left; padding: 13px 16px; border-bottom: 2px solid var(--line); }
   th { font-size: 15px; letter-spacing: .12em; text-transform: uppercase; }
@@ -124,6 +144,36 @@
     <div class="layer m"><b>Mecanismo</b><span class="q">O que executa a regra?</span><span class="src">Playbook de SDLC com IA, 2026</span></div>
   </div>
   <p class="sub">A IA não muda a regra. Ela muda quem executa e em que velocidade.</p>
+</section>
+
+<section class="slide" style="padding:48px 64px">
+  <div class="kicker">A figura do ponto 1</div>
+  <h2 style="margin-bottom:20px">Cada fase, suas técnicas</h2>
+  <div class="holo">
+    <div class="brk end" style="grid-column:1/3">Ponta · definir</div>
+    <div class="brk mid" style="grid-column:3/5">Meio · o agente acelera</div>
+    <div class="brk end" style="grid-column:5/7">Ponta · verificar</div>
+    <div class="hc end"><h4>Requisitos</h4><div class="tg">Técnicas</div><ul><li>Abuse case<small>McDermott e Fox, 1999</small></li><li>Misuse case<small>Sindre e Opdahl, 2000</small></li><li>Attack tree<small>Schneier, 1999</small></li><li>Bug bar<small>Microsoft SDL</small></li></ul><div class="mg">Mecanismo IA</div><div class="mech"><code>intent.md</code> com requisito negativo</div></div>
+    <div class="hc end"><h4>Design</h4><div class="tg">Técnicas</div><ul><li>Modelagem de ameaças<small>Shostack, 2014</small></li><li>DFD<small>DeMarco, 1979</small></li><li>Superfície de ataque<small>Manadhata e Wing, 2004</small></li></ul><div class="mg">Mecanismo IA</div><div class="mech"><code>spec.md</code> sob skill de segurança</div></div>
+    <div class="hc mid"><h4>Código</h4><div class="tg">Técnicas</div><ul><li>Inspeção formal<small>Fagan, 1976</small></li><li>SAST no commit</li><li>Linting</li></ul><div class="mg">Mecanismo IA</div><div class="mech">Modo plano + hooks</div></div>
+    <div class="hc mid"><h4>Testes</h4><div class="tg">Técnicas</div><ul><li>Fuzzing<small>Miller et al., 1990</small></li><li>DAST · SCA</li><li>Pentest</li></ul><div class="mg">Mecanismo IA</div><div class="mech">Teste que falha primeiro, evals no CI</div></div>
+    <div class="hc end"><h4>Revisão e deploy</h4><div class="tg">Técnicas</div><ul><li>Secure code review<small>OWASP</small></li><li>Bug bar como portão<small>Microsoft SDL</small></li><li>Separação de funções</li></ul><div class="mg">Mecanismo IA</div><div class="mech">Review agêntico; humano aprova</div></div>
+    <div class="hc end"><h4>Observabilidade</h4><div class="tg">Técnicas</div><ul><li>Resposta a incidentes<small>NIST SP 800-61</small></li><li>Gestão de vulnerabilidades</li><li>Fire drill<small>Janca, cap. 9</small></li></ul><div class="mg">Mecanismo IA</div><div class="mech">1σ · 2σ · 3σ → <code>intent.md</code></div></div>
+  </div>
+  <p class="legend">O código ficou barato. <b class="cm">O trabalho de segurança migrou para as pontas.</b></p>
+</section>
+
+<section class="slide">
+  <div class="kicker">Por que as pontas</div>
+  <h2>O agente executa o meio.<br>Ninguém executa as pontas por você.</h2>
+  <div class="split" style="margin-top:0">
+    <div class="col m"><div class="lab">Início · definir</div><ul>
+      <li>O agente não inventa o requisito que ninguém escreveu</li>
+      <li>Falha de design sai em escala, na velocidade do agente</li></ul></div>
+    <div class="col m"><div class="lab">Fim · verificar</div><ul>
+      <li>O volume de código a revisar cresce</li>
+      <li>Produção é onde a premissa errada aparece</li></ul></div>
+  </div>
 </section>
 
 <section class="slide">
@@ -222,7 +272,7 @@
 
 <!-- 8 -->
 <section class="slide">
-  <div class="kicker">Fase 1 · Requisitos ↔ Plan</div>
+  <div class="kicker">Fase 1 · Requisitos ↔ Plan<span class="badge">ponta</span></div>
   <h2>O que o sistema deve garantir</h2>
   <div class="tri">
     <div class="col p"><div class="lab">Princípios</div><ul>
@@ -240,7 +290,7 @@
 
 <!-- 9 -->
 <section class="slide">
-  <div class="kicker">Fase 2 · Design</div>
+  <div class="kicker">Fase 2 · Design<span class="badge">ponta</span></div>
   <h2>Desenho seguro antes do código</h2>
   <div class="tri">
     <div class="col p"><div class="lab">Princípios</div><ul>
@@ -318,7 +368,7 @@
 
 <!-- 12 -->
 <section class="slide">
-  <div class="kicker">Fase 5 · Deploy e manutenção ↔ Deploy + Maintain</div>
+  <div class="kicker">Fase 5 · Deploy e manutenção ↔ Deploy + Maintain<span class="badge">ponta</span></div>
   <h2>Detectar e responder em produção</h2>
   <div class="tri">
     <div class="col p"><div class="lab">Princípios</div><ul>
@@ -385,6 +435,21 @@
 </section>
 
 <!-- 16 -->
+<section class="slide">
+  <div class="kicker">O que precisa ser trabalhado</div>
+  <h2>Quatro frentes, todas nas pontas</h2>
+  <div class="todo">
+    <div class="col m"><div class="lab">1 · Requisitos</div><ul>
+      <li>Requisito negativo e critério de aceite em todo <code>intent.md</code></li><li>Bug bar escrita antes do primeiro requisito</li></ul></div>
+    <div class="col m"><div class="lab">2 · Definição de segurança</div><ul>
+      <li>Modelo de ameaças dentro da <code>spec.md</code></li><li>Política de segurança como skill, com dono</li></ul></div>
+    <div class="col m"><div class="lab">3 · Revisão</div><ul>
+      <li><code>REVIEW.md</code> com critério de segurança explícito</li><li>Humano revisa o que o agente sinaliza</li></ul></div>
+    <div class="col m"><div class="lab">4 · Observabilidade</div><ul>
+      <li>Log sem segredo, alerta com dono</li><li>Fire drill antes do incidente</li></ul></div>
+  </div>
+</section>
+
 <section class="slide">
   <blockquote>O loop continua rodando.<br><span class="cm">O julgamento humano fica acima dele.</span></blockquote>
   <div class="refs">
