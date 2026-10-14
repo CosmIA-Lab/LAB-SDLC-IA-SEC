@@ -118,6 +118,14 @@
   .map td:first-child { font-weight: 700; width: 34%; }
   .refs { columns: 2; column-gap: 48px; font-size: 19px; color: var(--muted); line-height: 1.55; margin-top: 40px; }
 
+  .fonte { position: absolute; left: 88px; right: 110px; bottom: 22px; font-size: 13px; line-height: 1.4; color: var(--muted); border-top: 1px solid var(--line); padding-top: 8px; }
+  .chip { flex-direction: column; align-items: flex-start; justify-content: center; gap: 4px; }
+  .chip small, .hc .mech small { display: block; font-size: 13px; font-weight: 500; color: var(--muted); }
+  .chain { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+  .chain .a { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 24px; background: var(--card); border: 2px solid var(--line); border-radius: 10px; padding: 14px 18px; }
+  .chain .arr { font-size: 26px; color: var(--muted); }
+  .map td { vertical-align: top; }
+
   @media print {
     @page { size: 1280px 720px; margin: 0; }
     body { background: none; }
@@ -127,40 +135,41 @@
 </head>
 <body>
 
-<!-- 1 -->
 <section class="slide">
   <div class="kicker">Ponto 1 · Visão holística</div>
   <h1>SDLC seguro<br>quando a IA escreve o código</h1>
-  <p class="sub">Os princípios da Janca, as técnicas da literatura<br>e os mecanismos do loop com IA, no mesmo ciclo.</p>
+  <p class="sub">Os princípios da Janca, as técnicas da literatura<br>e os mecanismos do playbook de SDLC com IA, no mesmo ciclo.</p>
+  <p class="fonte">Fontes principais: Janca (2020), <i>Alice and Bob Learn Application Security</i> · Claxton (2026), <i>The AI-native SDLC playbook</i>. Páginas da Janca: paginação do índice remissivo da edição Kindle.</p>
 </section>
 
-<!-- 2 -->
 <section class="slide">
   <div class="kicker">O molde</div>
   <h2>Três camadas, da regra à execução</h2>
   <div class="layers">
     <div class="layer p"><b>Princípio</b><span class="q">Que regra não quebra?</span><span class="src">Janca, 2020</span></div>
     <div class="layer t"><b>Técnica</b><span class="q">Qual método nomeado acha o problema?</span><span class="src">Literatura (quem, ano)</span></div>
-    <div class="layer m"><b>Mecanismo</b><span class="q">O que executa a regra?</span><span class="src">Playbook de SDLC com IA, 2026</span></div>
+    <div class="layer m"><b>Mecanismo</b><span class="q">O que executa a regra?</span><span class="src">Claxton, 2026</span></div>
   </div>
-  <p class="sub">A IA não muda a regra. Ela muda quem executa e em que velocidade.</p>
+  <p class="sub">A IA entra em cada fase. O humano continua responsável pelas decisões de julgamento.</p>
+  <p class="fonte">Camadas: README deste repositório, "Hierarquia de estudo" · Frase: Claxton, "What is an AI-native SDLC?"</p>
 </section>
 
-<section class="slide" style="padding:48px 64px">
+<section class="slide" style="padding:44px 64px">
   <div class="kicker">A figura do ponto 1</div>
-  <h2 style="margin-bottom:20px">Cada fase, suas técnicas</h2>
+  <h2 style="margin-bottom:18px">Cada fase, suas técnicas</h2>
   <div class="holo">
     <div class="brk end" style="grid-column:1/3">Ponta · humano define</div>
     <div class="brk mid" style="grid-column:3/5">Meio · guardrail automático</div>
     <div class="brk end" style="grid-column:5/7">Ponta · humano aprova</div>
-    <div class="hc end"><h4>Requisitos</h4><div class="tg">Técnicas</div><ul><li>Abuse case<small>McDermott e Fox, 1999</small></li><li>Misuse case<small>Sindre e Opdahl, 2000</small></li><li>Attack tree<small>Schneier, 1999</small></li><li>Bug bar<small>Microsoft SDL</small></li></ul><div class="mg">Mecanismo IA</div><div class="mech"><code>intent.md</code> com requisito negativo</div></div>
-    <div class="hc end"><h4>Design</h4><div class="tg">Técnicas</div><ul><li>Modelagem de ameaças<small>Shostack, 2014</small></li><li>DFD<small>DeMarco, 1979</small></li><li>Superfície de ataque<small>Manadhata e Wing, 2004</small></li></ul><div class="mg">Mecanismo IA</div><div class="mech"><code>spec.md</code> sob skill de segurança</div></div>
-    <div class="hc mid"><h4>Código</h4><div class="tg">Técnicas</div><ul><li>Inspeção formal<small>Fagan, 1976</small></li><li>SAST no commit</li><li>Linting</li></ul><div class="mg">Mecanismo IA</div><div class="mech">Modo plano + hooks</div></div>
-    <div class="hc mid"><h4>Testes</h4><div class="tg">Técnicas</div><ul><li>Fuzzing<small>Miller et al., 1990</small></li><li>DAST · SCA</li><li>Pentest</li></ul><div class="mg">Mecanismo IA</div><div class="mech">Teste que falha primeiro, evals no CI</div></div>
-    <div class="hc end"><h4>Revisão e deploy</h4><div class="tg">Técnicas</div><ul><li>Secure code review<small>OWASP</small></li><li>Bug bar como portão<small>Microsoft SDL</small></li><li>Separação de funções</li></ul><div class="mg">Mecanismo IA</div><div class="mech">Review agêntico; humano aprova</div></div>
-    <div class="hc end"><h4>Observabilidade</h4><div class="tg">Técnicas</div><ul><li>Resposta a incidentes<small>NIST SP 800-61</small></li><li>Gestão de vulnerabilidades</li><li>Fire drill<small>Janca, cap. 9</small></li></ul><div class="mg">Mecanismo IA</div><div class="mech">1σ · 2σ · 3σ → <code>intent.md</code></div></div>
+    <div class="hc end"><h4>Requisitos</h4><div class="tg">Técnicas</div><ul><li>Abuse case<small>McDermott e Fox, 1999</small></li><li>Misuse case<small>Sindre e Opdahl, 2000</small></li><li>Attack tree<small>Schneier, 1999</small></li><li>Checklist de requisitos<small>Janca p. 61–63</small></li></ul><div class="mg">Mecanismo IA</div><div class="mech"><code>intent.md</code> revisado pelo product owner<small class="mref">01 Plan</small></div></div>
+    <div class="hc end"><h4>Design</h4><div class="tg">Técnicas</div><ul><li>Modelagem de ameaças<small>Shostack, 2014 · Janca p. 78–82</small></li><li>DFD<small>DeMarco, 1979</small></li><li>Superfície de ataque<small>Manadhata e Wing, 2004</small></li></ul><div class="mg">Mecanismo IA</div><div class="mech"><code>spec.md</code> sob skill de segurança<small class="mref">02 Design</small></div></div>
+    <div class="hc mid"><h4>Código</h4><div class="tg">Técnicas</div><ul><li>Inspeção formal<small>Fagan, 1976</small></li><li>Code review<small>Janca p. 122–123</small></li><li>SAST<small>Janca p. 123–125</small></li></ul><div class="mg">Mecanismo IA</div><div class="mech">Modo plano + hooks<small class="mref">03 Build</small></div></div>
+    <div class="hc mid"><h4>Testes</h4><div class="tg">Técnicas</div><ul><li>Fuzzing<small>Miller et al., 1990 · Janca p. 133</small></li><li>DAST · SCA<small>Janca p. 133–134, 125–126</small></li><li>Pentest<small>Janca p. 135–136</small></li></ul><div class="mg">Mecanismo IA</div><div class="mech">Teste que falha primeiro; evals no CI<small class="mref">04 Test</small></div></div>
+    <div class="hc end"><h4>Revisão e deploy</h4><div class="tg">Técnicas</div><ul><li>Secure code review<small>OWASP · Janca p. 122–123</small></li><li>Separação de funções<small>Claxton, 05 Deploy</small></li></ul><div class="mg">Mecanismo IA</div><div class="mech">Review contra <code>REVIEW.md</code>; code owner aprova<small class="mref">05 Deploy</small></div></div>
+    <div class="hc end"><h4>Observabilidade</h4><div class="tg">Técnicas</div><ul><li>Resposta a incidentes<small>NIST SP 800-61 · Janca p. 200–201</small></li><li>Fire drill<small>Janca p. 201–202</small></li><li>Varredura contínua<small>Janca p. 202</small></li></ul><div class="mg">Mecanismo IA</div><div class="mech">1σ · 2σ · 3σ → <code>intent.md</code><small class="mref">06 Maintain</small></div></div>
   </div>
-  <p class="legend">O agente está em todas as fases. <b class="cm">O julgamento humano se concentra nas pontas.</b></p>
+  <p class="legend">O agente está em todas as fases. <b class="cm">A atenção humana se concentra nas pontas.</b></p>
+  <p class="fonte">Pontas: Claxton, "Code is no longer the bottleneck" (o gargalo vai para antes e depois do build) e "Plays" (a atenção humana se concentra nos portões) · Mecanismos: Claxton, seção indicada em cada coluna.</p>
 </section>
 
 <section class="slide">
@@ -168,296 +177,289 @@
   <h2>O agente está em todas as fases.<br>A decisão humana fica nas pontas.</h2>
   <div class="tri">
     <div class="col m"><div class="lab">Início</div><ul>
-      <li><b>Agente:</b> rascunha <code>intent.md</code> e <code>spec.md</code>, sinaliza conflito de política</li>
-      <li><b>Humano:</b> aprova a intenção e decide o conflito</li></ul></div>
+      <li><b>Agente:</b> escreve <code>intent.md</code> e <code>spec.md</code>, sinaliza conflito de política</li>
+      <li><b>Humano:</b> o product owner revisa; o dono da política decide</li></ul></div>
     <div class="col p"><div class="lab">Meio</div><ul>
-      <li><b>Agente:</b> implementa e testa</li>
-      <li><b>Sistema:</b> plano aprovado, hook e eval seguram sozinhos</li></ul></div>
+      <li><b>Agente:</b> implementa a partir do <code>plan.md</code> aprovado</li>
+      <li><b>Sistema:</b> hooks e evals seguram</li></ul></div>
     <div class="col m"><div class="lab">Fim</div><ul>
       <li><b>Agente:</b> revisa o PR, diagnostica o alerta</li>
-      <li><b>Humano:</b> aprova o merge e passa o portão de produção</li></ul></div>
+      <li><b>Humano:</b> code owner aprova; uma pessoa nomeada libera produção</li></ul></div>
   </div>
+  <p class="fonte">Claxton: "01 Plan" (product owner revisa o intent) · "02 Design" (conflito vai ao dono) · "03 Build" (plan.md, hooks) · "04 Test" (evals) · "05 Deploy" (code owner, portão de produção) · "06 Maintain" (2σ diagnostica).</p>
 </section>
 
 <section class="slide">
-  <div class="kicker">O livro inteiro, num quadro</div>
-  <h2>Onze capítulos, cinco fases</h2>
+  <div class="kicker">O livro, num quadro</div>
+  <h2>Onze capítulos, duas partes</h2>
   <table class="map">
-    <tr><th>Fase</th><th>Capítulos</th></tr>
-    <tr><td>Base</td><td>1 Fundamentos · 10 Aprendizado contínuo</td></tr>
-    <tr><td>Requisitos · Design</td><td>2 Requisitos · 3 Design seguro</td></tr>
-    <tr><td>Código</td><td>4 Código seguro · 5 Armadilhas comuns</td></tr>
-    <tr><td>Testes · Deploy</td><td>6 Testes e deploy · 8 Sistemas modernos</td></tr>
-    <tr><td>Manutenção · Programa</td><td>7 Programa de AppSec · 9 Bons hábitos</td></tr>
+    <tr><th>Parte</th><th>Capítulos</th></tr>
+    <tr><td>I · O que saber para escrever código seguro o bastante para a internet</td><td>1 Fundamentos · 2 Requisitos · 3 Design · 4 Código · 5 Armadilhas comuns</td></tr>
+    <tr><td>II · O que fazer para criar código muito bom</td><td>6 Testes e deploy · 7 Programa de AppSec · 8 Sistemas modernos · 9 Bons hábitos · 10 Aprendizado contínuo · 11 Considerações finais</td></tr>
   </table>
-  <p class="sub">Parte I: o que saber para escrever código seguro. Parte II: o que fazer para ele continuar seguro.</p>
+  <p class="sub">Fases do SDLC no livro: Requisitos, Design, Código, Testes e Release.</p>
+  <p class="fonte">Janca: sumário (títulos das partes e capítulos) · fases do SDLC, p. 21.</p>
 </section>
 
-<!-- 3 -->
 <section class="slide">
   <div class="kicker">Pushing Left</div>
-  <h2>Quanto mais tarde, mais caro</h2>
+  <h2>Falha descoberta tarde custa mais</h2>
   <div class="cost">
-    <div class="bar" style="height:8%"><span>$</span></div>
-    <div class="bar" style="height:16%"><span>$$</span></div>
-    <div class="bar" style="height:32%"><span>$$$</span></div>
-    <div class="bar" style="height:58%"><span>$$$$</span></div>
-    <div class="bar" style="height:100%"><span>incidente</span></div>
+    <div class="bar" style="height:8%"></div>
+    <div class="bar" style="height:16%"></div>
+    <div class="bar" style="height:32%"></div>
+    <div class="bar" style="height:58%"></div>
+    <div class="bar" style="height:100%"></div>
   </div>
   <div class="cost-l"><div>Requisitos</div><div>Design</div><div>Código</div><div>Testes</div><div>Produção</div></div>
   <div class="split">
-    <div class="pill"><b>Bug</b> nasce no código → <b>patch</b></div>
-    <div class="pill"><b>Falha</b> nasce no desenho → <b class="cm">reprojeto</b></div>
+    <div class="pill"><b>Bug</b> nasce no código</div>
+    <div class="pill"><b>Falha de design</b> nasce no desenho</div>
   </div>
+  <p class="fonte">Janca: Introdução, "Pushing Left" · falha × bug, p. 66–68 · custo e descoberta tardia da falha, p. 67 · pushing left e falhas de design, p. 68. Barras ilustrativas, sem valores do livro.</p>
 </section>
 
-<!-- 4 -->
 <section class="slide">
   <div class="kicker">O que a IA muda</div>
-  <h2>Código ficou barato.<br>Desenho errado, não.</h2>
+  <h2>Código deixou de ser o gargalo</h2>
   <div class="split" style="margin-top:0">
-    <div class="pill">O gargalo migra para <b>planejar, revisar e implantar</b></div>
-    <div class="pill">A falha de design sai <b class="cm">mais rápido</b> e em mais lugares</div>
-    <div class="pill">Controle feito para código humano <b>deixa de bater</b></div>
-    <div class="pill">Pushing Left fica <b class="cm">mais urgente</b>, não menos</div>
+    <div class="pill">O gargalo vai para <b>antes e depois do build</b></div>
+    <div class="pill">Controles feitos para código humano <b>deixam de bater</b></div>
+    <div class="pill">Exceção esperando comitê <b>encarece a governança</b></div>
+    <div class="pill">Falha de design descoberta tarde <b class="cm">continua cara</b></div>
   </div>
+  <p class="fonte">Claxton, "Code is no longer the bottleneck" (três primeiros) · Janca p. 67 (quarto).</p>
 </section>
 
-<!-- 5 -->
 <section class="slide">
-  <div class="kicker cp">Fundamentos · valem em todas as fases</div>
-  <h2>Doze fundamentos do capítulo 1</h2>
+  <div class="kicker cp">Capítulo 1 · Security Fundamentals</div>
+  <h2>Doze fundamentos</h2>
   <div class="chips">
-    <div class="chip">CIA</div>
-    <div class="chip">Assume breach</div>
-    <div class="chip">Ameaça interna</div>
-    <div class="chip">Defense in depth</div>
-    <div class="chip">Least privilege</div>
-    <div class="chip">Cadeia de suprimentos</div>
-    <div class="chip">Sem obscuridade</div>
-    <div class="chip">Menos superfície de ataque</div>
-    <div class="chip">Sem hard coding</div>
-    <div class="chip">Never trust, always verify</div>
-    <div class="chip">Segurança usável</div>
-    <div class="chip">Fatores de autenticação</div>
+    <div class="chip">CIA<small>p. 3–6</small></div>
+    <div class="chip">Assume breach<small>p. 7–8</small></div>
+    <div class="chip">Ameaça interna<small>p. 8–9</small></div>
+    <div class="chip">Defense in depth<small>p. 9–10</small></div>
+    <div class="chip">Least privilege<small>p. 11</small></div>
+    <div class="chip">Cadeia de suprimentos<small>p. 11–13</small></div>
+    <div class="chip">Sem obscuridade<small>p. 13–14</small></div>
+    <div class="chip">Menos superfície de ataque<small>p. 14–15</small></div>
+    <div class="chip">Sem hard coding<small>p. 15</small></div>
+    <div class="chip">Never trust, always verify<small>p. 15–17</small></div>
+    <div class="chip">Segurança usável<small>p. 17–18</small></div>
+    <div class="chip">Fatores de autenticação<small>p. 18–19</small></div>
   </div>
+  <p class="fonte">Janca, cap. 1: seções do sumário, páginas do índice remissivo.</p>
 </section>
 
-<!-- 6 -->
 <section class="slide">
   <div class="kicker">O ciclo</div>
-  <h2>Cinco fases, um loop, um artefato por fase</h2>
+  <h2>Cada fase deixa um artefato</h2>
   <div class="cycle">
     <div class="ph"><div class="j">Requisitos</div><div class="a">PLAN</div><div class="f">intent.md</div></div>
     <div class="ph"><div class="j">Design</div><div class="a">DESIGN</div><div class="f">spec.md</div></div>
     <div class="ph"><div class="j">Código</div><div class="a">BUILD</div><div class="f">plan.md + diff</div></div>
     <div class="ph"><div class="j">Testes</div><div class="a">TEST</div><div class="f">teste + eval</div></div>
-    <div class="ph"><div class="j">Deploy e manutenção</div><div class="a">DEPLOY + MAINTAIN</div><div class="f">PR · incidente</div></div>
+    <div class="ph"><div class="j">Release</div><div class="a">DEPLOY + MAINTAIN</div><div class="f">PR · incidente</div></div>
   </div>
-  <p class="back">↺ o incidente vira uma nova intenção, e o ciclo recomeça</p>
-  <p class="sub" style="text-align:center">Fase: Janca · <span class="cm">Estágio e artefato: playbook</span></p>
+  <p class="back">↺ o diagnóstico em produção volta como <code>intent.md</code></p>
+  <p class="fonte">Fases: Janca p. 21 · Estágios e artefatos: Claxton, "The shifts across the six stages" · Volta do loop: Claxton, "06 Maintain · Closing the loop".</p>
 </section>
 
-<!-- 7 -->
 <section class="slide">
   <div class="kicker">Rastreabilidade</div>
-  <h2>A mesma corrente, agora versionada</h2>
-  <div class="chain2">
-    <div class="lab cp">Raciocínio</div>
-    <div class="n">Ativo</div><div class="n">Classificação</div><div class="n">Requisito</div><div class="n">Controle</div><div class="n">Teste</div>
-    <div></div>
-    <div class="vline">↓</div><div class="vline">↓</div><div class="vline">↓</div><div class="vline">↓</div><div class="vline">↓</div>
-    <div class="lab cm">Artefato</div>
-    <div class="n mono">intent.md</div><div class="n mono">intent.md</div><div class="n mono">spec.md</div><div class="n mono">plan.md + diff</div><div class="n mono">teste + PR</div>
+  <h2>Cada estágio commita o que o próximo lê</h2>
+  <div class="chain">
+    <span class="a">intent.md</span><span class="arr">→</span>
+    <span class="a">spec.md</span><span class="arr">→</span>
+    <span class="a">plan.md</span><span class="arr">→</span>
+    <span class="a">diff + testes</span><span class="arr">→</span>
+    <span class="a">PR revisado</span><span class="arr">→</span>
+    <span class="a">incidente</span>
   </div>
-  <p class="sub">Cada estágio commita o que o próximo lê. O histórico vira <b class="cm">trilha de auditoria</b>.</p>
+  <p class="sub">A cadeia de commits é a <b class="cm">trilha de auditoria</b>.</p>
+  <p class="fonte">Claxton, "What is an AI-native SDLC?".</p>
 </section>
 
-<!-- 8 -->
 <section class="slide">
   <div class="kicker">Fase 1 · Requisitos ↔ Plan<span class="badge">ponta</span></div>
   <h2>O que o sistema deve garantir</h2>
   <div class="tri">
-    <div class="col p"><div class="lab">Princípios</div><ul>
-      <li>Verificabilidade</li><li>Rastreabilidade</li><li>Negação explícita</li></ul></div>
+    <div class="col p"><div class="lab">Na Janca</div><ul>
+      <li>Requisito de segurança no projeto<small>p. 22–23</small></li>
+      <li>Checklist de requisitos<small>p. 61–63</small></li>
+      <li>Security user stories<small>p. 178</small></li></ul></div>
     <div class="col t"><div class="lab">Técnicas</div><ul>
       <li>Abuse case<small>McDermott e Fox, 1999</small></li>
       <li>Misuse case<small>Sindre e Opdahl, 2000</small></li>
       <li>Attack tree<small>Schneier, 1999</small></li></ul></div>
-    <div class="col m"><div class="lab">Mecanismo com IA</div><ul>
-      <li>Intenção conversada com o agente</li>
-      <li>Template de <code>intent.md</code> pede requisito negativo e critério de aceite</li></ul></div>
+    <div class="col m"><div class="lab">No playbook</div><ul>
+      <li>Quem tem a ideia conversa com o agente e gera o <code>intent.md</code></li>
+      <li>Product owner revisa antes do commit</li></ul></div>
   </div>
-  <div class="out"><b>Saída:</b> requisito com teste. Sem teste, não entrou no ciclo.</div>
+  <p class="fonte">Janca: páginas indicadas · Técnicas: autores indicados · Playbook: Claxton, "01 Plan · Capture as intent.md".</p>
 </section>
 
-<!-- 9 -->
 <section class="slide">
   <div class="kicker">Fase 2 · Design<span class="badge">ponta</span></div>
   <h2>Desenho seguro antes do código</h2>
   <div class="tri">
-    <div class="col p"><div class="lab">Princípios</div><ul>
-      <li>Least privilege</li><li>Defense in depth</li><li>Fail secure</li><li>Zero trust</li></ul></div>
+    <div class="col p"><div class="lab">Na Janca</div><ul>
+      <li>Least privilege<small>p. 11, 60–61</small></li>
+      <li>Zero trust e assume breach no design<small>p. 70–71</small></li>
+      <li>Dado de produção segregado<small>p. 77–78</small></li></ul></div>
     <div class="col t"><div class="lab">Técnicas</div><ul>
-      <li>Modelagem de ameaças<small>Shostack, 2014</small></li>
-      <li>DFD<small>DeMarco, 1979</small></li>
-      <li>Superfície de ataque<small>Manadhata e Wing, 2004</small></li></ul></div>
-    <div class="col m"><div class="lab">Mecanismo com IA</div><ul>
-      <li><code>spec.md</code> gerada sob skill de segurança</li>
-      <li>Conflito com política vai para o dono decidir</li></ul></div>
+      <li>Modelagem de ameaças<small>Shostack, 2014 · Janca p. 78–82</small></li>
+      <li>STRIDE · PASTA<small>Janca p. 79</small></li>
+      <li>DFD<small>DeMarco, 1979</small></li></ul></div>
+    <div class="col m"><div class="lab">No playbook</div><ul>
+      <li><code>spec.md</code> gerada a partir do intent, guiada por skill de segurança</li>
+      <li>Conflito com política vai para o dono</li></ul></div>
   </div>
-  <div class="out"><b>Saída:</b> desenho com ameaças e mitigações. Sem mitigação, não saiu da fase.</div>
+  <p class="fonte">Janca: páginas indicadas · Playbook: Claxton, "02 Design · Requirements and design".</p>
 </section>
 
-<!-- 10 -->
 <section class="slide">
   <div class="kicker">Fase 3 · Código ↔ Build</div>
   <h2>Sem repetir falha conhecida</h2>
   <div class="tri">
-    <div class="col p"><div class="lab">Princípios</div><ul>
-      <li>Never trust input</li><li>Nada hard coded</li><li>Identidade e sessão não se improvisam</li></ul></div>
+    <div class="col p"><div class="lab">Na Janca</div><ul>
+      <li>Dado não confiável<small>p. 87–89</small></li>
+      <li>Validação de entrada<small>p. 58–59</small></li>
+      <li>Identidade e sessão<small>p. 90–92</small></li>
+      <li>Bounds checking<small>p. 93–94</small></li></ul></div>
     <div class="col t"><div class="lab">Técnicas</div><ul>
       <li>Inspeção formal<small>Fagan, 1976</small></li>
-      <li>Secure code review<small>OWASP Code Review Guide</small></li>
-      <li>SAST no commit<small>ver ponto 7</small></li></ul></div>
-    <div class="col m"><div class="lab">Mecanismo com IA</div><ul>
-      <li>Modo plano: lê sem editar → <code>plan.md</code></li>
-      <li>Hook bloqueia segredo no diff e caminho protegido</li></ul></div>
+      <li>Code review<small>Janca p. 122–123</small></li>
+      <li>SAST<small>Janca p. 123–125</small></li></ul></div>
+    <div class="col m"><div class="lab">No playbook</div><ul>
+      <li>Modo plano lê sem editar; plano aprovado vira <code>plan.md</code></li>
+      <li>Hook bloqueia caminho protegido e credencial no diff</li></ul></div>
   </div>
-  <div class="out"><b>Saída:</b> código revisado, com teste que prova o requisito.</div>
+  <p class="fonte">Janca: páginas indicadas · Playbook: Claxton, "03 Build · plan mode" e "Hooks as build-time guardrails".</p>
 </section>
 
 <section class="slide">
   <div class="kicker">Capítulo 4 na prática</div>
-  <h2>Dois casos que valem para tudo</h2>
+  <h2>Dois casos do livro</h2>
   <div class="split" style="margin-top:0">
-    <div class="col t"><div class="lab">Upload de arquivo · assume o pior</div><ul>
-      <li>Valida tipo e tamanho</li><li>Renomeia; o usuário não escolhe o caminho</li>
-      <li>Guarda longe da aplicação e escaneia</li><li>Allowlist: só os tipos menos perigosos</li></ul></div>
-    <div class="col p"><div class="lab">Erro e log · fail-closed</div><ul>
-      <li>Nada de stack trace na tela</li><li>Desfaz a transação e fecha o que abriu</li>
-      <li>Loga para quem responde e para quem audita</li><li>No formato que o SIEM espera</li></ul></div>
+    <div class="col t"><div class="lab">Upload de arquivo · p. 56–57</div><ul>
+      <li>Assume o pior</li><li>Valida tipo e tamanho; renomeia</li>
+      <li>O usuário não escolhe o caminho</li><li>Guarda longe, escaneia, aceita só tipos menos perigosos</li></ul></div>
+    <div class="col p"><div class="lab">Erro e log · p. 57</div><ul>
+      <li>Nada de stack trace na tela</li><li>Fail-closed: desfaz a transação e fecha o que abriu</li>
+      <li>Loga para quem responde e para quem audita</li><li>No formato do SIEM</li></ul></div>
   </div>
-  <p class="sub">O hook do agente segue a mesma regra: <b class="cm">na dúvida, nega</b>.</p>
+  <p class="sub">No playbook, o sandbox também falha fechado: não sobe se não conseguir isolar.</p>
+  <p class="fonte">Janca p. 56–57 · Claxton, "05 Deploy · Worked example: managed settings".</p>
 </section>
 
-<!-- 11 -->
 <section class="slide">
   <div class="kicker">Fase 4 · Testes ↔ Test</div>
-  <h2>Achado com evidência</h2>
+  <h2>Testar o sistema, não só o código</h2>
   <div class="tri">
-    <div class="col p"><div class="lab">Princípios</div><ul>
-      <li>Achado sem prova não é achado</li><li>Bug bar decide a release</li><li>Testar os sete alvos, não só o fonte</li></ul></div>
+    <div class="col p"><div class="lab">Na Janca</div><ul>
+      <li>Testar o código<small>p. 122–128</small></li>
+      <li>Testar a aplicação rodando<small>p. 129–136</small></li>
+      <li>Infra, banco, APIs, integrações, rede<small>p. 141–145</small></li></ul></div>
     <div class="col t"><div class="lab">Técnicas</div><ul>
-      <li>Fuzzing<small>Miller et al., 1990</small></li>
-      <li>SAST · DAST · SCA<small>ver ponto 7</small></li>
-      <li>Pentest</li></ul></div>
-    <div class="col m"><div class="lab">Mecanismo com IA</div><ul>
+      <li>Fuzzing<small>Miller et al., 1990 · Janca p. 133</small></li>
+      <li>DAST · SCA<small>Janca p. 133–134, 125–126</small></li>
+      <li>Pentest<small>Janca p. 135–136</small></li></ul></div>
+    <div class="col m"><div class="lab">No playbook</div><ul>
       <li>Teste que falha primeiro, protegido contra edição</li>
       <li>Todo incidente vira eval permanente no CI</li></ul></div>
   </div>
-  <div class="out"><b>Saída:</b> achado com severidade, prova e decisão.</div>
+  <p class="fonte">Janca: páginas indicadas · Playbook: Claxton, "04 Test · Give Claude a feedback loop" e "Continuous evals in CI".</p>
 </section>
 
 <section class="slide">
   <div class="kicker">Capítulo 6 · o que se testa</div>
   <h2>Sete alvos, não só o código</h2>
   <div class="chips">
-    <div class="chip">Código</div><div class="chip">Aplicação</div><div class="chip">Infraestrutura</div><div class="chip">Banco de dados</div>
-    <div class="chip">APIs e web services</div><div class="chip">Integrações</div><div class="chip">Rede</div><div class="chip" style="border-top-color:var(--m)">+ Deploy</div>
+    <div class="chip">Código<small>p. 122–128</small></div><div class="chip">Aplicação<small>p. 129–136</small></div><div class="chip">Infraestrutura<small>p. 141</small></div><div class="chip">Banco de dados<small>p. 141–142</small></div>
+    <div class="chip">APIs e web services<small>p. 142–143</small></div><div class="chip">Integrações<small>p. 143–144</small></div><div class="chip">Rede<small>p. 144–145</small></div><div class="chip" style="border-top-color:var(--m)">+ Deploy<small>p. 145–146</small></div>
   </div>
-  <p class="sub">O agente prova o próprio trabalho no código. <b class="cm">Os outros seis alvos continuam com o time.</b></p>
+  <p class="sub">No playbook, o agente verifica o próprio trabalho com teste, build ou comparação de tela.</p>
+  <p class="fonte">Janca, cap. 6: páginas indicadas · Claxton, "04 Test · Give Claude a feedback loop".</p>
 </section>
 
-<!-- 12 -->
 <section class="slide">
-  <div class="kicker">Fase 5 · Deploy e manutenção ↔ Deploy + Maintain<span class="badge">ponta</span></div>
+  <div class="kicker">Fase 5 · Release ↔ Deploy + Maintain<span class="badge">ponta</span></div>
   <h2>Detectar e responder em produção</h2>
   <div class="tri">
-    <div class="col p"><div class="lab">Princípios</div><ul>
-      <li>Assume breach</li><li>Log sem segredo</li><li>Alerta sem resposta não existe</li></ul></div>
+    <div class="col p"><div class="lab">Na Janca</div><ul>
+      <li>Assume breach<small>p. 7–8</small></li>
+      <li>Log sem dado sensível<small>p. 57</small></li>
+      <li>Monitoramento<small>p. 101–103</small></li></ul></div>
     <div class="col t"><div class="lab">Técnicas</div><ul>
-      <li>Resposta a incidentes<small>NIST SP 800-61</small></li>
-      <li>Gestão de vulnerabilidades<small>ver ponto 10</small></li></ul></div>
-    <div class="col m"><div class="lab">Mecanismo com IA</div><ul>
-      <li>Agente vai até o portão de produção; uma pessoa nomeada passa</li>
+      <li>Resposta a incidentes<small>NIST SP 800-61 · Janca p. 200–201</small></li>
+      <li>Varredura contínua<small>Janca p. 202</small></li></ul></div>
+    <div class="col m"><div class="lab">No playbook</div><ul>
+      <li>Agente vai até o portão de produção; uma pessoa nomeada libera</li>
       <li>1σ registra · 2σ diagnostica · 3σ propõe PR</li></ul></div>
   </div>
-  <div class="out"><b>Saída:</b> incidente contido e lição virando <code>intent.md</code>.</div>
+  <p class="fonte">Janca: páginas indicadas · Playbook: Claxton, "05 Deploy · CI/CD integration and deployment" e "06 Maintain · Closing the loop".</p>
 </section>
 
 <section class="slide">
   <div class="kicker">Capítulo 9 · bons hábitos</div>
-  <h2>O hábito da Janca e o mecanismo que o executa</h2>
+  <h2>O hábito no livro e o mecanismo no playbook</h2>
   <table>
-    <tr><th class="cp">Hábito (Janca)</th><th class="cm">Mecanismo no loop com IA</th></tr>
-    <tr><td>Fire drill</td><td>Rollback é o caminho mais ensaiado</td></tr>
-    <tr><td>Varredura contínua</td><td>Scans de segurança agendados em todos os repositórios</td></tr>
-    <tr><td>Resposta a incidentes</td><td>Agente no canal do incidente; post-mortem vira <code>intent.md</code></td></tr>
-    <tr><td>Inventário</td><td>Artefatos versionados: o que existe está no repositório</td></tr>
+    <tr><th class="cp">Janca</th><th class="cm">Claxton</th></tr>
+    <tr><td>Fire drill · p. 201–202</td><td>Rollback é o caminho mais ensaiado · 05 Deploy</td></tr>
+    <tr><td>Varredura contínua · p. 202</td><td>Scans agendados em todos os repositórios · 06 Maintain</td></tr>
+    <tr><td>Resposta a incidentes · p. 200–201</td><td>Agente no canal do incidente; post-mortem vai para um arquivo de lições versionado · 06 Maintain</td></tr>
   </table>
+  <p class="fonte">Janca e Claxton nas páginas e seções de cada linha. O pareamento das linhas é deste material.</p>
 </section>
 
-<!-- 13 -->
 <section class="slide">
-  <div class="kicker">O agente também é superfície de ataque</div>
-  <h2>Os princípios da Janca aplicados ao agente</h2>
+  <div class="kicker">Princípios da Janca × managed settings</div>
+  <h2>Os mesmos princípios, aplicados ao agente</h2>
   <table>
-    <tr><th class="cp">Princípio</th><th class="cm">Guardrail no agente</th></tr>
-    <tr><td>Least privilege</td><td>Permissão mínima, token de CI curto e escopado</td></tr>
-    <tr><td>Sem segredo em código</td><td>Leitura de <code>.env</code> e credenciais negada</td></tr>
-    <tr><td>Zero trust + fail secure</td><td>Sandbox com allowlist de domínio que falha fechado</td></tr>
-    <tr><td>Ameaça interna</td><td>Quem escreveu o código não aprova; sem rota direta para a main</td></tr>
-    <tr><td>Cadeia de suprimentos</td><td>Só hooks, plugins e MCP gerenciados</td></tr>
+    <tr><th class="cp">Princípio (Janca)</th><th class="cm">Guardrail (Claxton, 05 Deploy)</th></tr>
+    <tr><td>Least privilege · p. 11</td><td>Token de CI curto e escopado, sem credencial de produção</td></tr>
+    <tr><td>Sem hard coding · p. 15</td><td>Leitura de <code>.env</code> e credenciais negada</td></tr>
+    <tr><td>Fail-closed · p. 57</td><td>Sandbox não sobe se não conseguir isolar</td></tr>
+    <tr><td>Ameaça interna · p. 8–9</td><td>O agente que escreveu não aprova; sem rota para a main</td></tr>
+    <tr><td>Cadeia de suprimentos · p. 11–13</td><td>Só hooks, marketplaces e MCP gerenciados</td></tr>
   </table>
+  <p class="fonte">Janca: páginas indicadas · Claxton, "05 Deploy": "AI in the PR review loop", "CI/CD integration and deployment", "Worked example: managed settings". O pareamento das linhas é deste material.</p>
 </section>
 
-<!-- 14 -->
 <section class="slide">
-  <div class="kicker">Segurança usável</div>
+  <div class="kicker">Controle</div>
   <h2>Aconselhar não é impedir</h2>
   <table>
     <tr><th>Controle</th><th>Mecanismo</th><th>Efeito</th></tr>
-    <tr><td>Advisory</td><td>Skill, <code>CLAUDE.md</code></td><td>Conformidade <b>provável</b></td></tr>
+    <tr><td>Advisory</td><td>Skill</td><td>Conformidade <b>provável</b></td></tr>
     <tr><td>Enforced</td><td>Hook, permissão, branch protection</td><td>Violação <b class="cm">quase impossível</b></td></tr>
   </table>
-  <p class="sub">Controle que atrapalha é contornado (cap. 1).<br>A Janca chama de <b class="cm">Security as Code</b> (cap. 8): a regra vive no sistema, não no hábito.</p>
+  <p class="sub">Regra que sempre tem que valer precisa de trava determinística.<br>Na Janca: <b class="cm">Security as Code</b>.</p>
+  <p class="fonte">Claxton, "03 Build · Skills as institutional knowledge" e "Hooks as build-time guardrails" · Janca, Security as Code, p. 128–129, 177–178.</p>
 </section>
 
-<!-- 15 -->
-<section class="slide">
-  <div class="kicker">Regras de ouro</div>
-  <h2>Uma de cada lado, mesma ideia</h2>
-  <table>
-    <tr><th class="cp">Janca</th><th class="cm">Loop com IA</th></tr>
-    <tr><td>Bug se corrige com patch; falha, com reprojeto</td><td>Plano aprovado antes de qualquer edição</td></tr>
-    <tr><td>Design review por quem não desenhou</td><td>O agente que escreveu não aprova</td></tr>
-    <tr><td>Plano de resposta não ensaiado falha</td><td>Rollback é o caminho mais ensaiado</td></tr>
-    <tr><td>Lição vira requisito do próximo ciclo</td><td>Incidente vira <code>intent.md</code> e eval</td></tr>
-  </table>
-</section>
-
-<!-- 16 -->
 <section class="slide">
   <div class="kicker">O que precisa ser trabalhado</div>
-  <h2>Quatro frentes onde o julgamento humano pesa</h2>
+  <h2>Quatro frentes onde a atenção humana pesa</h2>
   <div class="todo">
     <div class="col m"><div class="lab">1 · Requisitos</div><ul>
-      <li>Requisito negativo e critério de aceite em todo <code>intent.md</code></li><li>Bug bar escrita antes do primeiro requisito</li></ul></div>
+      <li>Checklist de requisitos no <code>intent.md</code><small>Janca p. 61–63 · Claxton, 01 Plan</small></li></ul></div>
     <div class="col m"><div class="lab">2 · Definição de segurança</div><ul>
-      <li>Modelo de ameaças dentro da <code>spec.md</code></li><li>Política de segurança como skill, com dono</li></ul></div>
+      <li>Modelagem de ameaças na <code>spec.md</code>; política como skill com dono<small>Janca p. 78–82 · Claxton, 02 Design</small></li></ul></div>
     <div class="col m"><div class="lab">3 · Revisão</div><ul>
-      <li><code>REVIEW.md</code> com critério de segurança explícito</li><li>Humano revisa o que o agente sinaliza</li></ul></div>
+      <li>Critério de segurança no <code>REVIEW.md</code>; code owner aprova<small>Janca p. 122–123 · Claxton, 05 Deploy</small></li></ul></div>
     <div class="col m"><div class="lab">4 · Observabilidade</div><ul>
-      <li>Log sem segredo, alerta com dono</li><li>Fire drill antes do incidente</li></ul></div>
+      <li>Monitoramento, log sem dado sensível, fire drill<small>Janca p. 57, 101–103, 201–202 · Claxton, 06 Maintain</small></li></ul></div>
   </div>
+  <p class="fonte">Por que estas quatro: Claxton, "Code is no longer the bottleneck" e "Plays". A escolha das frentes é deste material.</p>
 </section>
 
 <section class="slide">
   <blockquote>O loop continua rodando.<br><span class="cm">O julgamento humano fica acima dele.</span></blockquote>
   <div class="refs">
     Janca, T. (2020). <i>Alice and Bob Learn Application Security</i>. Wiley.<br>
-    Claxton, L. (2026). <i>The AI-native SDLC playbook</i>. Anthropic.<br>
+    Claxton, L. (2026). <i>The AI-native SDLC playbook</i>. Anthropic. claude.com/resources/articles/the-ai-native-sdlc-playbook<br>
     Shostack, A. (2014). <i>Threat Modeling</i>. Wiley.<br>
     McDermott, J.; Fox, C. (1999). Abuse case models.<br>
     Sindre, G.; Opdahl, A. (2000). Misuse cases.<br>
@@ -466,8 +468,10 @@
     Manadhata, P.; Wing, J. (2004). Attack surface.<br>
     Fagan, M. (1976). Design and code inspections.<br>
     Miller, B. et al. (1990). Fuzz testing.<br>
-    NIST SP 800-61. Incident handling guide.
+    NIST SP 800-61. Incident handling guide.<br>
+    OWASP Code Review Guide.
   </div>
+  <p class="fonte">Frase: Claxton, "Closing thoughts" (tradução).</p>
 </section>
 
 <script>
