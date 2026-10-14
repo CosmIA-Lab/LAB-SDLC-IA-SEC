@@ -1,0 +1,19 @@
+01-ciclo-de-vida-seguro/apresentacao/ponto-1-sdlc-seguro.html
+  s_8760fbde163f9e::t_7deb52b2372d54 97-98,111,118,129-142,144,162,174,176,180,183,185-187,189,194,209,224,242,260,277-290,292,309-318,320,336-347,349,363,371,375,388,406
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "76f87e91f12668e6c8e9e49d753f782d59d9b263",
+  "prompts": {},
+  "sessions": {
+    "s_8760fbde163f9e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "20207166-53bc-496f-94d8-00b15fd28c95",
+        "model": "unknown"
+      },
+      "human_author": "alan <nascimentoalankst@gmail.com>"
+    }
+  }
+}
