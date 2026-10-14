@@ -94,6 +94,8 @@
   th.cp, th.cm { font-weight: 800; }
 
   blockquote { font-size: 50px; line-height: 1.2; font-weight: 800; letter-spacing: -.01em; }
+  .split .col ul { gap: 12px; }
+  .map td:first-child { font-weight: 700; width: 34%; }
   .refs { columns: 2; column-gap: 48px; font-size: 19px; color: var(--muted); line-height: 1.55; margin-top: 40px; }
 
   @media print {
@@ -106,14 +108,14 @@
 <body>
 
 <!-- 1 -->
-<section class="slide" data-n="1">
+<section class="slide">
   <div class="kicker">Ponto 1 · Visão holística</div>
   <h1>SDLC seguro<br>quando a IA escreve o código</h1>
   <p class="sub">Os princípios da Janca, as técnicas da literatura<br>e os mecanismos do loop com IA, no mesmo ciclo.</p>
 </section>
 
 <!-- 2 -->
-<section class="slide" data-n="2">
+<section class="slide">
   <div class="kicker">O molde</div>
   <h2>Três camadas, da regra à execução</h2>
   <div class="layers">
@@ -124,8 +126,22 @@
   <p class="sub">A IA não muda a regra. Ela muda quem executa e em que velocidade.</p>
 </section>
 
+<section class="slide">
+  <div class="kicker">O livro inteiro, num quadro</div>
+  <h2>Onze capítulos, cinco fases</h2>
+  <table class="map">
+    <tr><th>Fase</th><th>Capítulos</th></tr>
+    <tr><td>Base</td><td>1 Fundamentos · 10 Aprendizado contínuo</td></tr>
+    <tr><td>Requisitos · Design</td><td>2 Requisitos · 3 Design seguro</td></tr>
+    <tr><td>Código</td><td>4 Código seguro · 5 Armadilhas comuns</td></tr>
+    <tr><td>Testes · Deploy</td><td>6 Testes e deploy · 8 Sistemas modernos</td></tr>
+    <tr><td>Manutenção · Programa</td><td>7 Programa de AppSec · 9 Bons hábitos</td></tr>
+  </table>
+  <p class="sub">Parte I: o que saber para escrever código seguro. Parte II: o que fazer para ele continuar seguro.</p>
+</section>
+
 <!-- 3 -->
-<section class="slide" data-n="3">
+<section class="slide">
   <div class="kicker">Pushing Left</div>
   <h2>Quanto mais tarde, mais caro</h2>
   <div class="cost">
@@ -143,7 +159,7 @@
 </section>
 
 <!-- 4 -->
-<section class="slide" data-n="4">
+<section class="slide">
   <div class="kicker">O que a IA muda</div>
   <h2>Código ficou barato.<br>Desenho errado, não.</h2>
   <div class="split" style="margin-top:0">
@@ -155,27 +171,27 @@
 </section>
 
 <!-- 5 -->
-<section class="slide" data-n="5">
+<section class="slide">
   <div class="kicker cp">Fundamentos · valem em todas as fases</div>
-  <h2>Doze princípios transversais</h2>
+  <h2>Doze fundamentos do capítulo 1</h2>
   <div class="chips">
     <div class="chip">CIA</div>
     <div class="chip">Assume breach</div>
+    <div class="chip">Ameaça interna</div>
     <div class="chip">Defense in depth</div>
     <div class="chip">Least privilege</div>
-    <div class="chip">Zero trust</div>
-    <div class="chip">Fail secure</div>
-    <div class="chip">Menos superfície de ataque</div>
-    <div class="chip">Sem obscuridade</div>
-    <div class="chip">Sem segredo em código</div>
-    <div class="chip">Segurança usável</div>
-    <div class="chip">Ameaça interna</div>
     <div class="chip">Cadeia de suprimentos</div>
+    <div class="chip">Sem obscuridade</div>
+    <div class="chip">Menos superfície de ataque</div>
+    <div class="chip">Sem hard coding</div>
+    <div class="chip">Never trust, always verify</div>
+    <div class="chip">Segurança usável</div>
+    <div class="chip">Fatores de autenticação</div>
   </div>
 </section>
 
 <!-- 6 -->
-<section class="slide" data-n="6">
+<section class="slide">
   <div class="kicker">O ciclo</div>
   <h2>Cinco fases, um loop, um artefato por fase</h2>
   <div class="cycle">
@@ -190,7 +206,7 @@
 </section>
 
 <!-- 7 -->
-<section class="slide" data-n="7">
+<section class="slide">
   <div class="kicker">Rastreabilidade</div>
   <h2>A mesma corrente, agora versionada</h2>
   <div class="chain2">
@@ -205,7 +221,7 @@
 </section>
 
 <!-- 8 -->
-<section class="slide" data-n="8">
+<section class="slide">
   <div class="kicker">Fase 1 · Requisitos ↔ Plan</div>
   <h2>O que o sistema deve garantir</h2>
   <div class="tri">
@@ -223,7 +239,7 @@
 </section>
 
 <!-- 9 -->
-<section class="slide" data-n="9">
+<section class="slide">
   <div class="kicker">Fase 2 · Design</div>
   <h2>Desenho seguro antes do código</h2>
   <div class="tri">
@@ -241,7 +257,7 @@
 </section>
 
 <!-- 10 -->
-<section class="slide" data-n="10">
+<section class="slide">
   <div class="kicker">Fase 3 · Código ↔ Build</div>
   <h2>Sem repetir falha conhecida</h2>
   <div class="tri">
@@ -258,8 +274,22 @@
   <div class="out"><b>Saída:</b> código revisado, com teste que prova o requisito.</div>
 </section>
 
+<section class="slide">
+  <div class="kicker">Capítulo 4 na prática</div>
+  <h2>Dois casos que valem para tudo</h2>
+  <div class="split" style="margin-top:0">
+    <div class="col t"><div class="lab">Upload de arquivo · assume o pior</div><ul>
+      <li>Valida tipo e tamanho</li><li>Renomeia; o usuário não escolhe o caminho</li>
+      <li>Guarda longe da aplicação e escaneia</li><li>Allowlist: só os tipos menos perigosos</li></ul></div>
+    <div class="col p"><div class="lab">Erro e log · fail-closed</div><ul>
+      <li>Nada de stack trace na tela</li><li>Desfaz a transação e fecha o que abriu</li>
+      <li>Loga para quem responde e para quem audita</li><li>No formato que o SIEM espera</li></ul></div>
+  </div>
+  <p class="sub">O hook do agente segue a mesma regra: <b class="cm">na dúvida, nega</b>.</p>
+</section>
+
 <!-- 11 -->
-<section class="slide" data-n="11">
+<section class="slide">
   <div class="kicker">Fase 4 · Testes ↔ Test</div>
   <h2>Achado com evidência</h2>
   <div class="tri">
@@ -276,8 +306,18 @@
   <div class="out"><b>Saída:</b> achado com severidade, prova e decisão.</div>
 </section>
 
+<section class="slide">
+  <div class="kicker">Capítulo 6 · o que se testa</div>
+  <h2>Sete alvos, não só o código</h2>
+  <div class="chips">
+    <div class="chip">Código</div><div class="chip">Aplicação</div><div class="chip">Infraestrutura</div><div class="chip">Banco de dados</div>
+    <div class="chip">APIs e web services</div><div class="chip">Integrações</div><div class="chip">Rede</div><div class="chip" style="border-top-color:var(--m)">+ Deploy</div>
+  </div>
+  <p class="sub">O agente prova o próprio trabalho no código. <b class="cm">Os outros seis alvos continuam com o time.</b></p>
+</section>
+
 <!-- 12 -->
-<section class="slide" data-n="12">
+<section class="slide">
   <div class="kicker">Fase 5 · Deploy e manutenção ↔ Deploy + Maintain</div>
   <h2>Detectar e responder em produção</h2>
   <div class="tri">
@@ -293,8 +333,20 @@
   <div class="out"><b>Saída:</b> incidente contido e lição virando <code>intent.md</code>.</div>
 </section>
 
+<section class="slide">
+  <div class="kicker">Capítulo 9 · bons hábitos</div>
+  <h2>O hábito da Janca e o mecanismo que o executa</h2>
+  <table>
+    <tr><th class="cp">Hábito (Janca)</th><th class="cm">Mecanismo no loop com IA</th></tr>
+    <tr><td>Fire drill</td><td>Rollback é o caminho mais ensaiado</td></tr>
+    <tr><td>Varredura contínua</td><td>Scans de segurança agendados em todos os repositórios</td></tr>
+    <tr><td>Resposta a incidentes</td><td>Agente no canal do incidente; post-mortem vira <code>intent.md</code></td></tr>
+    <tr><td>Inventário</td><td>Artefatos versionados: o que existe está no repositório</td></tr>
+  </table>
+</section>
+
 <!-- 13 -->
-<section class="slide" data-n="13">
+<section class="slide">
   <div class="kicker">O agente também é superfície de ataque</div>
   <h2>Os princípios da Janca aplicados ao agente</h2>
   <table>
@@ -308,7 +360,7 @@
 </section>
 
 <!-- 14 -->
-<section class="slide" data-n="14">
+<section class="slide">
   <div class="kicker">Segurança usável</div>
   <h2>Aconselhar não é impedir</h2>
   <table>
@@ -316,11 +368,11 @@
     <tr><td>Advisory</td><td>Skill, <code>CLAUDE.md</code></td><td>Conformidade <b>provável</b></td></tr>
     <tr><td>Enforced</td><td>Hook, permissão, branch protection</td><td>Violação <b class="cm">quase impossível</b></td></tr>
   </table>
-  <p class="sub">Controle que atrapalha é contornado (Janca).<br>Por isso a regra que sempre vale fica no sistema, não no hábito.</p>
+  <p class="sub">Controle que atrapalha é contornado (cap. 1).<br>A Janca chama de <b class="cm">Security as Code</b> (cap. 8): a regra vive no sistema, não no hábito.</p>
 </section>
 
 <!-- 15 -->
-<section class="slide" data-n="15">
+<section class="slide">
   <div class="kicker">Regras de ouro</div>
   <h2>Uma de cada lado, mesma ideia</h2>
   <table>
@@ -333,7 +385,7 @@
 </section>
 
 <!-- 16 -->
-<section class="slide" data-n="16">
+<section class="slide">
   <blockquote>O loop continua rodando.<br><span class="cm">O julgamento humano fica acima dele.</span></blockquote>
   <div class="refs">
     Janca, T. (2020). <i>Alice and Bob Learn Application Security</i>. Wiley.<br>
@@ -351,6 +403,7 @@
 </section>
 
 <script>
+  document.querySelectorAll('.slide').forEach((el, i) => el.dataset.n = i + 1);
   // ← → navegam entre slides no navegador
   const slides = [...document.querySelectorAll('.slide')];
   document.addEventListener('keydown', e => {
