@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SDLC seguro com IA</title>
+<style>
+  :root {
+    --bg: #f6f4ef;
+    --ink: #1c1b19;
+    --muted: #6b675f;
+    --line: #d9d4c8;
+    --accent: #c2410c;
+    --ok: #15803d;
+    --card: #ffffff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-snap-type: y mandatory; }
+  body { background: #2a2925; font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--ink); }
+
+  .slide {
+    width: 1280px; height: 720px; margin: 24px auto; padding: 72px 96px;
+    background: var(--bg); position: relative; overflow: hidden;
+    display: flex; flex-direction: column; justify-content: center;
+    scroll-snap-align: center;
+  }
+  .slide::after {
+    content: attr(data-n); position: absolute; right: 48px; bottom: 32px;
+    font-size: 16px; color: var(--muted); font-variant-numeric: tabular-nums;
+  }
+  .kicker { font-size: 20px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); font-weight: 700; margin-bottom: 20px; }
+  h1 { font-size: 76px; line-height: 1.05; font-weight: 800; letter-spacing: -.02em; }
+  h2 { font-size: 54px; line-height: 1.1; font-weight: 800; letter-spacing: -.015em; margin-bottom: 40px; }
+  .sub { font-size: 30px; color: var(--muted); margin-top: 28px; }
+  .big { font-size: 40px; line-height: 1.3; }
+  .muted { color: var(--muted); }
+  .accent { color: var(--accent); }
+  code { font-family: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace; font-size: .9em; background: #ece7dc; padding: 2px 10px; border-radius: 6px; }
+
+  ul.points { list-style: none; display: grid; gap: 22px; }
+  ul.points li { font-size: 32px; line-height: 1.3; padding-left: 40px; position: relative; }
+  ul.points li::before { content: ""; position: absolute; left: 0; top: 14px; width: 18px; height: 18px; background: var(--accent); border-radius: 4px; }
+
+  .row { display: flex; gap: 20px; align-items: stretch; }
+  .card { background: var(--card); border: 2px solid var(--line); border-radius: 16px; padding: 28px; flex: 1; }
+  .card h3 { font-size: 26px; margin-bottom: 12px; }
+  .card p { font-size: 22px; line-height: 1.35; color: var(--muted); }
+
+  /* loop */
+  .loop { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; margin-top: 12px; }
+  .stage { background: var(--card); border: 2px solid var(--line); border-radius: 14px; padding: 22px 12px; text-align: center; position: relative; }
+  .stage b { display: block; font-size: 15px; color: var(--accent); letter-spacing: .1em; }
+  .stage span { display: block; font-size: 26px; font-weight: 700; margin-top: 6px; }
+  .stage:not(:last-child)::after { content: "→"; position: absolute; right: -14px; top: 50%; transform: translateY(-50%); font-size: 22px; color: var(--muted); }
+  .back { margin-top: 18px; text-align: center; font-size: 22px; color: var(--muted); }
+  .human { margin-bottom: 18px; text-align: center; font-size: 24px; padding: 14px; border: 2px dashed var(--accent); border-radius: 12px; color: var(--accent); font-weight: 600; }
+
+  /* cadeia */
+  .chain { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+  .chain .a { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 24px; background: var(--card); border: 2px solid var(--line); border-radius: 10px; padding: 14px 18px; }
+  .chain .arr { font-size: 26px; color: var(--muted); }
+
+  /* estágio */
+  .stage-slide { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+  .stage-slide .card { padding: 34px; }
+  .stage-slide .card .label { font-size: 16px; letter-spacing: .12em; text-transform: uppercase; font-weight: 700; color: var(--muted); margin-bottom: 14px; }
+  .stage-slide .card .val { font-size: 30px; line-height: 1.3; font-weight: 600; }
+  .stage-slide .card.sec { border-color: var(--accent); }
+  .stage-slide .card.sec .label { color: var(--accent); }
+
+  table { border-collapse: collapse; width: 100%; font-size: 26px; }
+  th, td { text-align: left; padding: 18px 20px; border-bottom: 2px solid var(--line); }
+  th { font-size: 16px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+
+  .tiers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .tier { background: var(--card); border: 2px solid var(--line); border-radius: 14px; padding: 26px; }
+  .tier b { font-size: 44px; color: var(--accent); display: block; }
+  .tier span { font-size: 24px; }
+
+  blockquote { font-size: 52px; line-height: 1.2; font-weight: 700; letter-spacing: -.01em; }
+  .ref { font-size: 22px; color: var(--muted); line-height: 1.6; margin-top: 48px; }
+
+  @media print {
+    @page { size: 1280px 720px; margin: 0; }
+    body { background: none; }
+    .slide { margin: 0; break-after: page; }
+  }
+</style>
+</head>
+<body>
+
+<section class="slide" data-n="1">
+  <div class="kicker">Ponto 1 · SDLC seguro</div>
+  <h1>SDLC seguro<br>quando a IA escreve o código</h1>
+  <p class="sub">O ciclo vira um loop. O controle sai do hábito e entra no sistema.</p>
+</section>
+
+<section class="slide" data-n="2">
+  <div class="kicker">O problema</div>
+  <h2>Código deixou de ser o gargalo</h2>
+  <ul class="points">
+    <li>O gargalo migra para planejar, revisar e implantar</li>
+    <li>Controles feitos para código humano deixam de bater com a realidade</li>
+    <li>Exceção esperando comitê vira custo de governança</li>
+  </ul>
+</section>
+
+<section class="slide" data-n="3">
+  <div class="kicker">A mudança</div>
+  <h2>De linha reta para loop</h2>
+  <div class="human">Julgamento humano fica acima do loop</div>
+  <div class="loop">
+    <div class="stage"><b>1</b><span>Plan</span></div>
+    <div class="stage"><b>2</b><span>Design</span></div>
+    <div class="stage"><b>3</b><span>Build</span></div>
+    <div class="stage"><b>4</b><span>Test</span></div>
+    <div class="stage"><b>5</b><span>Deploy</span></div>
+    <div class="stage"><b>6</b><span>Maintain</span></div>
+  </div>
+  <p class="back">↺ achado em produção volta como nova intenção</p>
+</section>
+
+<section class="slide" data-n="4">
+  <div class="kicker">Ponte com o ponto 1</div>
+  <h2>As cinco fases da Janca cabem nos seis estágios</h2>
+  <table>
+    <tr><th>Janca (2020)</th><th>Loop com IA (2026)</th></tr>
+    <tr><td>Requisitos</td><td>Plan</td></tr>
+    <tr><td>Design</td><td>Design</td></tr>
+    <tr><td>Código</td><td>Build</td></tr>
+    <tr><td>Testes</td><td>Test</td></tr>
+    <tr><td>Deploy e manutenção</td><td>Deploy + Maintain</td></tr>
+  </table>
+</section>
+
+<section class="slide" data-n="5">
+  <div class="kicker">Rastreabilidade</div>
+  <h2>Cada estágio commita o que o próximo lê</h2>
+  <div class="chain">
+    <span class="a">intent.md</span><span class="arr">→</span>
+    <span class="a">spec.md</span><span class="arr">→</span>
+    <span class="a">plan.md</span><span class="arr">→</span>
+    <span class="a">diff + testes</span><span class="arr">→</span>
+    <span class="a">PR revisado</span><span class="arr">→</span>
+    <span class="a">incidente</span>
+  </div>
+  <p class="sub">Artefatos versionados + histórico de commits = <span class="accent">trilha de auditoria</span></p>
+</section>
+
+<section class="slide" data-n="6">
+  <div class="kicker">Estágio 1 · Plan</div>
+  <h2>Intenção antes de requisito</h2>
+  <div class="stage-slide">
+    <div class="card"><div class="label">Artefato</div><div class="val"><code>intent.md</code>: problema, quem é afetado, restrições</div></div>
+    <div class="card sec"><div class="label">Segurança</div><div class="val">Dado sensível e restrição entram já na intenção</div></div>
+  </div>
+</section>
+
+<section class="slide" data-n="7">
+  <div class="kicker">Estágio 2 · Design</div>
+  <h2>A política revisa a spec</h2>
+  <div class="stage-slide">
+    <div class="card"><div class="label">Artefato</div><div class="val"><code>spec.md</code> gerada a partir da intenção</div></div>
+    <div class="card sec"><div class="label">Segurança</div><div class="val">Skill de segurança sinaliza conflito; o dono da política decide</div></div>
+  </div>
+</section>
+
+<section class="slide" data-n="8">
+  <div class="kicker">Estágio 3 · Build</div>
+  <h2>Plano primeiro, código depois</h2>
+  <div class="stage-slide">
+    <div class="card"><div class="label">Artefato</div><div class="val"><code>plan.md</code> feito em modo leitura, sem editar nada</div></div>
+    <div class="card sec"><div class="label">Segurança</div><div class="val">Hook bloqueia caminho protegido e segredo no diff</div></div>
+  </div>
+</section>
+
+<section class="slide" data-n="9">
+  <div class="kicker">Estágio 4 · Test</div>
+  <h2>O agente precisa provar o próprio trabalho</h2>
+  <div class="stage-slide">
+    <div class="card"><div class="label">Artefato</div><div class="val">Teste que falha primeiro, protegido contra edição</div></div>
+    <div class="card sec"><div class="label">Segurança</div><div class="val">Todo incidente vira caso de eval permanente no CI</div></div>
+  </div>
+</section>
+
+<section class="slide" data-n="10">
+  <div class="kicker">Estágio 5 · Deploy</div>
+  <h2>Quem escreveu não aprova</h2>
+  <div class="stage-slide">
+    <div class="card"><div class="label">Artefato</div><div class="val">PR revisado contra <code>REVIEW.md</code>: bug, segurança, aderência à spec</div></div>
+    <div class="card sec"><div class="label">Segurança</div><div class="val">Agente vai até o portão de produção; quem passa é uma pessoa nomeada</div></div>
+  </div>
+</section>
+
+<section class="slide" data-n="11">
+  <div class="kicker">Estágio 6 · Maintain</div>
+  <h2>Detecção determinística aciona o agente</h2>
+  <div class="tiers">
+    <div class="tier"><b>1σ</b><span>registra</span></div>
+    <div class="tier"><b>2σ</b><span>diagnostica, só leitura</span></div>
+    <div class="tier"><b>3σ</b><span>propõe PR ou runbook aprovado</span></div>
+  </div>
+  <p class="sub">O achado vira um novo <code>intent.md</code>, e o loop fecha.</p>
+</section>
+
+<section class="slide" data-n="12">
+  <div class="kicker">Controle</div>
+  <h2>Aconselhar não é impedir</h2>
+  <table>
+    <tr><th>Tipo</th><th>Mecanismo</th><th>Efeito</th></tr>
+    <tr><td>Advisory</td><td>Skill</td><td>Torna a conformidade <b>provável</b></td></tr>
+    <tr><td>Enforced</td><td>Hook, permissão, branch protection</td><td>Torna a violação <b class="accent">quase impossível</b></td></tr>
+  </table>
+  <p class="sub">Regra que sempre tem que valer precisa de trava determinística.</p>
+</section>
+
+<section class="slide" data-n="13">
+  <div class="kicker">Guardrails gerenciados</div>
+  <h2>O que o engenheiro não desliga</h2>
+  <ul class="points">
+    <li>Leitura de <code>.env</code>, segredos e credenciais negada</li>
+    <li><code>curl</code>, <code>wget</code> e rede não aprovada bloqueados</li>
+    <li>Sandbox com allowlist de domínio que <span class="accent">falha fechado</span></li>
+    <li>Sem modo bypass; só hooks e MCP gerenciados</li>
+    <li>CI com token curto e escopado, sem credencial fixa de produção</li>
+  </ul>
+</section>
+
+<section class="slide" data-n="14">
+  <div class="kicker">Princípios</div>
+  <h2>Quatro regras que não quebram</h2>
+  <div class="row">
+    <div class="card"><h3>Separação de funções</h3><p>Agente não tem rota direta para a main</p></div>
+    <div class="card"><h3>Controle no sistema</h3><p>Não no hábito nem na documentação</p></div>
+    <div class="card"><h3>Portão humano</h3><p>Produção exige autorização nomeada</p></div>
+    <div class="card"><h3>Tudo é evidência</h3><p>Commit, plano, review, decisão de hook</p></div>
+  </div>
+</section>
+
+<section class="slide" data-n="15">
+  <blockquote>O loop continua rodando.<br><span class="accent">O julgamento humano fica acima dele.</span></blockquote>
+  <p class="ref">
+    Claxton, L. (2026). <i>The AI-native SDLC playbook</i>. Anthropic.<br>
+    Janca, T. (2020). <i>Alice and Bob Learn Application Security</i>. Wiley.
+  </p>
+</section>
+
+<script>
+  // ← → navegam entre slides no navegador
+  const slides = [...document.querySelectorAll('.slide')];
+  document.addEventListener('keydown', e => {
+    const i = slides.findIndex(s => s.getBoundingClientRect().top > -10);
+    if (['ArrowRight', 'ArrowDown', 'PageDown', ' '].includes(e.key)) slides[Math.min(i + 1, slides.length - 1)]?.scrollIntoView({ block: 'center' });
+    if (['ArrowLeft', 'ArrowUp', 'PageUp'].includes(e.key)) slides[Math.max(i - 1, 0)]?.scrollIntoView({ block: 'center' });
+    if (e.key.startsWith('Arrow') || e.key.startsWith('Page') || e.key === ' ') e.preventDefault();
+  });
+</script>
+</body>
+</html>
