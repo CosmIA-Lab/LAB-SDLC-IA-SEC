@@ -43,22 +43,28 @@ A mesma em produção: incidente, investigação forense, notificação de clien
 
 ## 2. Fundamentos — o que vale em todas as fases
 
-Os princípios não são uma fase. São transversais: valem do requisito à manutenção, e cada fase apenas os aplica.
+Os fundamentos não são uma fase. A autora os reúne no cap. 1, antes dos capítulos de fase, como a base necessária para entender como o resto do livro se aplica (p. 6). O que a Figura 7-1 distribui por fase são atividades, não fundamentos.
 
-| Princípio | Regra |
-|---|---|
-| CIA | confidencialidade, integridade e disponibilidade são o que se protege |
-| Assume breach | presumir que a invasão já aconteceu e desenhar para conter o dano |
-| Defense in depth | várias camadas; uma falha não derruba tudo |
-| Least privilege | mínimo de acesso por componente e por pessoa |
-| Zero trust | verificar sempre, nunca confiar por padrão ("never trust, always verify") |
-| Fail secure | erro nega acesso, nunca libera |
-| Redução da superfície de ataque | menos porta aberta, menos coisa para defender |
-| Sem segurança por obscuridade | esconder não é proteger; o segredo é a chave, não o desenho |
-| Sem segredo em código | credencial em código-fonte é credencial vazada |
-| Segurança usável | controle que atrapalha é controle que o usuário contorna |
-| Ameaça interna | quem tem acesso legítimo também é vetor |
-| Cadeia de suprimentos | código que você não escreveu também é seu risco |
+Os doze fundamentos do cap. 1, na ordem do livro:
+
+| Fundamento | Regra | Página |
+|---|---|---|
+| CIA | confidencialidade, integridade e disponibilidade são o que se protege | 3 |
+| Assume breach | presumir que a invasão já aconteceu e desenhar para conter o dano | 6 |
+| Ameaça interna | quem tem acesso legítimo também é vetor, por malícia ou acidente | 7 |
+| Defense in depth | várias camadas; uma falha não derruba tudo | 9 |
+| Least privilege | mínimo de acesso por componente e por pessoa | 10 |
+| Cadeia de suprimentos | código que você não escreveu também é seu risco | 11 |
+| Sem segurança por obscuridade | esconder não é proteger; o segredo é a chave, não o desenho | 13 |
+| Redução da superfície de ataque | menos porta aberta, menos coisa para defender | 14 |
+| Sem segredo em código | credencial em código-fonte é credencial vazada | 15 |
+| Never trust, always verify | verificar sempre, nunca confiar por padrão | 15 |
+| Segurança usável | controle que atrapalha é controle que o usuário contorna | 17 |
+| Fatores de autenticação | algo que você tem, algo que você é, algo que você sabe; mais de um fator é MFA | 18 |
+
+Nem todos são princípios no sentido estrito: ameaça interna é categoria de risco, sem segredo em código é antipadrão e fatores de autenticação é taxonomia. A autora os trata como *security concepts*, não como princípios.
+
+Fail secure não entra nesta tabela: não é fundamento do cap. 1. Como princípio de arquitetura, pertence ao ponto 3, com fonte própria.
 
 Detalhamento dos princípios de arquitetura: ponto 3. Cadeia de suprimentos: ponto 8.
 
