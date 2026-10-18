@@ -1,0 +1,4 @@
+# Modelo de voz neural do Piper — baixado sob demanda, grande demais para o repo
+voices/
+# WAV intermediário — só o mp3 final é versionado
+*.wav
