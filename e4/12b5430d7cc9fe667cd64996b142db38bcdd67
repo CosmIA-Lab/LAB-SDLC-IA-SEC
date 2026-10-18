@@ -1,0 +1,29 @@
+01-ciclo-de-vida-seguro/cards/README.md
+  s_4e2602966c5b1c::t_8651e9d6111a4f 7,9-13
+01-ciclo-de-vida-seguro/audio/roteiro.md
+  s_4e2602966c5b1c::t_99ff646cf1e3eb 1-41
+01-ciclo-de-vida-seguro/audio/README.md
+  s_4e2602966c5b1c::t_8ae0f1f720f309 1-29
+01-ciclo-de-vida-seguro/cards/CONVENCAO.md
+  s_4e2602966c5b1c::t_b5fe3b1b631b15 1-52
+01-ciclo-de-vida-seguro/cards/index.html
+  s_4e2602966c5b1c::t_200d9b8babea8a 12-13,16-17,19,21,23-25,48,59-68,70-88,90-102,104-146,148-202,212,220-221,239-247
+01-ciclo-de-vida-seguro/audio/narracao.txt
+  s_4e2602966c5b1c::t_45cada106286ac 1-35
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "e412b5430d7cc9fe667cd64996b142db38bcdd67",
+  "prompts": {},
+  "sessions": {
+    "s_4e2602966c5b1c": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "01a14ea8-0f5b-71a3-b110-8f6ec4e4591a",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "alan <nascimentoalankst@gmail.com>"
+    }
+  }
+}
