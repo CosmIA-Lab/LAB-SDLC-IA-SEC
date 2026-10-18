@@ -49,8 +49,6 @@ Essa é a estratégia. Mas se ela manda agir cedo e ao longo de todo o ciclo, su
 
 Alguns conceitos valem no ciclo inteiro — não pertencem a nenhuma fase, pertencem a todas. Fixá-los antes de percorrer as fases evita reexplicá-los em cada uma (Janca, 2020, p. 6).
 
-*Nota de estudo: a coluna Natureza classifica cada conceito — fundamento (premissa), princípio (regra), ameaça (risco) ou taxonomia — para você não fixar a lista inteira como "princípios".*
-
 Os doze conceitos de base (Janca, 2020):
 
 | Conceito | Natureza | Regra | Página |
@@ -68,11 +66,7 @@ Os doze conceitos de base (Janca, 2020):
 | Segurança usável | princípio | controle que atrapalha é controle que o usuário contorna | 17 |
 | Fatores de autenticação | taxonomia | algo que você tem, algo que você é, algo que você sabe; mais de um fator é MFA | 18 |
 
-*Nota de estudo: CIA e assume breach são as premissas; os sete princípios são as regras que delas derivam; ameaça interna e cadeia de suprimentos são os vetores que tudo isso combate; fatores de autenticação é só classificação.*
-
 Fail secure não entra nesta tabela: é princípio de arquitetura, detalhado no ponto 3 com fonte própria, não um dos conceitos de base do ciclo.
-
-*Nota de estudo: princípios de arquitetura → ponto 3; cadeia de suprimentos → ponto 8.*
 
 Fixada a base que vale no ciclo inteiro, falta o ciclo: quais são as fases, e o que essa base vira em cada uma. A próxima seção abre o mapa completo; depois, fase por fase.
 
@@ -93,8 +87,6 @@ As cinco fases existem em qualquer metodologia — Waterfall, Agile ou DevOps. O
 
 Deploy e manutenção são uma fase só, não duas: as atividades de segurança são as mesmas (monitorar, alertar, responder). A descontinuação não está no ciclo clássico de cinco fases; vem do Microsoft SDL e do NIST SSDF.
 
-*Nota de estudo: as fases e seus nomes seguem Janca (2020), Figuras I-1 e 7-1 — mapa por capítulo nas Referências.*
-
 ---
 
 ## 4. As cinco fases do SDLC seguro
@@ -102,8 +94,6 @@ Deploy e manutenção são uma fase só, não duas: as atividades de segurança 
 O SDLC seguro é o mesmo ciclo de vida de software, com segurança embutida em cada fase — não um teste no final.
 
 ### Fase 1 — Requisitos
-
-*Nota de estudo: ordem objetivo → princípios → técnicas → saída.*
 
 ```mermaid
 flowchart LR
@@ -161,15 +151,13 @@ As técnicas são lentes diferentes para achar falhas. Cada uma faz uma pergunta
 | Attack tree | Schneier, 1999 | Qual é o objetivo do atacante e quais os caminhos? | Parte do objetivo na raiz; cada ramo é um caminho pra chegar lá | Raiz: roubar dados de cartão. Ramos: SQL injection, upload sem validação, sessão sem expiração. Cada ramo vira um requisito |
 | Bug bar | Microsoft SDL | O que não pode ir pra release? | Define o limiar antes de escrever qualquer requisito; é requisito de processo, não de produto | Nenhuma falha crítica conhecida vai pra release |
 
-*Nota de estudo — apoio, não técnica: OWASP ASVS é o catálogo de requisito testável — serve como checklist quando a elicitação termina, para achar o que ninguém lembrou. SQUARE (Mead, SEI) é o processo que escolhe a técnica. Confuse case não é técnica nomeada com fonte canônica — é uma variação informal do misuse case para cobrir erro humano sem intenção (usuário digita CEP inválido; o formulário rejeita com mensagem clara); use como lembrete, não como técnica.*
+OWASP ASVS não é técnica: é o catálogo de requisito testável, usado como checklist quando a elicitação termina. SQUARE (Mead, SEI) é o processo que escolhe a técnica. O chamado *confuse case* — erro humano sem intenção (usuário digita CEP inválido; o formulário rejeita com mensagem clara) — é variação informal do misuse case, sem fonte canônica.
 
 #### Saída
 
 Requisito com critério de aceite. Sem teste, não entrou no ciclo.
 
 ### Fase 2 — Design
-
-*Nota de estudo: ordem objetivo → princípios → técnicas → saída.*
 
 ```mermaid
 flowchart LR
@@ -214,15 +202,13 @@ Regra de ouro: design errado custa uma reunião; código errado custa meses.
 | Diagrama de fluxo de dados (DFD) | DeMarco, 1979 | processos, armazenamentos e fluxos; é o insumo da modelagem de ameaças |
 | Análise de superfície de ataque | Manadhata e Wing, 2004 | lista pontos de entrada e prioriza por risco |
 
-*Nota de estudo — apoio, não técnica: STRIDE (Microsoft) e PASTA são as taxonomias que alimentam a modelagem. modelagem de ameaças → ponto 2.*
+STRIDE (Microsoft) e PASTA não são técnicas: são as taxonomias que alimentam a modelagem de ameaças.
 
 #### Saída
 
 Desenho com ameaças mapeadas e mitigações definidas. Sem mitigação, o desenho não saiu da fase.
 
 ### Fase 3 — Código
-
-*Nota de estudo: ordem objetivo → princípios → técnicas → saída.*
 
 ```mermaid
 flowchart LR
@@ -268,15 +254,13 @@ Regra de ouro: se você está escrevendo criptografia, autenticação ou sessão
 | Secure code review | OWASP Code Review Guide | revisão focada nos controles de segurança, manual ou apoiada por SAST |
 | SAST | ver ponto 7 | analisa o código-fonte sem executar, no commit |
 
-*Nota de estudo — apoio, não técnica: OWASP Top 10 e CWE são catálogos de padrão de falha. vulnerabilidades web → ponto 4; codificação segura → ponto 5; AuthN/AuthZ/sessão → ponto 6.*
+OWASP Top 10 e CWE não são técnicas: são catálogos de padrão de falha.
 
 #### Saída
 
 Código revisado, com teste que prova o requisito e sem achado crítico em aberto.
 
 ### Fase 4 — Testes
-
-*Nota de estudo: ordem objetivo → princípios → técnicas → saída.*
 
 ```mermaid
 flowchart LR
@@ -320,15 +304,11 @@ A fase não testa só o código. São sete alvos, e esquecer um deixa buraco (Ja
 | Secret scanning | procura credencial vazada no repositório |
 | Pentest | simula ataque real, geralmente por time externo |
 
-*Nota de estudo: técnicas e ferramentas → ponto 7; dependências e SCA → ponto 8.*
-
 #### Saída
 
 Achado com severidade, prova de reprodução e decisão: corrige agora, aceita o risco ou bloqueia a release.
 
 ### Fase 5 — Deploy e manutenção
-
-*Nota de estudo: ordem objetivo → princípios → técnicas → saída.*
 
 ```mermaid
 flowchart LR
@@ -370,8 +350,6 @@ Regra de ouro: simulação (fire drill) antes do incidente — plano de resposta
 |---|---|
 | Resposta a incidentes (NIST SP 800-61) | processo de contenção, erradicação, recuperação e lição aprendida |
 | Gestão de vulnerabilidades | ciclo de identificar, priorizar, corrigir e verificar |
-
-*Nota de estudo: gestão de vulnerabilidades → ponto 10.*
 
 #### Saída
 
@@ -475,8 +453,6 @@ Se uma verificação falhar, o pipeline para. Nada vai para produção com falha
 
 Cada técnica do DevSecOps tem ferramentas que a executam.
 
-*Nota de estudo: um exemplo por categoria, só para ancorar; o que se fixa é o que a técnica faz, não o vendor.*
-
 ### SAST — Static Application Security Testing
 
 Analisa o código-fonte sem executá-lo. Encontra padrões de falha conhecidos: SQL injection, buffer overflow, funções inseguras.
@@ -533,9 +509,7 @@ Um não substitui o outro: o DevSecOps é a forma de executar o SDLC seguro em e
 
 ---
 
-## 11. Tabela de recall
-
-*Nota de estudo: esta seção é andaime de retrieval practice, não conteúdo da dissertação.*
+## 11. Síntese
 
 | Fase / Conceito | Objetivo | Princípio | Técnica |
 |---|---|---|---|
