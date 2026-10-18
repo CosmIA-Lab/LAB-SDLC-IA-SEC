@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ponto 1 — Cartas de recall</title>
+<style>
+  :root { --bg:#0f1115; --card:#1a1d24; --ink:#e8e8e8; --dim:#8a8f99; --ok:#3fb950; --no:#f85149; --acc:#58a6ff; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background:var(--bg); color:var(--ink); display:flex; flex-direction:column; align-items:center; min-height:100vh; padding:24px 16px; }
+  h1 { font-size:18px; font-weight:600; margin:0 0 4px; }
+  .sub { color:var(--dim); font-size:13px; margin-bottom:20px; }
+  .decks { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-bottom:20px; }
+  .decks button { background:transparent; border:1px solid #333; color:var(--dim); padding:6px 12px; border-radius:20px; cursor:pointer; font-size:13px; }
+  .decks button.on { border-color:var(--acc); color:var(--acc); }
+  .stage { width:100%; max-width:640px; perspective:1200px; }
+  .card { position:relative; width:100%; min-height:300px; transform-style:preserve-3d; transition:transform .45s; cursor:pointer; }
+  .card.flipped { transform:rotateY(180deg); }
+  .face { position:absolute; inset:0; backface-visibility:hidden; background:var(--card); border:1px solid #2a2e37; border-radius:16px; padding:32px 28px; display:flex; flex-direction:column; justify-content:center; }
+  .back { transform:rotateY(180deg); }
+  .tag { position:absolute; top:14px; left:20px; font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--dim); }
+  .q { font-size:22px; line-height:1.35; font-weight:500; }
+  .a { font-size:17px; line-height:1.5; }
+  .a b { color:var(--acc); }
+  .hint { position:absolute; bottom:14px; right:20px; font-size:12px; color:var(--dim); }
+  .actions { display:flex; gap:12px; margin-top:20px; width:100%; max-width:640px; }
+  .actions button { flex:1; padding:14px; border-radius:12px; border:none; font-size:15px; font-weight:600; cursor:pointer; }
+  .no { background:#3a1518; color:var(--no); } .ok { background:#12301a; color:var(--ok); }
+  .actions button:disabled { opacity:.3; cursor:default; }
+  .bar { width:100%; max-width:640px; margin-top:20px; color:var(--dim); font-size:13px; display:flex; justify-content:space-between; }
+  .track { height:4px; background:#222; border-radius:2px; width:100%; max-width:640px; margin-top:8px; overflow:hidden; }
+  .track i { display:block; height:100%; background:var(--ok); width:0; transition:width .3s; }
+  .done { text-align:center; padding:40px 20px; }
+  .done h2 { color:var(--ok); }
+  .done button { margin-top:16px; background:var(--acc); color:#000; border:none; padding:12px 24px; border-radius:10px; font-weight:600; cursor:pointer; }
+  kbd { background:#222; padding:1px 6px; border-radius:4px; font-size:11px; }
+</style>
+</head>
+<body>
+<h1>Ponto 1 — Cartas de recall</h1>
+<div class="sub">Responda de cabeça, vire a carta, marque. O que erra volta mais vezes. <kbd>espaço</kbd> vira · <kbd>1</kbd> errei · <kbd>2</kbd> acertei</div>
+
+<div class="decks" id="decks"></div>
+
+<div class="stage" id="stage"></div>
+<div class="actions" id="actions">
+  <button class="no" id="btnNo" disabled>Errei</button>
+  <button class="ok" id="btnOk" disabled>Acertei</button>
+</div>
+<div class="bar"><span id="left"></span><span id="score"></span></div>
+<div class="track"><i id="prog"></i></div>
+
+<script>
+const CARDS = [
+  // ---- cadeia do ponto ----
+  {d:"cadeia", q:"Qual é a corrente de seis elos do ponto 1?", a:"<b>custo cresce no tempo</b> → <b>pushing left</b> → <b>falha ≠ bug</b> → <b>conceitos de base</b> → <b>cinco fases</b> → <b>DevSecOps</b>"},
+  {d:"cadeia", q:"Por que a pergunta de engenharia é <i>quando</i> a falha é descoberta, e não <i>se</i>?", a:"Todo software erra. O momento define o custo: no requisito é uma frase reescrita; em produção é incidente, forense e notificação de clientes."},
+  {d:"cadeia", q:"Pushing left é princípio, técnica ou estratégia? Por quê?", a:"<b>Estratégia.</b> Não restringe nada — decide <i>quando</i> aplicar os princípios (cedo). Raiz: curva de custo (Boehm, 1981); nome: Janca, 2020."},
+  {d:"cadeia", q:"Falha (flaw) × bug: onde nasce e como se corrige cada um?", a:"<b>Falha</b>: erro de desenho, nasce em requisito/design, corrige com <b>reprojeto</b>. <b>Bug</b>: erro de implementação, nasce no código, corrige com <b>patch</b>."},
+  {d:"cadeia", q:"Shift-left e shift-right: qual a relação com pushing left?", a:"<b>Shift-left</b> = pushing left aplicado ao pipeline (testar a cada commit). <b>Shift-right</b> = o complemento: monitorar produção. Um previne, o outro detecta."},
+  {d:"cadeia", q:"SDLC seguro × DevSecOps: natureza e pergunta de cada um", a:"SDLC seguro = <b>processo</b> (o que fazer em cada fase). DevSecOps = <b>prática</b> (como garantir que aconteça, contínuo e automatizado no pipeline)."},
+
+  // ---- escada ----
+  {d:"escada", q:"A escada de quatro degraus da taxonomia, com a pergunta de cada um", a:"<b>Fundamento</b>: o que tomamos como dado? · <b>Princípio</b>: que regra não quebra? · <b>Técnica</b>: qual método nomeado? · <b>Mecanismo</b>: o que executa?"},
+  {d:"escada", q:"Teste de fronteira: fundamento ou princípio?", a:"Se é aceito como <b>dado</b> (premissa) → fundamento. Se é <b>regra que não pode falhar</b> → princípio. O princípio deriva do fundamento."},
+  {d:"escada", q:"CIA é fundamento, princípio ou objetivo? Por quê?", a:"<b>Fundamento.</b> É o que se protege — o mandato (Janca, Fig. 1-1). Não é regra (não restringe) nem objetivo (não é entrega)."},
+  {d:"escada", q:"O que faz algo ser técnica no laboratório?", a:"Método <b>nomeado na literatura, com fonte (quem, ano)</b>. Sem nome e fonte, não é técnica — é apoio ou catálogo."},
+
+  // ---- conceitos de base ----
+  {d:"conceitos", q:"CIA — o que são as três letras e por que vêm primeiro?", a:"<b>Confidencialidade</b> (só quem deve acessa), <b>Integridade</b> (dado é o que deveria ser), <b>Disponibilidade</b> (está lá quando preciso). É o mandato da segurança — critério contra o qual todo requisito é medido."},
+  {d:"conceitos", q:"Assume breach — qual é a postura e o que ela torna necessário?", a:"Presumir que a invasão <b>já aconteceu</b> e desenhar para <b>conter o dano</b>. Torna defense in depth e least privilege necessários, não opcionais."},
+  {d:"conceitos", q:"Ameaça interna — qual a consequência de projeto?", a:"Quem tem acesso legítimo também é vetor (malícia ou acidente). Logo o <b>perímetro não basta</b>: controles precisam valer dentro, para contas autenticadas."},
+  {d:"conceitos", q:"Defense in depth — a regra em uma frase", a:"Várias barreiras <b>independentes</b>; a falha de uma não expõe tudo. O atacante precisa vencer todas; o defensor só precisa que uma segure."},
+  {d:"conceitos", q:"Least privilege — regra e ganho", a:"Cada componente e pessoa recebe o <b>mínimo de acesso</b> que permite o trabalho. Reduz o alcance de um erro ou comprometimento."},
+  {d:"conceitos", q:"Cadeia de suprimentos — por que é seu risco?", a:"Código de terceiros roda com <b>seus privilégios</b> e toca <b>seus dados</b>. Dependência vulnerável compromete tanto quanto bug próprio. Exige inventário."},
+  {d:"conceitos", q:"Sem segurança por obscuridade — o que deve ser secreto?", a:"<b>A chave, não o mecanismo.</b> Sistema seguro continua seguro com o desenho conhecido. 'Ninguém vai descobrir' é aposta contra o tempo."},
+  {d:"conceitos", q:"Redução da superfície de ataque — o que é superfície e qual a regra?", a:"Conjunto de pontos atacáveis (portas, endpoints, parâmetros, integrações). <b>Desligar o que não se usa, expor só o necessário</b> — menos a defender."},
+  {d:"conceitos", q:"Sem segredo em código — por quê e onde fica o segredo?", a:"Repositório é clonado, copiado e o histórico guarda tudo: segredo no fonte é segredo vazado. Fica em <b>cofre ou variável de ambiente</b> em runtime."},
+  {d:"conceitos", q:"Never trust, always verify — o que se verifica e o que isso combate?", a:"Todo dado e requisição são <b>não confiáveis até prova</b>, inclusive da rede interna. Combate a confiança implícita que insiders e invasores já dentro exploram."},
+  {d:"conceitos", q:"Segurança usável — a regra", a:"Controle que atrapalha é controle que o usuário <b>contorna</b>. Projetar o controle para ser o caminho mais fácil é parte da segurança."},
+  {d:"conceitos", q:"Fatores de autenticação — as três categorias e o que é MFA de verdade", a:"Algo que você <b>sabe</b> · <b>tem</b> · <b>é</b>. MFA = mais de uma <b>categoria</b>, não dois fatores do mesmo tipo."},
+  {d:"conceitos", q:"Natureza de cada um: CIA, assume breach, ameaça interna, cadeia de suprimentos, fatores de autenticação", a:"CIA e assume breach → <b>fundamento</b>. Ameaça interna e cadeia → <b>ameaça</b>. Fatores de autenticação → <b>taxonomia</b>. Os outros sete → princípio."},
+  {d:"conceitos", q:"Por que fail secure NÃO está entre os conceitos de base do ponto 1?", a:"É <b>princípio de arquitetura</b> — pertence ao ponto 3, com fonte própria. Não é um dos conceitos de base do cap. 1."},
+
+  // ---- fases ----
+  {d:"fases", q:"As cinco fases, em ordem (mnemônico R-D-C-T-D)", a:"<b>R</b>equisitos → <b>D</b>esign → <b>C</b>ódigo → <b>T</b>estes → <b>D</b>eploy e manutenção. (+ Descontinuação, fora do ciclo clássico: Microsoft SDL, NIST SSDF.)"},
+  {d:"fases", q:"Requisitos — objetivo e os três princípios", a:"Objetivo: ativos, classificação e requisito <b>verificável</b>. Princípios: <b>verificabilidade</b>, <b>rastreabilidade</b>, <b>negação explícita</b>."},
+  {d:"fases", q:"Requisitos — as técnicas com fonte", a:"<b>Abuse case</b> (McDermott e Fox, 1999) · <b>Misuse case</b> (Sindre e Opdahl, 2000) · <b>Attack tree</b> (Schneier, 1999) · <b>Bug bar</b> (Microsoft SDL)"},
+  {d:"fases", q:"Abuse case × misuse case — a diferença", a:"<b>Abuse</b>: atacante <b>externo</b> (inverte o caso de uso). <b>Misuse</b>: <b>insider</b> com acesso legítimo fazendo o que não deve."},
+  {d:"fases", q:"Requisito ruim × requisito bom — o exemplo", a:"Ruim: 'seja seguro'. Bom: '<b>rota autenticada rejeita token expirado com 401</b>'. Sem teste, não entrou no ciclo."},
+  {d:"fases", q:"Design — técnicas com fonte", a:"<b>Modelagem de ameaças</b> (Shostack, 2014 — 4 perguntas) · <b>DFD</b> (DeMarco, 1979) · <b>Análise de superfície de ataque</b> (Manadhata e Wing, 2004)"},
+  {d:"fases", q:"As quatro perguntas da modelagem de ameaças (Shostack)", a:"O que estamos construindo? · O que pode dar errado? · O que fazemos a respeito? · Fizemos um bom trabalho?"},
+  {d:"fases", q:"Design — regra de ouro sobre custo", a:"Design errado custa <b>uma reunião</b>; código errado custa <b>meses</b>. É onde nasce a falha de design — a que patch nenhum corrige."},
+  {d:"fases", q:"Código — técnica-raiz do code review e sua fonte", a:"<b>Inspeção formal de código — Fagan, 1976</b>. Revisão estruturada com papéis e checklist; raiz do code review moderno."},
+  {d:"fases", q:"Código — regra de ouro", a:"Se está escrevendo <b>criptografia, autenticação ou sessão do zero, pare</b> — já existe implementação revisada."},
+  {d:"fases", q:"Testes — os sete alvos", a:"Código · Aplicação · Infraestrutura · Banco de dados · APIs · Integrações · Rede. Esquecer um deixa buraco."},
+  {d:"fases", q:"SAST × DAST × SCA × fuzzing — uma linha cada", a:"<b>SAST</b>: fonte sem executar · <b>DAST</b>: aplicação rodando, como atacante · <b>SCA</b>: dependências com CVE · <b>Fuzzing</b>: entrada malformada até quebrar"},
+  {d:"fases", q:"Por que SAST/DAST/SCA aparecem em Código E em Testes?", a:"Não é redundância: no <b>Código</b> roda rápido por commit (retorno ao dev); nos <b>Testes</b> roda completo com evidência (decidir a release)."},
+  {d:"fases", q:"Deploy e manutenção — técnica de resposta a incidentes e sua fonte", a:"<b>NIST SP 800-61</b>: conter, erradicar, recuperar, aprender. Regra de ouro: <b>fire drill</b> antes do incidente."},
+  {d:"fases", q:"Deploy — os três princípios", a:"<b>Assume breach</b> (operar como se já estivesse dentro) · <b>Log sem segredo</b> · <b>Detecção vale o que vale a resposta</b> (alerta que ninguém lê não existe)."},
+  {d:"fases", q:"WAF e RASP — o que fazem e o que NÃO fazem", a:"WAF filtra antes da aplicação; RASP protege de dentro. <b>Nenhum corrige a falha</b>: compram tempo até o patch."},
+  {d:"fases", q:"Pipeline CI/CD seguro — a regra de ouro", a:"Se uma verificação falhar, <b>o pipeline para</b>. Nada vai para produção com falha de segurança conhecida."},
+  {d:"fases", q:"Fonte-âncora de todo o ponto 1", a:"<b>Janca, Tanya. <i>Alice and Bob Learn Application Security</i>. Wiley, 2020.</b> Figuras I-1 (cinco fases) e 7-1 (atividades por fase)."},
+];
+
+const DECKS = {cadeia:"Cadeia", escada:"Escada", conceitos:"Conceitos de base", fases:"Fases"};
+let active = new Set(Object.keys(DECKS));
+let queue = [], current = null, flipped = false, right = 0, wrong = 0, seen = 0, total = 0;
+
+const $ = id => document.getElementById(id);
+
+function buildDecks(){
+  $("decks").innerHTML = Object.entries(DECKS).map(([k,v]) =>
+    `<button data-d="${k}" class="${active.has(k)?'on':''}">${v}</button>`).join("") +
+    `<button data-d="__all" class="on">Todas</button>`;
+  $("decks").querySelectorAll("button").forEach(b => b.onclick = () => {
+    const d = b.dataset.d;
+    if (d === "__all") active = new Set(Object.keys(DECKS));
+    else { if (active.has(d) && active.size > 1) active.delete(d); else active.add(d); }
+    start();
+  });
+}
+
+function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];} return a; }
+
+function start(){
+  buildDecks();
+  queue = shuffle(CARDS.filter(c => active.has(c.d)).map(c => ({...c, miss:0})));
+  total = queue.length; right = wrong = seen = 0;
+  next();
+}
+
+function next(){
+  flipped = false;
+  if (!queue.length) return finish();
+  current = queue.shift();
+  $("stage").innerHTML = `
+    <div class="card" id="card">
+      <div class="face front"><span class="tag">${DECKS[current.d]}</span><div class="q">${current.q}</div><span class="hint">clique ou espaço para virar</span></div>
+      <div class="face back"><span class="tag">resposta</span><div class="a">${current.a}</div></div>
+    </div>`;
+  $("card").onclick = flip;
+  $("btnNo").disabled = $("btnOk").disabled = true;
+  update();
+}
+
+function flip(){
+  if (flipped) return;
+  flipped = true;
+  $("card").classList.add("flipped");
+  $("btnNo").disabled = $("btnOk").disabled = false;
+}
+
+function answer(ok){
+  if (!flipped) return;
+  seen++;
+  if (ok) { right++; if (current.miss > 0) { current.miss--; queue.splice(Math.min(queue.length, 6), 0, current); } }
+  else { wrong++; current.miss = 2; queue.splice(Math.min(queue.length, 3), 0, current); }
+  next();
+}
+
+function update(){
+  $("left").textContent = `${queue.length + 1} na fila`;
+  $("score").textContent = `✓ ${right}   ✗ ${wrong}`;
+  const done = total ? Math.max(0, 1 - (queue.length + 1) / Math.max(total, seen + queue.length + 1)) : 0;
+  $("prog").style.width = (done * 100) + "%";
+}
+
+function finish(){
+  $("stage").innerHTML = `<div class="done"><h2>Deck fechado</h2><p>${right} acertos · ${wrong} erros em ${seen} viradas.</p><p style="color:var(--dim)">Se alguma fonte não veio de cabeça, o ponto ainda não está internalizado.</p><button id="again">De novo</button></div>`;
+  $("again").onclick = start;
+  $("btnNo").disabled = $("btnOk").disabled = true;
+  $("prog").style.width = "100%";
+}
+
+$("btnNo").onclick = () => answer(false);
+$("btnOk").onclick = () => answer(true);
+document.addEventListener("keydown", e => {
+  if (e.key === " ") { e.preventDefault(); flip(); }
+  if (e.key === "1") answer(false);
+  if (e.key === "2") answer(true);
+});
+
+start();
+</script>
+</body>
+</html>
