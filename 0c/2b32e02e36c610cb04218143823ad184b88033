@@ -1,0 +1,21 @@
+01-ciclo-de-vida-seguro/audio/README.md
+  s_4e2602966c5b1c::t_b4838d7ec0202b 6,10-12,15,27,30-34,36-61
+01-ciclo-de-vida-seguro/audio/.gitignore
+  s_4e2602966c5b1c::t_948e2f674a4692 1-4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0c2b32e02e36c610cb04218143823ad184b88033",
+  "prompts": {},
+  "sessions": {
+    "s_4e2602966c5b1c": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "01a14ea8-0f5b-71a3-b110-8f6ec4e4591a",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "alan <nascimentoalankst@gmail.com>"
+    }
+  }
+}
