@@ -47,7 +47,7 @@ Essa é a estratégia. Mas se ela manda agir cedo e ao longo de todo o ciclo, su
 
 ## 2. Fundamentos — o que vale em todas as fases
 
-Alguns conceitos valem no ciclo inteiro — não pertencem a nenhuma fase, pertencem a todas. Fixá-los antes de percorrer as fases evita reexplicá-los em cada uma (Janca, 2020, p. 6).
+Antes de construir software seguro é preciso entender um conjunto de conceitos de base: sem saber *quando* e *por que* um controle é necessário, não adianta decorar como implementá-lo. São esses conceitos que sustentam as decisões de projeto e dão razão às regras de segurança (Janca, 2020, cap. 1, "Security Fundamentals"). Eles valem em todo o ciclo, por isso vêm antes das fases.
 
 Os doze conceitos de base (Janca, 2020):
 
