@@ -41,6 +41,8 @@ SQL injection corrigida no pull request: reescreve a query, adiciona teste. Fim.
 
 A mesma em produção: incidente, investigação forense, notificação de clientes, patch emergencial fora do horário.
 
+Essa é a estratégia. Mas se ela manda agir cedo e ao longo de todo o ciclo, surge a pergunta que a próxima seção responde: o que vale em *todas* as fases — antes de entrar em qualquer uma?
+
 ---
 
 ## 2. Fundamentos — o que vale em todas as fases
@@ -71,6 +73,8 @@ A distinção que mais ajuda a memorizar: **fundamento** é premissa (o que se p
 Fail secure não entra nesta tabela: não é conceito do cap. 1. Como princípio de arquitetura, pertence ao ponto 3, com fonte própria.
 
 Detalhamento dos princípios de arquitetura: ponto 3. Cadeia de suprimentos: ponto 8.
+
+Fixada a base que vale no ciclo inteiro, falta o ciclo: quais são as fases, e o que essa base vira em cada uma. A próxima seção abre o mapa completo; depois, fase por fase.
 
 ---
 
@@ -411,6 +415,8 @@ O resumo do livro, em uma tabela. É o mapa de onde cada ferramenta entra.
 | Deploy e manutenção | WAF, RASP, monitoramento, log, alerta, resposta a incidentes |
 
 Repare que SAST, DAST, SCA e code review aparecem em duas fases. Não é redundância: no Código roda rápido e por commit, para dar retorno ao desenvolvedor; nos Testes roda completo e com evidência, para decidir a release.
+
+Isto descreve *o que* fazer em cada fase. Mas processo escrito não é processo executado — depende de alguém lembrar, toda vez. A pergunta final do ponto é: como fazer isso acontecer sempre, sem depender de disciplina humana? É o que o DevSecOps responde.
 
 ---
 
