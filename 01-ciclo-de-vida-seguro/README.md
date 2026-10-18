@@ -22,11 +22,11 @@ Quanto mais tarde a falha é corrigida, mais cara ela fica. Falha encontrada no 
 
 ### A tese: pushing left
 
-Dessa curva de custo nasce a ideia que organiza todo o ciclo: *pushing left* — empurrar a segurança para a esquerda, para as fases iniciais, antes de o código existir. Não é um princípio (não restringe nada); é a **estratégia** que decide *quando* aplicar os princípios. A curva de custo é o fundamento (raiz em Boehm, *Software Engineering Economics*, 1981); Janca a reembala como pushing left. No restante do ponto 1, tudo é como executá-la cedo.
+Dessa curva de custo nasce a ideia que organiza todo o ciclo: *pushing left* — empurrar a segurança para a esquerda, para as fases iniciais, antes de o código existir. Não é um princípio (não restringe nada); é a **estratégia** que decide *quando* aplicar os princípios. A curva de custo é o fundamento (Boehm, *Software Engineering Economics*, 1981); "pushing left" é o nome dessa estratégia (Janca, 2020). No restante do ponto 1, tudo é como executá-la cedo.
 
 ### Falha de design e bug de implementação
 
-Janca separa os dois, e a distinção decide em que fase a correção cabe:
+A distinção entre os dois decide em que fase a correção cabe (Janca, 2020):
 
 | Tipo | O que é | Onde nasce | Custo de corrigir |
 |---|---|---|---|
@@ -47,11 +47,11 @@ Essa é a estratégia. Mas se ela manda agir cedo e ao longo de todo o ciclo, su
 
 ## 2. Fundamentos — o que vale em todas as fases
 
-A autora reúne no cap. 1, antes dos capítulos de fase, os conceitos de base que valem em todo o ciclo (p. 6) — ela os chama *security concepts*. Não são uma fase: o que a Figura 7-1 distribui por fase são atividades, não esta base.
+Alguns conceitos valem no ciclo inteiro — não pertencem a nenhuma fase, pertencem a todas. Fixá-los antes de percorrer as fases evita reexplicá-los em cada uma (Janca, 2020, p. 6).
 
-"Security concept" é um guarda-chuva, e dentro dele há naturezas diferentes. Pela taxonomia do laboratório (ver README-raiz), cada linha abaixo é um **fundamento** (premissa que se pressupõe), um **princípio** (regra que não pode quebrar), uma **ameaça** (categoria de risco) ou uma **taxonomia**. A coluna Natureza marca cada uma — não leia a lista inteira como "princípios".
+Esses conceitos têm naturezas diferentes, e misturá-las confunde. Cada linha abaixo é um **fundamento** (premissa que se pressupõe), um **princípio** (regra que não pode quebrar), uma **ameaça** (categoria de risco) ou uma **taxonomia** — a coluna Natureza marca qual. Não leia a lista inteira como "princípios".
 
-Os doze security concepts do cap. 1 (Janca), na ordem do livro:
+Os doze conceitos de base (Janca, 2020):
 
 | Conceito | Natureza | Regra | Página |
 |---|---|---|---|
@@ -70,7 +70,7 @@ Os doze security concepts do cap. 1 (Janca), na ordem do livro:
 
 A distinção que mais ajuda a memorizar: **fundamento** é premissa (o que se pressupõe); **princípio** é a regra que dela deriva (o que não pode falhar). CIA e assume breach são as premissas; os sete princípios são as regras que as executam. Ameaça interna e cadeia de suprimentos são os vetores que tudo isso combate; fatores de autenticação é só uma classificação.
 
-Fail secure não entra nesta tabela: não é conceito do cap. 1. Como princípio de arquitetura, pertence ao ponto 3, com fonte própria.
+Fail secure não entra nesta tabela: é princípio de arquitetura, detalhado no ponto 3 com fonte própria, não um dos conceitos de base do ciclo.
 
 Detalhamento dos princípios de arquitetura: ponto 3. Cadeia de suprimentos: ponto 8.
 
@@ -102,7 +102,7 @@ As cinco fases existem em qualquer metodologia — Waterfall, Agile ou DevOps. O
 | Deploy e manutenção | Figura 7-1, cap. 6 e 9 |
 | Descontinuação | não está no livro; Microsoft SDL e NIST SSDF |
 
-A fase de Operação deixou de ser separada: na Figura 7-1 o deploy e a manutenção são a mesma fase, porque as atividades de segurança são as mesmas (monitorar, alertar, responder).
+Deploy e manutenção são uma fase só, não duas: as atividades de segurança são as mesmas (monitorar, alertar, responder).
 
 ---
 
@@ -135,7 +135,7 @@ Identificar ativos, classificar dados e escrever requisitos de segurança verifi
 | Security user story | o requisito escrito no formato que o time ágil já usa |
 | Revisão da stack | avaliar linguagem, framework e serviços antes de adotar |
 
-As duas últimas vêm da Figura 7-1. A revisão da stack é a primeira decisão de segurança do projeto: framework que trata saída por padrão elimina uma classe inteira de falha antes da primeira linha de código.
+A revisão da stack é a primeira decisão de segurança do projeto: framework que trata saída por padrão elimina uma classe inteira de falha antes da primeira linha de código.
 
 **O que se produz:**
 
@@ -240,7 +240,7 @@ flowchart LR
     T --> S["Saída<br/>código revisado<br/>e com teste"]
 ```
 
-É o capítulo mais longo do livro, e a fase onde o requisito e o desenho viram comportamento real.
+É a fase onde o requisito e o desenho viram comportamento real.
 
 #### Objetivo
 
@@ -298,7 +298,7 @@ flowchart LR
 
 Encontrar falhas antes de produção, com evidência que permita corrigir.
 
-A fase não testa só o código. Janca cobre sete alvos, e esquecer um deixa buraco:
+A fase não testa só o código. São sete alvos, e esquecer um deixa buraco (Janca, 2020):
 
 | Alvo | O que se verifica |
 |---|---|
@@ -388,7 +388,7 @@ Produção monitorada, incidente contido e a lição virando requisito do próxi
 
 ### Fase extra — Descontinuação
 
-Não está no ciclo da Janca. Vem do Microsoft SDL e do NIST SSDF, e entra aqui porque o sistema que sai do ar continua guardando dado e credencial.
+Não está no ciclo clássico de cinco fases; vem do Microsoft SDL e do NIST SSDF. Entra porque o sistema que sai do ar continua guardando dado e credencial.
 
 **Objetivo:** encerrar o sistema sem vazar dados nem deixar credenciais ativas.
 
@@ -404,7 +404,7 @@ Não está no ciclo da Janca. Vem do Microsoft SDL e do NIST SSDF, e entra aqui 
 
 ## 5. Atividades de segurança por fase (Figura 7-1)
 
-O resumo do livro, em uma tabela. É o mapa de onde cada ferramenta entra.
+O ciclo inteiro em uma tabela: o mapa de onde cada atividade entra.
 
 | Fase | Atividades de segurança |
 |---|---|
