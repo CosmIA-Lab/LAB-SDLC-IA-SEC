@@ -10,17 +10,19 @@ Referência principal: Janca, Tanya. *Alice and Bob Learn Application Security*.
 
 ## 1. Pushing Left — a ideia que sustenta o ciclo
 
-*Pushing Left* é empurrar a segurança para a esquerda do ciclo: para as fases iniciais, antes do código existir.
+Todo software erra. A questão de engenharia nunca foi evitar o erro, e sim decidir *em que fase do ciclo* ele é descoberto — porque é a fase que define o custo.
 
-### A regra
+### A regra: o custo cresce com o tempo
 
 Quanto mais tarde a falha é corrigida, mais cara ela fica. Falha encontrada no requisito custa uma frase reescrita; a mesma falha em produção custa incidente, investigação e notificação de clientes.
-
-### Por quê
 
 - No requisito e no design, não existe código escrito — corrigir é mudar um documento.
 - No commit, o código é pequeno e o contexto está fresco.
 - Em produção, a falha já afetou dados, clientes ou receita.
+
+### A tese: pushing left
+
+Dessa curva de custo nasce a ideia que organiza todo o ciclo: *pushing left* — empurrar a segurança para a esquerda, para as fases iniciais, antes de o código existir. É o princípio; tudo que segue neste ponto é como aplicá-lo.
 
 ### Falha de design e bug de implementação
 
@@ -429,19 +431,19 @@ Modelo tradicional: o time de segurança recebia o sistema pronto, fazia um pent
 
 ## 7. Shift-left e shift-right
 
-Duas práticas centrais do DevSecOps. Shift-left é o *Pushing Left* da seção 1 aplicado ao pipeline.
+Aqui o princípio da seção 1 vira prática de pipeline. **Shift-left é o pushing left aplicado ao CI/CD** — não é ideia nova, é a mesma regra de custo executada a cada commit. O que o DevSecOps acrescenta é o par que falta: o lado direito.
 
-### Shift-left
+### Shift-left — o pushing left no pipeline
 
 Trazer segurança para o mais cedo possível. Em vez de testar no final, testar em cada commit: SAST no push, SCA nas dependências, secrets scanning antes do merge.
 
-### Shift-right
+### Shift-right — o que o pushing left sozinho não cobre
 
-Monitorar em produção. CVEs novos aparecem todo dia; o time precisa saber quais afetam o que roda e responder rápido.
+Empurrar para a esquerda previne, mas não enxerga o que já está rodando. Shift-right é monitorar em produção: CVEs novos aparecem todo dia, e o time precisa saber quais afetam o que roda e responder rápido.
 
 ### Juntas
 
-Shift-left previne. Shift-right detecta. Um sem o outro deixa buracos: só shift-left ignora o que já está em produção; só shift-right corrige tarde demais.
+Shift-left previne, shift-right detecta. Um sem o outro deixa buraco: só shift-left ignora o que já está em produção; só shift-right corrige tarde demais.
 
 ---
 
