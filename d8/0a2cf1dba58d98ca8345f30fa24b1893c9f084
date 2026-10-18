@@ -1,0 +1,23 @@
+00-mapa-de-estudo.md
+  s_79853771692021::t_b05db452babb95 1-123
+01-ciclo-de-vida-seguro/README.md
+  s_79853771692021::t_832753c779d78d 13,15,23-26,50-51,92-99,166,169,441,443,447,449,453,479,485,491,497,507,541
+README.md
+  s_79853771692021::t_4dc265cc4cf120 106-109
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "d80a2cf1dba58d98ca8345f30fa24b1893c9f084",
+  "prompts": {},
+  "sessions": {
+    "s_79853771692021": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "01a14c9f-7b0d-70a0-875c-b113b0ce1b5b",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "alan <nascimentoalankst@gmail.com>"
+    }
+  }
+}
