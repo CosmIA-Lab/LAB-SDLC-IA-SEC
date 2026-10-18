@@ -1,0 +1,21 @@
+01-ciclo-de-vida-seguro/cards/index.html
+  s_79853771692021::t_b0cf3eb489b9c3 1-187
+01-ciclo-de-vida-seguro/cards/README.md
+  s_79853771692021::t_73fc243588cca2 1-10
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "039b3d9444a4eb9328fe320f9d73627105263ef6",
+  "prompts": {},
+  "sessions": {
+    "s_79853771692021": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "01a14c9f-7b0d-70a0-875c-b113b0ce1b5b",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "alan <nascimentoalankst@gmail.com>"
+    }
+  }
+}
