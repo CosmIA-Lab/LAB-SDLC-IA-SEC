@@ -9,16 +9,20 @@
   * { box-sizing:border-box; }
   body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background:var(--bg); color:var(--ink); display:flex; flex-direction:column; align-items:center; min-height:100vh; padding:24px 16px; }
   h1 { font-size:18px; font-weight:600; margin:0 0 4px; }
-  .sub { color:var(--dim); font-size:13px; margin-bottom:20px; }
-  .decks { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-bottom:20px; }
+  .sub { color:var(--dim); font-size:13px; margin-bottom:16px; text-align:center; }
+  .decks { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-bottom:10px; }
   .decks button { background:transparent; border:1px solid #333; color:var(--dim); padding:6px 12px; border-radius:20px; cursor:pointer; font-size:13px; }
   .decks button.on { border-color:var(--acc); color:var(--acc); }
+  .legend { max-width:640px; margin-bottom:20px; font-size:12px; color:var(--dim); line-height:1.6; text-align:left; }
+  .legend b { color:var(--ink); font-weight:600; }
   .stage { width:100%; max-width:640px; perspective:1200px; }
-  .card { position:relative; width:100%; min-height:300px; transform-style:preserve-3d; transition:transform .45s; cursor:pointer; }
+  .card { position:relative; width:100%; min-height:320px; transform-style:preserve-3d; transition:transform .45s; cursor:pointer; }
   .card.flipped { transform:rotateY(180deg); }
-  .face { position:absolute; inset:0; backface-visibility:hidden; background:var(--card); border:1px solid #2a2e37; border-radius:16px; padding:32px 28px; display:flex; flex-direction:column; justify-content:center; }
+  .face { position:absolute; inset:0; backface-visibility:hidden; background:var(--card); border:1px solid #2a2e37; border-radius:16px; padding:56px 28px 40px; display:flex; flex-direction:column; justify-content:center; }
   .back { transform:rotateY(180deg); }
-  .tag { position:absolute; top:14px; left:20px; font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--dim); }
+  .head { position:absolute; top:14px; left:20px; right:20px; }
+  .tag { font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--acc); }
+  .obj { font-size:12px; color:var(--dim); margin-top:3px; }
   .q { font-size:22px; line-height:1.35; font-weight:500; }
   .a { font-size:17px; line-height:1.5; }
   .a b { color:var(--acc); }
@@ -41,6 +45,7 @@
 <div class="sub">Responda de cabeça, vire a carta, marque. O que erra volta mais vezes. <kbd>espaço</kbd> vira · <kbd>1</kbd> errei · <kbd>2</kbd> acertei</div>
 
 <div class="decks" id="decks"></div>
+<div class="legend" id="legend"></div>
 
 <div class="stage" id="stage"></div>
 <div class="actions" id="actions">
@@ -51,59 +56,152 @@
 <div class="track"><i id="prog"></i></div>
 
 <script>
+// Cada baralho tem nome direto e uma descrição de uma linha (nada de metáfora).
+const DECKS = {
+  sequencia: { name:"Sequência do argumento", sub:"o ponto 1 inteiro, passo a passo, na ordem em que um puxa o próximo" },
+  taxonomia: { name:"Taxonomia", sub:"os quatro níveis: fundamento → princípio → técnica → mecanismo" },
+  conceitos: { name:"Conceitos de base", sub:"os fundamentos e princípios que valem em todas as fases (CIA, least privilege…)" },
+  fases:     { name:"As cinco fases", sub:"o ciclo de requisitos a deploy, com objetivo, princípios e técnicas de cada fase" },
+};
+
+// Cada carta: deck · topic (tópico do ponto) · objective (o que a carta treina) · q · a.
+// Regra de autoria: toda sigla é expandida na primeira aparição; nome literal, nunca metáfora.
 const CARDS = [
-  // ---- cadeia do ponto ----
-  {d:"cadeia", q:"Qual é a corrente de seis elos do ponto 1?", a:"<b>custo cresce no tempo</b> → <b>pushing left</b> → <b>falha ≠ bug</b> → <b>conceitos de base</b> → <b>cinco fases</b> → <b>DevSecOps</b>"},
-  {d:"cadeia", q:"Por que a pergunta de engenharia é <i>quando</i> a falha é descoberta, e não <i>se</i>?", a:"Todo software erra. O momento define o custo: no requisito é uma frase reescrita; em produção é incidente, forense e notificação de clientes."},
-  {d:"cadeia", q:"Pushing left é princípio, técnica ou estratégia? Por quê?", a:"<b>Estratégia.</b> Não restringe nada — decide <i>quando</i> aplicar os princípios (cedo). Raiz: curva de custo (Boehm, 1981); nome: Janca, 2020."},
-  {d:"cadeia", q:"Falha (flaw) × bug: onde nasce e como se corrige cada um?", a:"<b>Falha</b>: erro de desenho, nasce em requisito/design, corrige com <b>reprojeto</b>. <b>Bug</b>: erro de implementação, nasce no código, corrige com <b>patch</b>."},
-  {d:"cadeia", q:"Shift-left e shift-right: qual a relação com pushing left?", a:"<b>Shift-left</b> = pushing left aplicado ao pipeline (testar a cada commit). <b>Shift-right</b> = o complemento: monitorar produção. Um previne, o outro detecta."},
-  {d:"cadeia", q:"SDLC seguro × DevSecOps: natureza e pergunta de cada um", a:"SDLC seguro = <b>processo</b> (o que fazer em cada fase). DevSecOps = <b>prática</b> (como garantir que aconteça, contínuo e automatizado no pipeline)."},
+  // ---- Sequência do argumento ----
+  {d:"sequencia", topic:"Visão geral do ponto 1", objective:"reconstruir o argumento inteiro na ordem",
+   q:"Quais são os seis passos encadeados que formam o argumento do ponto 1?",
+   a:"<b>custo cresce no tempo</b> → <b>pushing left</b> → <b>falha ≠ bug</b> → <b>conceitos de base</b> → <b>cinco fases</b> → <b>DevSecOps</b>"},
+  {d:"sequencia", topic:"O custo no tempo", objective:"entender por que o momento da descoberta importa",
+   q:"Por que a pergunta de engenharia é <i>quando</i> a falha é descoberta, e não <i>se</i>?",
+   a:"Todo software erra. O momento define o custo: no requisito é uma frase reescrita; em produção é incidente, forense e notificação de clientes."},
+  {d:"sequencia", topic:"Pushing left", objective:"classificar pushing left na taxonomia",
+   q:"Pushing left (trazer a segurança para o início do ciclo) é princípio, técnica ou estratégia? Por quê?",
+   a:"<b>Estratégia.</b> Não restringe nada — decide <i>quando</i> aplicar os princípios (cedo). Raiz: curva de custo (Boehm, 1981); nome: Janca, 2020."},
+  {d:"sequencia", topic:"Falha × bug", objective:"distinguir erro de desenho de erro de implementação",
+   q:"Falha (flaw) × bug: onde nasce e como se corrige cada um?",
+   a:"<b>Falha</b>: erro de desenho, nasce em requisito/design, corrige com <b>reprojeto</b>. <b>Bug</b>: erro de implementação, nasce no código, corrige com <b>patch</b>."},
+  {d:"sequencia", topic:"Shift-left e shift-right", objective:"relacionar os dois com pushing left",
+   q:"Shift-left (testar cedo) e shift-right (monitorar produção): qual a relação com pushing left?",
+   a:"<b>Shift-left</b> = pushing left aplicado ao pipeline (testar a cada commit). <b>Shift-right</b> = o complemento: monitorar produção. Um previne, o outro detecta."},
+  {d:"sequencia", topic:"SDLC seguro × DevSecOps", objective:"distinguir o processo da prática",
+   q:"SDLC seguro (ciclo de vida de desenvolvimento de software) × DevSecOps: natureza e pergunta de cada um?",
+   a:"SDLC seguro = <b>processo</b> (o que fazer em cada fase). DevSecOps = <b>prática</b> (como garantir que aconteça, contínuo e automatizado no pipeline)."},
 
-  // ---- escada ----
-  {d:"escada", q:"A escada de quatro degraus da taxonomia, com a pergunta de cada um", a:"<b>Fundamento</b>: o que tomamos como dado? · <b>Princípio</b>: que regra não quebra? · <b>Técnica</b>: qual método nomeado? · <b>Mecanismo</b>: o que executa?"},
-  {d:"escada", q:"Teste de fronteira: fundamento ou princípio?", a:"Se é aceito como <b>dado</b> (premissa) → fundamento. Se é <b>regra que não pode falhar</b> → princípio. O princípio deriva do fundamento."},
-  {d:"escada", q:"CIA é fundamento, princípio ou objetivo? Por quê?", a:"<b>Fundamento.</b> É o que se protege — o mandato (Janca, Fig. 1-1). Não é regra (não restringe) nem objetivo (não é entrega)."},
-  {d:"escada", q:"O que faz algo ser técnica no laboratório?", a:"Método <b>nomeado na literatura, com fonte (quem, ano)</b>. Sem nome e fonte, não é técnica — é apoio ou catálogo."},
+  // ---- Taxonomia ----
+  {d:"taxonomia", topic:"Os quatro níveis", objective:"nomear os níveis e a pergunta de cada um",
+   q:"Quais são os quatro níveis da taxonomia do laboratório, com a pergunta que cada um responde?",
+   a:"<b>Fundamento</b>: o que tomamos como dado? · <b>Princípio</b>: que regra não quebra? · <b>Técnica</b>: qual método nomeado? · <b>Mecanismo</b>: o que executa?"},
+  {d:"taxonomia", topic:"Fundamento × princípio", objective:"separar premissa de regra",
+   q:"Teste de fronteira: como saber se algo é fundamento ou princípio?",
+   a:"Se é aceito como <b>dado</b> (premissa) → fundamento. Se é <b>regra que não pode falhar</b> → princípio. O princípio deriva do fundamento."},
+  {d:"taxonomia", topic:"CIA na taxonomia", objective:"classificar CIA no nível certo",
+   q:"CIA (confidencialidade, integridade, disponibilidade) é fundamento, princípio ou objetivo? Por quê?",
+   a:"<b>Fundamento.</b> É o que se protege — o mandato (Janca, Fig. 1-1). Não é regra (não restringe) nem objetivo (não é entrega)."},
+  {d:"taxonomia", topic:"Definição de técnica", objective:"saber o critério que torna algo uma técnica",
+   q:"O que faz algo ser classificado como técnica no laboratório?",
+   a:"Método <b>nomeado na literatura, com fonte (quem, ano)</b>. Sem nome e fonte, não é técnica — é apoio ou catálogo."},
 
-  // ---- conceitos de base ----
-  {d:"conceitos", q:"CIA — o que são as três letras e por que vêm primeiro?", a:"<b>Confidencialidade</b> (só quem deve acessa), <b>Integridade</b> (dado é o que deveria ser), <b>Disponibilidade</b> (está lá quando preciso). É o mandato da segurança — critério contra o qual todo requisito é medido."},
-  {d:"conceitos", q:"Assume breach — qual é a postura e o que ela torna necessário?", a:"Presumir que a invasão <b>já aconteceu</b> e desenhar para <b>conter o dano</b>. Torna defense in depth e least privilege necessários, não opcionais."},
-  {d:"conceitos", q:"Ameaça interna — qual a consequência de projeto?", a:"Quem tem acesso legítimo também é vetor (malícia ou acidente). Logo o <b>perímetro não basta</b>: controles precisam valer dentro, para contas autenticadas."},
-  {d:"conceitos", q:"Defense in depth — a regra em uma frase", a:"Várias barreiras <b>independentes</b>; a falha de uma não expõe tudo. O atacante precisa vencer todas; o defensor só precisa que uma segure."},
-  {d:"conceitos", q:"Least privilege — regra e ganho", a:"Cada componente e pessoa recebe o <b>mínimo de acesso</b> que permite o trabalho. Reduz o alcance de um erro ou comprometimento."},
-  {d:"conceitos", q:"Cadeia de suprimentos — por que é seu risco?", a:"Código de terceiros roda com <b>seus privilégios</b> e toca <b>seus dados</b>. Dependência vulnerável compromete tanto quanto bug próprio. Exige inventário."},
-  {d:"conceitos", q:"Sem segurança por obscuridade — o que deve ser secreto?", a:"<b>A chave, não o mecanismo.</b> Sistema seguro continua seguro com o desenho conhecido. 'Ninguém vai descobrir' é aposta contra o tempo."},
-  {d:"conceitos", q:"Redução da superfície de ataque — o que é superfície e qual a regra?", a:"Conjunto de pontos atacáveis (portas, endpoints, parâmetros, integrações). <b>Desligar o que não se usa, expor só o necessário</b> — menos a defender."},
-  {d:"conceitos", q:"Sem segredo em código — por quê e onde fica o segredo?", a:"Repositório é clonado, copiado e o histórico guarda tudo: segredo no fonte é segredo vazado. Fica em <b>cofre ou variável de ambiente</b> em runtime."},
-  {d:"conceitos", q:"Never trust, always verify — o que se verifica e o que isso combate?", a:"Todo dado e requisição são <b>não confiáveis até prova</b>, inclusive da rede interna. Combate a confiança implícita que insiders e invasores já dentro exploram."},
-  {d:"conceitos", q:"Segurança usável — a regra", a:"Controle que atrapalha é controle que o usuário <b>contorna</b>. Projetar o controle para ser o caminho mais fácil é parte da segurança."},
-  {d:"conceitos", q:"Fatores de autenticação — as três categorias e o que é MFA de verdade", a:"Algo que você <b>sabe</b> · <b>tem</b> · <b>é</b>. MFA = mais de uma <b>categoria</b>, não dois fatores do mesmo tipo."},
-  {d:"conceitos", q:"Natureza de cada um: CIA, assume breach, ameaça interna, cadeia de suprimentos, fatores de autenticação", a:"CIA e assume breach → <b>fundamento</b>. Ameaça interna e cadeia → <b>ameaça</b>. Fatores de autenticação → <b>taxonomia</b>. Os outros sete → princípio."},
-  {d:"conceitos", q:"Por que fail secure NÃO está entre os conceitos de base do ponto 1?", a:"É <b>princípio de arquitetura</b> — pertence ao ponto 3, com fonte própria. Não é um dos conceitos de base do cap. 1."},
+  // ---- Conceitos de base ----
+  {d:"conceitos", topic:"CIA", objective:"definir as três letras e por que vêm primeiro",
+   q:"CIA — o que são as três letras e por que vêm primeiro?",
+   a:"<b>Confidencialidade</b> (só quem deve acessa), <b>Integridade</b> (dado é o que deveria ser), <b>Disponibilidade</b> (está lá quando preciso). É o mandato da segurança — critério contra o qual todo requisito é medido."},
+  {d:"conceitos", topic:"Assume breach", objective:"nomear a postura e o que ela torna necessário",
+   q:"Assume breach (presumir a invasão) — qual é a postura e o que ela torna necessário?",
+   a:"Presumir que a invasão <b>já aconteceu</b> e desenhar para <b>conter o dano</b>. Torna defense in depth e least privilege necessários, não opcionais."},
+  {d:"conceitos", topic:"Ameaça interna", objective:"tirar a consequência de projeto",
+   q:"Ameaça interna (quem tem crachá) — qual a consequência de projeto?",
+   a:"Quem tem acesso legítimo também é vetor (malícia ou acidente). Logo o <b>perímetro não basta</b>: controles precisam valer dentro, para contas autenticadas."},
+  {d:"conceitos", topic:"Defense in depth", objective:"enunciar a regra em uma frase",
+   q:"Defense in depth (defesa em camadas) — a regra em uma frase?",
+   a:"Várias barreiras <b>independentes</b>; a falha de uma não expõe tudo. O atacante precisa vencer todas; o defensor só precisa que uma segure."},
+  {d:"conceitos", topic:"Least privilege", objective:"enunciar a regra e o ganho",
+   q:"Least privilege (menor privilégio) — regra e ganho?",
+   a:"Cada componente e pessoa recebe o <b>mínimo de acesso</b> que permite o trabalho. Reduz o alcance de um erro ou comprometimento."},
+  {d:"conceitos", topic:"Cadeia de suprimentos", objective:"entender por que é o seu risco",
+   q:"Cadeia de suprimentos (código de terceiros que você usa) — por que é seu risco?",
+   a:"Código de terceiros roda com <b>seus privilégios</b> e toca <b>seus dados</b>. Dependência vulnerável compromete tanto quanto bug próprio. Exige inventário."},
+  {d:"conceitos", topic:"Sem segurança por obscuridade", objective:"saber o que deve ser secreto",
+   q:"Sem segurança por obscuridade — o que deve ser secreto?",
+   a:"<b>A chave, não o mecanismo.</b> Sistema seguro continua seguro com o desenho conhecido. 'Ninguém vai descobrir' é aposta contra o tempo."},
+  {d:"conceitos", topic:"Superfície de ataque", objective:"definir superfície e a regra de redução",
+   q:"Redução da superfície de ataque — o que é superfície e qual a regra?",
+   a:"Conjunto de pontos atacáveis (portas, endpoints, parâmetros, integrações). <b>Desligar o que não se usa, expor só o necessário</b> — menos a defender."},
+  {d:"conceitos", topic:"Sem segredo em código", objective:"saber o porquê e onde o segredo fica",
+   q:"Sem segredo em código — por quê e onde fica o segredo?",
+   a:"Repositório é clonado, copiado e o histórico guarda tudo: segredo no fonte é segredo vazado. Fica em <b>cofre ou variável de ambiente</b> em runtime."},
+  {d:"conceitos", topic:"Zero trust", objective:"saber o que se verifica e o que isso combate",
+   q:"Never trust, always verify (zero trust) — o que se verifica e o que isso combate?",
+   a:"Todo dado e requisição são <b>não confiáveis até prova</b>, inclusive da rede interna. Combate a confiança implícita que insiders e invasores já dentro exploram."},
+  {d:"conceitos", topic:"Segurança usável", objective:"enunciar a regra",
+   q:"Segurança usável — a regra?",
+   a:"Controle que atrapalha é controle que o usuário <b>contorna</b>. Projetar o controle para ser o caminho mais fácil é parte da segurança."},
+  {d:"conceitos", topic:"Fatores de autenticação", objective:"nomear as três categorias e o que é MFA de verdade",
+   q:"Fatores de autenticação — as três categorias e o que é MFA (autenticação multifator) de verdade?",
+   a:"Algo que você <b>sabe</b> · <b>tem</b> · <b>é</b>. MFA = mais de uma <b>categoria</b>, não dois fatores do mesmo tipo."},
+  {d:"conceitos", topic:"Classificação dos conceitos", objective:"classificar cada conceito na taxonomia",
+   q:"Natureza de cada um: CIA, assume breach, ameaça interna, cadeia de suprimentos, fatores de autenticação?",
+   a:"CIA e assume breach → <b>fundamento</b>. Ameaça interna e cadeia → <b>ameaça</b>. Fatores de autenticação → <b>taxonomia</b>. Os outros sete → princípio."},
+  {d:"conceitos", topic:"Fronteira do ponto 1", objective:"saber o que NÃO pertence ao ponto 1",
+   q:"Por que fail secure (falhar de forma segura) NÃO está entre os conceitos de base do ponto 1?",
+   a:"É <b>princípio de arquitetura</b> — pertence ao ponto 3, com fonte própria. Não é um dos conceitos de base do cap. 1."},
 
-  // ---- fases ----
-  {d:"fases", q:"As cinco fases, em ordem (mnemônico R-D-C-T-D)", a:"<b>R</b>equisitos → <b>D</b>esign → <b>C</b>ódigo → <b>T</b>estes → <b>D</b>eploy e manutenção. (+ Descontinuação, fora do ciclo clássico: Microsoft SDL, NIST SSDF.)"},
-  {d:"fases", q:"Requisitos — objetivo e os três princípios", a:"Objetivo: ativos, classificação e requisito <b>verificável</b>. Princípios: <b>verificabilidade</b>, <b>rastreabilidade</b>, <b>negação explícita</b>."},
-  {d:"fases", q:"Requisitos — as técnicas com fonte", a:"<b>Abuse case</b> (McDermott e Fox, 1999) · <b>Misuse case</b> (Sindre e Opdahl, 2000) · <b>Attack tree</b> (Schneier, 1999) · <b>Bug bar</b> (Microsoft SDL)"},
-  {d:"fases", q:"Abuse case × misuse case — a diferença", a:"<b>Abuse</b>: atacante <b>externo</b> (inverte o caso de uso). <b>Misuse</b>: <b>insider</b> com acesso legítimo fazendo o que não deve."},
-  {d:"fases", q:"Requisito ruim × requisito bom — o exemplo", a:"Ruim: 'seja seguro'. Bom: '<b>rota autenticada rejeita token expirado com 401</b>'. Sem teste, não entrou no ciclo."},
-  {d:"fases", q:"Design — técnicas com fonte", a:"<b>Modelagem de ameaças</b> (Shostack, 2014 — 4 perguntas) · <b>DFD</b> (DeMarco, 1979) · <b>Análise de superfície de ataque</b> (Manadhata e Wing, 2004)"},
-  {d:"fases", q:"As quatro perguntas da modelagem de ameaças (Shostack)", a:"O que estamos construindo? · O que pode dar errado? · O que fazemos a respeito? · Fizemos um bom trabalho?"},
-  {d:"fases", q:"Design — regra de ouro sobre custo", a:"Design errado custa <b>uma reunião</b>; código errado custa <b>meses</b>. É onde nasce a falha de design — a que patch nenhum corrige."},
-  {d:"fases", q:"Código — técnica-raiz do code review e sua fonte", a:"<b>Inspeção formal de código — Fagan, 1976</b>. Revisão estruturada com papéis e checklist; raiz do code review moderno."},
-  {d:"fases", q:"Código — regra de ouro", a:"Se está escrevendo <b>criptografia, autenticação ou sessão do zero, pare</b> — já existe implementação revisada."},
-  {d:"fases", q:"Testes — os sete alvos", a:"Código · Aplicação · Infraestrutura · Banco de dados · APIs · Integrações · Rede. Esquecer um deixa buraco."},
-  {d:"fases", q:"SAST × DAST × SCA × fuzzing — uma linha cada", a:"<b>SAST</b>: fonte sem executar · <b>DAST</b>: aplicação rodando, como atacante · <b>SCA</b>: dependências com CVE · <b>Fuzzing</b>: entrada malformada até quebrar"},
-  {d:"fases", q:"Por que SAST/DAST/SCA aparecem em Código E em Testes?", a:"Não é redundância: no <b>Código</b> roda rápido por commit (retorno ao dev); nos <b>Testes</b> roda completo com evidência (decidir a release)."},
-  {d:"fases", q:"Deploy e manutenção — técnica de resposta a incidentes e sua fonte", a:"<b>NIST SP 800-61</b>: conter, erradicar, recuperar, aprender. Regra de ouro: <b>fire drill</b> antes do incidente."},
-  {d:"fases", q:"Deploy — os três princípios", a:"<b>Assume breach</b> (operar como se já estivesse dentro) · <b>Log sem segredo</b> · <b>Detecção vale o que vale a resposta</b> (alerta que ninguém lê não existe)."},
-  {d:"fases", q:"WAF e RASP — o que fazem e o que NÃO fazem", a:"WAF filtra antes da aplicação; RASP protege de dentro. <b>Nenhum corrige a falha</b>: compram tempo até o patch."},
-  {d:"fases", q:"Pipeline CI/CD seguro — a regra de ouro", a:"Se uma verificação falhar, <b>o pipeline para</b>. Nada vai para produção com falha de segurança conhecida."},
-  {d:"fases", q:"Fonte-âncora de todo o ponto 1", a:"<b>Janca, Tanya. <i>Alice and Bob Learn Application Security</i>. Wiley, 2020.</b> Figuras I-1 (cinco fases) e 7-1 (atividades por fase)."},
+  // ---- As cinco fases ----
+  {d:"fases", topic:"As cinco fases", objective:"listar as fases em ordem",
+   q:"As cinco fases, em ordem (mnemônico R-D-C-T-D)?",
+   a:"<b>R</b>equisitos → <b>D</b>esign → <b>C</b>ódigo → <b>T</b>estes → <b>D</b>eploy e manutenção. (+ Descontinuação, fora do ciclo clássico: Microsoft SDL, NIST SSDF.)"},
+  {d:"fases", topic:"Fase · Requisitos", objective:"nomear objetivo e princípios da fase",
+   q:"Requisitos — objetivo e os três princípios?",
+   a:"Objetivo: ativos, classificação e requisito <b>verificável</b>. Princípios: <b>verificabilidade</b>, <b>rastreabilidade</b>, <b>negação explícita</b>."},
+  {d:"fases", topic:"Fase · Requisitos", objective:"nomear as técnicas com fonte",
+   q:"Requisitos — as técnicas com fonte (quem, ano)?",
+   a:"<b>Abuse case</b> (McDermott e Fox, 1999) · <b>Misuse case</b> (Sindre e Opdahl, 2000) · <b>Attack tree</b> (Schneier, 1999) · <b>Bug bar</b> (Microsoft SDL)"},
+  {d:"fases", topic:"Fase · Requisitos", objective:"distinguir abuse case de misuse case",
+   q:"Abuse case × misuse case — a diferença?",
+   a:"<b>Abuse</b>: atacante <b>externo</b> (inverte o caso de uso). <b>Misuse</b>: <b>insider</b> com acesso legítimo fazendo o que não deve."},
+  {d:"fases", topic:"Fase · Requisitos", objective:"reconhecer um requisito verificável",
+   q:"Requisito ruim × requisito bom — o exemplo?",
+   a:"Ruim: 'seja seguro'. Bom: '<b>rota autenticada rejeita token expirado com 401</b>'. Sem teste, não entrou no ciclo."},
+  {d:"fases", topic:"Fase · Design", objective:"nomear as técnicas com fonte",
+   q:"Design — técnicas com fonte (quem, ano)?",
+   a:"<b>Modelagem de ameaças</b> (Shostack, 2014 — 4 perguntas) · <b>DFD — diagrama de fluxo de dados</b> (DeMarco, 1979) · <b>Análise de superfície de ataque</b> (Manadhata e Wing, 2004)"},
+  {d:"fases", topic:"Fase · Design", objective:"recitar as quatro perguntas de Shostack",
+   q:"As quatro perguntas da modelagem de ameaças (Shostack)?",
+   a:"O que estamos construindo? · O que pode dar errado? · O que fazemos a respeito? · Fizemos um bom trabalho?"},
+  {d:"fases", topic:"Fase · Design", objective:"fixar o custo relativo da fase",
+   q:"Design — regra de ouro sobre custo?",
+   a:"Design errado custa <b>uma reunião</b>; código errado custa <b>meses</b>. É onde nasce a falha de design — a que patch nenhum corrige."},
+  {d:"fases", topic:"Fase · Código", objective:"nomear a técnica-raiz e a fonte",
+   q:"Código — técnica-raiz do code review e sua fonte?",
+   a:"<b>Inspeção formal de código — Fagan, 1976</b>. Revisão estruturada com papéis e checklist; raiz do code review moderno."},
+  {d:"fases", topic:"Fase · Código", objective:"fixar a regra de ouro da fase",
+   q:"Código — regra de ouro?",
+   a:"Se está escrevendo <b>criptografia, autenticação ou sessão do zero, pare</b> — já existe implementação revisada."},
+  {d:"fases", topic:"Fase · Testes", objective:"listar os sete alvos de teste",
+   q:"Testes — os sete alvos?",
+   a:"Código · Aplicação · Infraestrutura · Banco de dados · APIs · Integrações · Rede. Esquecer um deixa buraco."},
+  {d:"fases", topic:"Fase · Testes", objective:"distinguir as quatro análises de segurança",
+   q:"SAST (análise estática do fonte), DAST (análise dinâmica da app rodando), SCA (análise de dependências) e fuzzing — uma linha cada?",
+   a:"<b>SAST</b>: fonte sem executar · <b>DAST</b>: aplicação rodando, como atacante · <b>SCA</b>: dependências com CVE · <b>Fuzzing</b>: entrada malformada até quebrar"},
+  {d:"fases", topic:"Fase · Testes", objective:"explicar por que as análises repetem em duas fases",
+   q:"Por que SAST, DAST e SCA aparecem em Código E em Testes?",
+   a:"Não é redundância: no <b>Código</b> roda rápido por commit (retorno ao dev); nos <b>Testes</b> roda completo com evidência (decidir a release)."},
+  {d:"fases", topic:"Fase · Deploy e manutenção", objective:"nomear a técnica de resposta a incidentes e a fonte",
+   q:"Deploy e manutenção — técnica de resposta a incidentes e sua fonte?",
+   a:"<b>NIST SP 800-61</b>: conter, erradicar, recuperar, aprender. Regra de ouro: <b>fire drill</b> antes do incidente."},
+  {d:"fases", topic:"Fase · Deploy e manutenção", objective:"nomear os três princípios da fase",
+   q:"Deploy — os três princípios?",
+   a:"<b>Assume breach</b> (operar como se já estivesse dentro) · <b>Log sem segredo</b> · <b>Detecção vale o que vale a resposta</b> (alerta que ninguém lê não existe)."},
+  {d:"fases", topic:"Fase · Deploy e manutenção", objective:"saber o limite de WAF e RASP",
+   q:"WAF (firewall de aplicação web) e RASP (autoproteção em runtime) — o que fazem e o que NÃO fazem?",
+   a:"WAF filtra antes da aplicação; RASP protege de dentro. <b>Nenhum corrige a falha</b>: compram tempo até o patch."},
+  {d:"fases", topic:"Fase · Deploy e manutenção", objective:"fixar a regra do pipeline",
+   q:"Pipeline CI/CD (integração e entrega contínuas) seguro — a regra de ouro?",
+   a:"Se uma verificação falhar, <b>o pipeline para</b>. Nada vai para produção com falha de segurança conhecida."},
+  {d:"fases", topic:"Fonte do ponto 1", objective:"citar a fonte-âncora de cabeça",
+   q:"Fonte-âncora de todo o ponto 1?",
+   a:"<b>Janca, Tanya. <i>Alice and Bob Learn Application Security</i>. Wiley, 2020.</b> Figuras I-1 (cinco fases) e 7-1 (atividades por fase)."},
 ];
 
-const DECKS = {cadeia:"Cadeia", escada:"Escada", conceitos:"Conceitos de base", fases:"Fases"};
 let active = new Set(Object.keys(DECKS));
 let queue = [], current = null, flipped = false, right = 0, wrong = 0, seen = 0, total = 0;
 
@@ -111,7 +209,7 @@ const $ = id => document.getElementById(id);
 
 function buildDecks(){
   $("decks").innerHTML = Object.entries(DECKS).map(([k,v]) =>
-    `<button data-d="${k}" class="${active.has(k)?'on':''}">${v}</button>`).join("") +
+    `<button data-d="${k}" class="${active.has(k)?'on':''}" title="${v.sub}">${v.name}</button>`).join("") +
     `<button data-d="__all" class="on">Todas</button>`;
   $("decks").querySelectorAll("button").forEach(b => b.onclick = () => {
     const d = b.dataset.d;
@@ -119,6 +217,8 @@ function buildDecks(){
     else { if (active.has(d) && active.size > 1) active.delete(d); else active.add(d); }
     start();
   });
+  $("legend").innerHTML = Object.values(DECKS).map(v =>
+    `<b>${v.name}</b> — ${v.sub}`).join("<br>");
 }
 
 function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];} return a; }
@@ -136,8 +236,15 @@ function next(){
   current = queue.shift();
   $("stage").innerHTML = `
     <div class="card" id="card">
-      <div class="face front"><span class="tag">${DECKS[current.d]}</span><div class="q">${current.q}</div><span class="hint">clique ou espaço para virar</span></div>
-      <div class="face back"><span class="tag">resposta</span><div class="a">${current.a}</div></div>
+      <div class="face front">
+        <div class="head"><span class="tag">${current.topic}</span><div class="obj">Objetivo: ${current.objective}</div></div>
+        <div class="q">${current.q}</div>
+        <span class="hint">clique ou espaço para virar</span>
+      </div>
+      <div class="face back">
+        <div class="head"><span class="tag">${current.topic} · resposta</span></div>
+        <div class="a">${current.a}</div>
+      </div>
     </div>`;
   $("card").onclick = flip;
   $("btnNo").disabled = $("btnOk").disabled = true;
