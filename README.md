@@ -49,18 +49,20 @@ Regras:
 - Diagrama repete as três seções.
 - Apresentação segue o README. Se divergir, o README manda.
 
-## Hierarquia de estudo: princípio, técnica, mecanismo
+## Hierarquia de estudo: fundamento, princípio, técnica, mecanismo
 
-Três camadas, da regra à execução:
+Quatro camadas, da premissa à execução:
 
 | Camada | Pergunta |
 |---|---|
+| Fundamento | O que tomamos como dado? |
 | Princípio | Que regra não quebra? |
 | Técnica | Qual método nomeado revela onde aplicar? |
 | Mecanismo | O que executa a regra? |
 
 Regras:
 
+- Fundamento é a premissa de base que não se discute — o que se pressupõe como dado e sobre o qual os princípios se apoiam. Pergunta: "o que tomamos como dado?". O princípio deriva do fundamento; teste de fronteira: se é aceito como dado, é fundamento; se é regra que não pode falhar, é princípio.
 - Princípio é regra de restrição, não procedimento. Diz o que não pode falhar; não diz como fazer.
 - Técnica é método com nome na literatura, com fonte (quem, ano). Sem nome, não é técnica.
 - Mecanismo é a implementação concreta.

@@ -45,30 +45,30 @@ A mesma em produção: incidente, investigação forense, notificação de clien
 
 ## 2. Fundamentos — o que vale em todas as fases
 
-Os fundamentos não são uma fase. A autora os reúne no cap. 1, antes dos capítulos de fase, como a base necessária para entender como o resto do livro se aplica (p. 6). O que a Figura 7-1 distribui por fase são atividades, não fundamentos.
+A autora reúne no cap. 1, antes dos capítulos de fase, os conceitos de base que valem em todo o ciclo (p. 6) — ela os chama *security concepts*. Não são uma fase: o que a Figura 7-1 distribui por fase são atividades, não esta base.
 
-Cuidado ao ler os "Princípios" de cada fase adiante — ali se misturam duas coisas: o **fundamento transversal** que a fase *seleciona* desta tabela (ex.: least privilege, fail secure) e a **regra própria da fase**, local, que não vale fora dela (ex.: "bounds checking" no código, "negação explícita" no requisito). Fundamento reaparece em várias fases; regra de fase aparece em uma só.
+"Security concept" é um guarda-chuva, e dentro dele há naturezas diferentes. Pela taxonomia do laboratório (ver README-raiz), cada linha abaixo é um **fundamento** (premissa que se pressupõe), um **princípio** (regra que não pode quebrar), uma **ameaça** (categoria de risco) ou uma **taxonomia**. A coluna Natureza marca cada uma — não leia a lista inteira como "princípios".
 
-Os doze fundamentos do cap. 1, na ordem do livro:
+Os doze security concepts do cap. 1 (Janca), na ordem do livro:
 
-| Fundamento | Regra | Página |
-|---|---|---|
-| CIA | confidencialidade, integridade e disponibilidade são o que se protege | 3 |
-| Assume breach | presumir que a invasão já aconteceu e desenhar para conter o dano | 6 |
-| Ameaça interna | quem tem acesso legítimo também é vetor, por malícia ou acidente | 7 |
-| Defense in depth | várias camadas; uma falha não derruba tudo | 9 |
-| Least privilege | mínimo de acesso por componente e por pessoa | 10 |
-| Cadeia de suprimentos | código que você não escreveu também é seu risco | 11 |
-| Sem segurança por obscuridade | esconder não é proteger; o segredo é a chave, não o desenho | 13 |
-| Redução da superfície de ataque | menos porta aberta, menos coisa para defender | 14 |
-| Sem segredo em código | credencial em código-fonte é credencial vazada | 15 |
-| Never trust, always verify | verificar sempre, nunca confiar por padrão | 15 |
-| Segurança usável | controle que atrapalha é controle que o usuário contorna | 17 |
-| Fatores de autenticação | algo que você tem, algo que você é, algo que você sabe; mais de um fator é MFA | 18 |
+| Conceito | Natureza | Regra | Página |
+|---|---|---|---|
+| CIA | fundamento | confidencialidade, integridade e disponibilidade são o que se protege | 3 |
+| Assume breach | fundamento | presumir que a invasão já aconteceu e desenhar para conter o dano | 6 |
+| Ameaça interna | ameaça | quem tem acesso legítimo também é vetor, por malícia ou acidente | 7 |
+| Defense in depth | princípio | várias camadas; uma falha não derruba tudo | 9 |
+| Least privilege | princípio | mínimo de acesso por componente e por pessoa | 10 |
+| Cadeia de suprimentos | ameaça | código que você não escreveu também é seu risco | 11 |
+| Sem segurança por obscuridade | princípio | esconder não é proteger; o segredo é a chave, não o desenho | 13 |
+| Redução da superfície de ataque | princípio | menos porta aberta, menos coisa para defender | 14 |
+| Sem segredo em código | princípio | credencial em código-fonte é credencial vazada | 15 |
+| Never trust, always verify | princípio | verificar sempre, nunca confiar por padrão | 15 |
+| Segurança usável | princípio | controle que atrapalha é controle que o usuário contorna | 17 |
+| Fatores de autenticação | taxonomia | algo que você tem, algo que você é, algo que você sabe; mais de um fator é MFA | 18 |
 
-Nem todos são princípios no sentido estrito: ameaça interna é categoria de risco, sem segredo em código é antipadrão e fatores de autenticação é taxonomia. A autora os trata como *security concepts*, não como princípios.
+A distinção que mais ajuda a memorizar: **fundamento** é premissa (o que se pressupõe); **princípio** é a regra que dela deriva (o que não pode falhar). CIA e assume breach são as premissas; os sete princípios são as regras que as executam. Ameaça interna e cadeia de suprimentos são os vetores que tudo isso combate; fatores de autenticação é só uma classificação.
 
-Fail secure não entra nesta tabela: não é fundamento do cap. 1. Como princípio de arquitetura, pertence ao ponto 3, com fonte própria.
+Fail secure não entra nesta tabela: não é conceito do cap. 1. Como princípio de arquitetura, pertence ao ponto 3, com fonte própria.
 
 Detalhamento dos princípios de arquitetura: ponto 3. Cadeia de suprimentos: ponto 8.
 
