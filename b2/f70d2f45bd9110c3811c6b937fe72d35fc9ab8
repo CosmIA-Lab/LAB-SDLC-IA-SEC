@@ -1,0 +1,21 @@
+00-mapa-de-estudo.md
+  s_746dbcfbc6055c::t_7b1127445f3a78 1-123
+README.md
+  s_746dbcfbc6055c::t_44cdc42c54f146 106-109
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b2f70d2f45bd9110c3811c6b937fe72d35fc9ab8",
+  "prompts": {},
+  "sessions": {
+    "s_746dbcfbc6055c": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "01a14617-ef4f-7533-ac2c-983ad3277da4",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": null
+    }
+  }
+}
