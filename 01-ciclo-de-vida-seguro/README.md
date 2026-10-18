@@ -91,18 +91,9 @@ flowchart LR
 
 As cinco fases existem em qualquer metodologia — Waterfall, Agile ou DevOps. O que muda é a duração e a frequência de cada volta, não a existência das fases.
 
-### De onde vem cada fase
+Deploy e manutenção são uma fase só, não duas: as atividades de segurança são as mesmas (monitorar, alertar, responder). A descontinuação não está no ciclo clássico de cinco fases; vem do Microsoft SDL e do NIST SSDF.
 
-| Fase (Janca) | Fonte |
-|---|---|
-| Requisitos | Figura I-1, cap. 2 |
-| Design | Figura I-1, cap. 3 |
-| Código | Figura I-1, cap. 4 e 5 |
-| Testes | Figura I-1, cap. 6 |
-| Deploy e manutenção | Figura 7-1, cap. 6 e 9 |
-| Descontinuação | não está no livro; Microsoft SDL e NIST SSDF |
-
-Deploy e manutenção são uma fase só, não duas: as atividades de segurança são as mesmas (monitorar, alertar, responder).
+*Nota de estudo: as fases e seus nomes seguem Janca (2020), Figuras I-1 e 7-1 — mapa por capítulo nas Referências.*
 
 ---
 
@@ -112,7 +103,7 @@ O SDLC seguro é o mesmo ciclo de vida de software, com segurança embutida em c
 
 ### Fase 1 — Requisitos
 
-Ordem: objetivo → princípios → técnicas → saída.
+*Nota de estudo: ordem objetivo → princípios → técnicas → saída.*
 
 ```mermaid
 flowchart LR
@@ -170,7 +161,7 @@ As técnicas são lentes diferentes para achar falhas. Cada uma faz uma pergunta
 | Attack tree | Schneier, 1999 | Qual é o objetivo do atacante e quais os caminhos? | Parte do objetivo na raiz; cada ramo é um caminho pra chegar lá | Raiz: roubar dados de cartão. Ramos: SQL injection, upload sem validação, sessão sem expiração. Cada ramo vira um requisito |
 | Bug bar | Microsoft SDL | O que não pode ir pra release? | Define o limiar antes de escrever qualquer requisito; é requisito de processo, não de produto | Nenhuma falha crítica conhecida vai pra release |
 
-Apoio, não técnica: OWASP ASVS é o catálogo de requisito testável — serve como checklist quando a elicitação termina, para achar o que ninguém lembrou. SQUARE (Mead, SEI) é o processo que escolhe a técnica. Confuse case não é técnica nomeada com fonte canônica — é uma variação informal do misuse case para cobrir erro humano sem intenção (usuário digita CEP inválido; o formulário rejeita com mensagem clara); use como lembrete, não como técnica.
+*Nota de estudo — apoio, não técnica: OWASP ASVS é o catálogo de requisito testável — serve como checklist quando a elicitação termina, para achar o que ninguém lembrou. SQUARE (Mead, SEI) é o processo que escolhe a técnica. Confuse case não é técnica nomeada com fonte canônica — é uma variação informal do misuse case para cobrir erro humano sem intenção (usuário digita CEP inválido; o formulário rejeita com mensagem clara); use como lembrete, não como técnica.*
 
 #### Saída
 
@@ -178,7 +169,7 @@ Requisito com critério de aceite. Sem teste, não entrou no ciclo.
 
 ### Fase 2 — Design
 
-Ordem: objetivo → princípios → técnicas → saída.
+*Nota de estudo: ordem objetivo → princípios → técnicas → saída.*
 
 ```mermaid
 flowchart LR
@@ -223,7 +214,7 @@ Regra de ouro: design errado custa uma reunião; código errado custa meses.
 | Diagrama de fluxo de dados (DFD) | DeMarco, 1979 | processos, armazenamentos e fluxos; é o insumo da modelagem de ameaças |
 | Análise de superfície de ataque | Manadhata e Wing, 2004 | lista pontos de entrada e prioriza por risco |
 
-Apoio, não técnica: STRIDE (Microsoft) e PASTA são as taxonomias que alimentam a modelagem. Detalhamento da modelagem de ameaças: ponto 2.
+*Nota de estudo — apoio, não técnica: STRIDE (Microsoft) e PASTA são as taxonomias que alimentam a modelagem. Detalhamento da modelagem de ameaças: ponto 2.*
 
 #### Saída
 
@@ -231,7 +222,7 @@ Desenho com ameaças mapeadas e mitigações definidas. Sem mitigação, o desen
 
 ### Fase 3 — Código
 
-Ordem: objetivo → princípios → técnicas → saída.
+*Nota de estudo: ordem objetivo → princípios → técnicas → saída.*
 
 ```mermaid
 flowchart LR
@@ -277,7 +268,7 @@ Regra de ouro: se você está escrevendo criptografia, autenticação ou sessão
 | Secure code review | OWASP Code Review Guide | revisão focada nos controles de segurança, manual ou apoiada por SAST |
 | SAST | ver ponto 7 | analisa o código-fonte sem executar, no commit |
 
-Apoio, não técnica: OWASP Top 10 e CWE são catálogos de padrão de falha. Detalhamento das vulnerabilidades web: ponto 4. Codificação segura e erros de memória: ponto 5. AuthN, AuthZ e sessão: ponto 6.
+*Nota de estudo — apoio, não técnica: OWASP Top 10 e CWE são catálogos de padrão de falha. Detalhamento das vulnerabilidades web: ponto 4. Codificação segura e erros de memória: ponto 5. AuthN, AuthZ e sessão: ponto 6.*
 
 #### Saída
 
@@ -285,7 +276,7 @@ Código revisado, com teste que prova o requisito e sem achado crítico em abert
 
 ### Fase 4 — Testes
 
-Ordem: objetivo → princípios → técnicas → saída.
+*Nota de estudo: ordem objetivo → princípios → técnicas → saída.*
 
 ```mermaid
 flowchart LR
@@ -337,7 +328,7 @@ Achado com severidade, prova de reprodução e decisão: corrige agora, aceita o
 
 ### Fase 5 — Deploy e manutenção
 
-Ordem: objetivo → princípios → técnicas → saída.
+*Nota de estudo: ordem objetivo → princípios → técnicas → saída.*
 
 ```mermaid
 flowchart LR
@@ -559,7 +550,7 @@ Um não substitui o outro: o DevSecOps é a forma de executar o SDLC seguro em e
 
 ## Referências
 
-- **Janca, Tanya. *Alice and Bob Learn Application Security*. Wiley, 2020** — referência principal. Figura I-1 (o SDLC e suas cinco fases), Figura 7-1 (atividades de segurança por fase), cap. 1 (fundamentos), cap. 2 (requisitos), cap. 3 (design seguro), cap. 4 (código seguro), cap. 5 (armadilhas comuns), cap. 6 (testes e deploy), cap. 7 (programa de AppSec), cap. 9 (bons hábitos)
+- **Janca, Tanya. *Alice and Bob Learn Application Security*. Wiley, 2020** — referência principal. Figura I-1 (o SDLC e suas cinco fases), Figura 7-1 (atividades de segurança por fase). Por fase: Requisitos — cap. 2; Design — cap. 3; Código — cap. 4 e 5; Testes — cap. 6; Deploy e manutenção — cap. 6 e 9 (Figura 7-1). Também: cap. 1 (conceitos de base), cap. 7 (programa de AppSec)
 - Microsoft SDL — learn.microsoft.com (procure "Security Development Lifecycle")
 - NIST SSDF — nist.gov/publications/sp-800-218
 - NIST SP 800-61 — resposta a incidentes
