@@ -49,7 +49,7 @@ Essa é a estratégia. Mas se ela manda agir cedo e ao longo de todo o ciclo, su
 
 Alguns conceitos valem no ciclo inteiro — não pertencem a nenhuma fase, pertencem a todas. Fixá-los antes de percorrer as fases evita reexplicá-los em cada uma (Janca, 2020, p. 6).
 
-Esses conceitos têm naturezas diferentes, e misturá-las confunde. Cada linha abaixo é um **fundamento** (premissa que se pressupõe), um **princípio** (regra que não pode quebrar), uma **ameaça** (categoria de risco) ou uma **taxonomia** — a coluna Natureza marca qual. Não leia a lista inteira como "princípios".
+*Nota de estudo: a coluna Natureza classifica cada conceito — fundamento (premissa), princípio (regra), ameaça (risco) ou taxonomia — para você não fixar a lista inteira como "princípios".*
 
 Os doze conceitos de base (Janca, 2020):
 
