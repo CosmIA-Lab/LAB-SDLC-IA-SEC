@@ -22,7 +22,7 @@ Quanto mais tarde a falha é corrigida, mais cara ela fica. Falha encontrada no 
 
 ### A tese: pushing left
 
-Dessa curva de custo nasce a ideia que organiza todo o ciclo: *pushing left* — empurrar a segurança para a esquerda, para as fases iniciais, antes de o código existir. Não é um princípio (não restringe nada); é a **estratégia** que decide *quando* aplicar os princípios. A curva de custo é o fundamento (raiz em Boehm, *Software Engineering Economics*, 1981); Janca a reembala como pushing left. Tudo que segue neste ponto é como executá-la cedo.
+Dessa curva de custo nasce a ideia que organiza todo o ciclo: *pushing left* — empurrar a segurança para a esquerda, para as fases iniciais, antes de o código existir. Não é um princípio (não restringe nada); é a **estratégia** que decide *quando* aplicar os princípios. A curva de custo é o fundamento (raiz em Boehm, *Software Engineering Economics*, 1981); Janca a reembala como pushing left. No restante do ponto 1, tudo é como executá-la cedo.
 
 ### Falha de design e bug de implementação
 
