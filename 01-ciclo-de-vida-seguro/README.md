@@ -66,7 +66,57 @@ Os doze conceitos de base (Janca, 2020):
 | Segurança usável | princípio | controle que atrapalha é controle que o usuário contorna | 17 |
 | Fatores de autenticação | taxonomia | algo que você tem, algo que você é, algo que você sabe; mais de um fator é MFA | 18 |
 
-Fail secure não entra nesta tabela: é princípio de arquitetura, detalhado no ponto 3 com fonte própria, não um dos conceitos de base do ciclo.
+A tabela resume; cada conceito abaixo tem o problema que o motiva e o que muda quando ele é aplicado.
+
+### CIA — o mandato da segurança
+
+Confidencialidade, integridade e disponibilidade são as três propriedades que toda equipe de segurança existe para proteger — o mandato (Janca, 2020, Figura 1-1). Confidencialidade: só quem deve acessa. Integridade: o dado é o que deveria ser, sem alteração indevida. Disponibilidade: o sistema está lá quando é preciso. Parece abstrato até virar decisão: cada controle que incomoda — tirar direito de administrador, bloquear dispositivo desconhecido — existe para proteger uma dessas três. Por isso CIA vem primeiro: é o critério contra o qual todo requisito e todo risco é medido.
+
+### Assume breach — presumir a invasão
+
+A postura ingênua desenha o sistema para impedir a entrada. A postura madura presume que a entrada já aconteceu — ou vai acontecer — e desenha para limitar o dano. A diferença é prática: se o atacante já está dentro, segmentação, logs, menor privilégio e detecção deixam de ser luxo e viram o plano principal. Assume breach é a premissa que torna defense in depth e least privilege necessários, não opcionais.
+
+### Ameaça interna — o vetor com crachá
+
+Quem tem acesso legítimo também é vetor: por malícia (funcionário que exporta a base de clientes) ou por acidente (quem clica no link errado, quem configura mal). A consequência de projeto é que o perímetro não basta — controles precisam valer *dentro*, para contas autenticadas, e não só na porta.
+
+### Defense in depth — camadas
+
+Nenhum controle é infalível. Defense in depth é colocar várias barreiras independentes, de modo que a falha de uma não exponha tudo: validação de entrada *e* query parametrizada *e* WAF *e* menor privilégio no banco. O atacante precisa vencer todas; o defensor só precisa que uma segure.
+
+### Least privilege — o mínimo necessário
+
+Cada componente e cada pessoa recebe o menor acesso que permite fazer o trabalho — nada a mais. Reduz o que um erro ou um comprometimento pode alcançar: uma conta de serviço que só lê não vaza o que não pode escrever, e um usuário sem admin não instala o que não deveria. É o princípio mais barato de aplicar e o mais frequentemente ignorado por conveniência.
+
+### Cadeia de suprimentos — o código que você não escreveu
+
+A maior parte de uma aplicação moderna é código de terceiros: bibliotecas, frameworks, imagens, serviços. Cada um é risco seu, porque roda com os seus privilégios e toca os seus dados. Uma dependência vulnerável ou maliciosa compromete o sistema tanto quanto um bug próprio. Daí a necessidade de saber o que se usa (inventário), de onde vem e se está atualizado.
+
+### Sem segurança por obscuridade
+
+Esconder o desenho não é proteger. Um sistema seguro continua seguro mesmo quando o atacante conhece sua arquitetura e seu código — o que deve permanecer secreto é a chave, não o mecanismo. Depender de "ninguém vai descobrir" é apostar contra o tempo: alguém descobre.
+
+### Redução da superfície de ataque
+
+Superfície de ataque é o conjunto de pontos por onde o sistema pode ser atacado: portas, endpoints, parâmetros, integrações, funcionalidades. Cada um exige proteção e cada um pode falhar. Reduzir a superfície — desligar o que não se usa, expor só o necessário — diminui o que precisa ser defendido antes de qualquer controle ser escrito.
+
+### Sem segredo em código
+
+Senha, token ou chave no código-fonte é segredo vazado: o repositório é clonado, copiado, compartilhado, e o histórico guarda tudo. Segredos vivem em cofre ou em variáveis de ambiente injetadas em runtime, nunca no fonte. É a regra mais simples do conjunto e uma das mais quebradas.
+
+### Never trust, always verify — zero trust
+
+Todo dado e toda requisição são tratados como não confiáveis até prova em contrário, inclusive quando vêm de dentro da rede ou de outro sistema seu. Confiança implícita baseada em "está na rede interna" é o que insiders e invasores já dentro exploram. Verifica-se sempre: identidade, autorização, integridade da entrada.
+
+### Segurança usável
+
+Controle que atrapalha é controle que o usuário contorna — senha impossível vira post-it, aprovação lenta vira atalho. Segurança que ignora o humano falha pelo lado humano. Projetar o controle para ser o caminho mais fácil é parte da segurança, não concessão.
+
+### Fatores de autenticação
+
+Três categorias de prova de identidade: algo que você sabe (senha), algo que você tem (telefone, token físico), algo que você é (biometria). Autenticação multifator combina mais de uma categoria — não dois fatores do mesmo tipo. Uma senha vazada não basta quando o segundo fator está em outra categoria.
+
+Fail secure não entra neste conjunto: é princípio de arquitetura, detalhado no ponto 3 com fonte própria, não um dos conceitos de base do ciclo.
 
 Fixada a base que vale no ciclo inteiro, falta o ciclo: quais são as fases, e o que essa base vira em cada uma. A próxima seção abre o mapa completo; depois, fase por fase.
 
