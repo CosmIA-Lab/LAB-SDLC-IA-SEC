@@ -103,6 +103,10 @@ O README guarda estruturas de raciocínio e processos de aprendizagem — não e
 - **Pergunta em vez de definição**: cada conceito vira pergunta. "O que é ativo?" vira "o que vale proteger nesse sistema?" — a resposta é sempre concreta.
 - **Estrutura antes de conteúdo**: primeiro o molde (objetivo, princípios, técnicas), depois o preenchimento. O molde é o que se memoriza; o conteúdo é o que se aplica.
 
+## Mapa de estudo
+
+Visão relacional dos dez pontos — fundamentos transversais, a tríade por ponto e como um ponto puxa o outro: [00-mapa-de-estudo.md](00-mapa-de-estudo.md).
+
 ## Pontos
 
 1. [Ciclo de vida de desenvolvimento seguro e DevSecOps](01-ciclo-de-vida-seguro/README.md)
