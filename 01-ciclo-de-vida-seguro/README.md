@@ -45,7 +45,7 @@ A mesma em produção: incidente, investigação forense, notificação de clien
 
 ## 2. Fundamentos — o que vale em todas as fases
 
-Os princípios não são uma fase. São transversais: valem do requisito à manutenção, e cada fase apenas os aplica.
+Os princípios não são uma fase. São transversais: valem do requisito à manutenção. Mas cuidado ao ler os "Princípios" de cada fase adiante — ali se misturam duas coisas: o **fundamento transversal** que a fase *seleciona* desta tabela (ex.: least privilege, fail secure) e a **regra própria da fase**, local, que não vale fora dela (ex.: "bounds checking" no código, "negação explícita" no requisito). Fundamento reaparece em várias fases; regra de fase aparece em uma só.
 
 | Princípio | Regra |
 |---|---|
