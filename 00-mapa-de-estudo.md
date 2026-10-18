@@ -59,11 +59,11 @@ Como usar: ao estudar qualquer ponto, pergunte quais destes fundamentos ele exec
 
 ## 3. A tríade aplicada — uma âncora por ponto
 
-Para cada ponto, o par que mais cai: a técnica nomeada (com fonte) e o mecanismo que a executa. É o mínimo para não confundir regra, método e implementação.
+Para cada ponto, o par que mais cai: a âncora nomeada (com fonte) e o mecanismo que a executa. É o mínimo para não confundir regra, método e implementação. A âncora costuma ser uma técnica; no ponto 1 é uma *estratégia* (pushing left), não técnica — a coluna aceita os dois, desde que marcados.
 
-| Ponto | Técnica âncora (fonte) | Mecanismo que executa |
+| Ponto | Âncora: técnica ou estratégia (fonte) | Mecanismo que executa |
 |---|---|---|
-| 1. SDLC seguro | Pushing Left (Janca, 2020); NIST SSDF | pipeline CI/CD com gates por fase |
+| 1. SDLC seguro | *estratégia*: pushing left (Boehm, 1981; Janca, 2020); NIST SSDF | pipeline CI/CD com gates por fase |
 | 2. Modelagem de ameaças | STRIDE (Microsoft); attack tree (Schneier, 1999) | DFD + Threat Dragon / threat modeling |
 | 3. Arquitetura segura | Saltzer & Schroeder, 1975 (8 princípios) | trust boundary, segmentação, sandbox |
 | 4. Vulns web | OWASP Top 10; OWASP ASVS | query parametrizada, output encoding, CSP |
