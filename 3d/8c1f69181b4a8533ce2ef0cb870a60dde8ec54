@@ -1,0 +1,19 @@
+01-ciclo-de-vida-seguro/README.md
+  s_79853771692021::t_bbc8974f32d68c 69-119
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "3d8c1f69181b4a8533ce2ef0cb870a60dde8ec54",
+  "prompts": {},
+  "sessions": {
+    "s_79853771692021": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "01a14c9f-7b0d-70a0-875c-b113b0ce1b5b",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "alan <nascimentoalankst@gmail.com>"
+    }
+  }
+}
