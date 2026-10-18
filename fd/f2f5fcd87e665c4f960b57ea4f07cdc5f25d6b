@@ -1,0 +1,21 @@
+01-ciclo-de-vida-seguro/README.md
+  s_79853771692021::t_106cbc8c424a37 48-71
+README.md
+  s_79853771692021::t_7cbfbd7591637c 52,54,58,65
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "fdf2f5fcd87e665c4f960b57ea4f07cdc5f25d6b",
+  "prompts": {},
+  "sessions": {
+    "s_79853771692021": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "01a14c9f-7b0d-70a0-875c-b113b0ce1b5b",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "alan <nascimentoalankst@gmail.com>"
+    }
+  }
+}
