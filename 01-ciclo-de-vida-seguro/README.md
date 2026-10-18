@@ -68,11 +68,11 @@ Os doze conceitos de base (Janca, 2020):
 | Segurança usável | princípio | controle que atrapalha é controle que o usuário contorna | 17 |
 | Fatores de autenticação | taxonomia | algo que você tem, algo que você é, algo que você sabe; mais de um fator é MFA | 18 |
 
-A distinção que mais ajuda a memorizar: **fundamento** é premissa (o que se pressupõe); **princípio** é a regra que dela deriva (o que não pode falhar). CIA e assume breach são as premissas; os sete princípios são as regras que as executam. Ameaça interna e cadeia de suprimentos são os vetores que tudo isso combate; fatores de autenticação é só uma classificação.
+*Nota de estudo: CIA e assume breach são as premissas; os sete princípios são as regras que delas derivam; ameaça interna e cadeia de suprimentos são os vetores que tudo isso combate; fatores de autenticação é só classificação.*
 
 Fail secure não entra nesta tabela: é princípio de arquitetura, detalhado no ponto 3 com fonte própria, não um dos conceitos de base do ciclo.
 
-Detalhamento dos princípios de arquitetura: ponto 3. Cadeia de suprimentos: ponto 8.
+*Nota de estudo: princípios de arquitetura → ponto 3; cadeia de suprimentos → ponto 8.*
 
 Fixada a base que vale no ciclo inteiro, falta o ciclo: quais são as fases, e o que essa base vira em cada uma. A próxima seção abre o mapa completo; depois, fase por fase.
 
@@ -214,7 +214,7 @@ Regra de ouro: design errado custa uma reunião; código errado custa meses.
 | Diagrama de fluxo de dados (DFD) | DeMarco, 1979 | processos, armazenamentos e fluxos; é o insumo da modelagem de ameaças |
 | Análise de superfície de ataque | Manadhata e Wing, 2004 | lista pontos de entrada e prioriza por risco |
 
-*Nota de estudo — apoio, não técnica: STRIDE (Microsoft) e PASTA são as taxonomias que alimentam a modelagem. Detalhamento da modelagem de ameaças: ponto 2.*
+*Nota de estudo — apoio, não técnica: STRIDE (Microsoft) e PASTA são as taxonomias que alimentam a modelagem. modelagem de ameaças → ponto 2.*
 
 #### Saída
 
@@ -268,7 +268,7 @@ Regra de ouro: se você está escrevendo criptografia, autenticação ou sessão
 | Secure code review | OWASP Code Review Guide | revisão focada nos controles de segurança, manual ou apoiada por SAST |
 | SAST | ver ponto 7 | analisa o código-fonte sem executar, no commit |
 
-*Nota de estudo — apoio, não técnica: OWASP Top 10 e CWE são catálogos de padrão de falha. Detalhamento das vulnerabilidades web: ponto 4. Codificação segura e erros de memória: ponto 5. AuthN, AuthZ e sessão: ponto 6.*
+*Nota de estudo — apoio, não técnica: OWASP Top 10 e CWE são catálogos de padrão de falha. vulnerabilidades web → ponto 4; codificação segura → ponto 5; AuthN/AuthZ/sessão → ponto 6.*
 
 #### Saída
 
@@ -320,7 +320,7 @@ A fase não testa só o código. São sete alvos, e esquecer um deixa buraco (Ja
 | Secret scanning | procura credencial vazada no repositório |
 | Pentest | simula ataque real, geralmente por time externo |
 
-Detalhamento das técnicas e ferramentas: ponto 7. Dependências e SCA: ponto 8.
+*Nota de estudo: técnicas e ferramentas → ponto 7; dependências e SCA → ponto 8.*
 
 #### Saída
 
@@ -371,7 +371,7 @@ Regra de ouro: simulação (fire drill) antes do incidente — plano de resposta
 | Resposta a incidentes (NIST SP 800-61) | processo de contenção, erradicação, recuperação e lição aprendida |
 | Gestão de vulnerabilidades | ciclo de identificar, priorizar, corrigir e verificar |
 
-Detalhamento da gestão de vulnerabilidades: ponto 10.
+*Nota de estudo: gestão de vulnerabilidades → ponto 10.*
 
 #### Saída
 
@@ -473,7 +473,9 @@ Se uma verificação falhar, o pipeline para. Nada vai para produção com falha
 
 ## 9. Ferramentas do DevSecOps
 
-Cada letra do DevSecOps tem ferramentas correspondentes. Os nomes abaixo são exemplo, não recomendação: um por categoria, só para ancorar a técnica a uma ferramenta concreta. O que se memoriza é o que a técnica faz, não o vendor.
+Cada técnica do DevSecOps tem ferramentas que a executam.
+
+*Nota de estudo: um exemplo por categoria, só para ancorar; o que se fixa é o que a técnica faz, não o vendor.*
 
 ### SAST — Static Application Security Testing
 
@@ -531,7 +533,9 @@ Um não substitui o outro: o DevSecOps é a forma de executar o SDLC seguro em e
 
 ---
 
-## 11. Técnicas para memorizar
+## 11. Tabela de recall
+
+*Nota de estudo: esta seção é andaime de retrieval practice, não conteúdo da dissertação.*
 
 | Fase / Conceito | Objetivo | Princípio | Técnica |
 |---|---|---|---|
