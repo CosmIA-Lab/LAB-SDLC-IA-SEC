@@ -10,17 +10,19 @@ Referência principal: Janca, Tanya. *Alice and Bob Learn Application Security*.
 
 ## 1. Pushing Left — a ideia que sustenta o ciclo
 
-*Pushing Left* é empurrar a segurança para a esquerda do ciclo: para as fases iniciais, antes do código existir.
+Todo software erra. A questão de engenharia nunca foi evitar o erro, e sim decidir *em que fase do ciclo* ele é descoberto — porque é a fase que define o custo.
 
-### A regra
+### A regra: o custo cresce com o tempo
 
 Quanto mais tarde a falha é corrigida, mais cara ela fica. Falha encontrada no requisito custa uma frase reescrita; a mesma falha em produção custa incidente, investigação e notificação de clientes.
-
-### Por quê
 
 - No requisito e no design, não existe código escrito — corrigir é mudar um documento.
 - No commit, o código é pequeno e o contexto está fresco.
 - Em produção, a falha já afetou dados, clientes ou receita.
+
+### A tese: pushing left
+
+Dessa curva de custo nasce a ideia que organiza todo o ciclo: *pushing left* — empurrar a segurança para a esquerda, para as fases iniciais, antes de o código existir. É o princípio; tudo que segue neste ponto é como aplicá-lo.
 
 ### Falha de design e bug de implementação
 
@@ -44,6 +46,8 @@ A mesma em produção: incidente, investigação forense, notificação de clien
 ## 2. Fundamentos — o que vale em todas as fases
 
 Os fundamentos não são uma fase. A autora os reúne no cap. 1, antes dos capítulos de fase, como a base necessária para entender como o resto do livro se aplica (p. 6). O que a Figura 7-1 distribui por fase são atividades, não fundamentos.
+
+Cuidado ao ler os "Princípios" de cada fase adiante — ali se misturam duas coisas: o **fundamento transversal** que a fase *seleciona* desta tabela (ex.: least privilege, fail secure) e a **regra própria da fase**, local, que não vale fora dela (ex.: "bounds checking" no código, "negação explícita" no requisito). Fundamento reaparece em várias fases; regra de fase aparece em uma só.
 
 Os doze fundamentos do cap. 1, na ordem do livro:
 
@@ -85,14 +89,14 @@ As cinco fases existem em qualquer metodologia — Waterfall, Agile ou DevOps. O
 
 ### De onde vem cada fase
 
-| Fase (Janca) | Nome anterior neste material | Fonte |
-|---|---|---|
-| Requisitos | Requisitos | Figura I-1, cap. 2 |
-| Design | Design | Figura I-1, cap. 3 |
-| Código | Implementação | Figura I-1, cap. 4 e 5 |
-| Testes | Verificação | Figura I-1, cap. 6 |
-| Deploy e manutenção | Operação | Figura 7-1, cap. 6 e 9 |
-| Descontinuação | Descontinuação | não está no livro; Microsoft SDL e NIST SSDF |
+| Fase (Janca) | Fonte |
+|---|---|
+| Requisitos | Figura I-1, cap. 2 |
+| Design | Figura I-1, cap. 3 |
+| Código | Figura I-1, cap. 4 e 5 |
+| Testes | Figura I-1, cap. 6 |
+| Deploy e manutenção | Figura 7-1, cap. 6 e 9 |
+| Descontinuação | não está no livro; Microsoft SDL e NIST SSDF |
 
 A fase de Operação deixou de ser separada: na Figura 7-1 o deploy e a manutenção são a mesma fase, porque as atividades de segurança são as mesmas (monitorar, alertar, responder).
 
@@ -159,11 +163,10 @@ As técnicas são lentes diferentes para achar falhas. Cada uma faz uma pergunta
 |---|---|---|---|---|
 | Abuse case | McDermott e Fox, 1999 | O que um atacante externo faria? | Inverte o caso de uso normal: desenha o fluxo legítimo e depois o fluxo do atacante | Caso de uso: usuário faz login. Abuse case: atacante tenta login com senha vazada. Requisito: bloqueia após três tentativas falhas |
 | Misuse case | Sindre e Opdahl, 2000 | O que um insider faria? | Insider com acesso legítimo fazendo o que não deve; aparece no mesmo diagrama do caso de uso | Funcionário exporta a base de clientes. Requisito: exportação exige aprovação de dois níveis |
-| Confuse case | extensão dos misuse cases | O que acontece quando alguém erra sem intenção? | O sistema não é à prova de engano; cobre erro humano | Usuário digita CEP inválido. Requisito: formulário rejeita com mensagem clara |
-| Attack tree | Schneier | Qual é o objetivo do atacante e quais os caminhos? | Parte do objetivo na raiz; cada ramo é um caminho pra chegar lá | Raiz: roubar dados de cartão. Ramos: SQL injection, upload sem validação, sessão sem expiração. Cada ramo vira um requisito |
+| Attack tree | Schneier, 1999 | Qual é o objetivo do atacante e quais os caminhos? | Parte do objetivo na raiz; cada ramo é um caminho pra chegar lá | Raiz: roubar dados de cartão. Ramos: SQL injection, upload sem validação, sessão sem expiração. Cada ramo vira um requisito |
 | Bug bar | Microsoft SDL | O que não pode ir pra release? | Define o limiar antes de escrever qualquer requisito; é requisito de processo, não de produto | Nenhuma falha crítica conhecida vai pra release |
 
-Apoio, não técnica: OWASP ASVS é o catálogo de requisito testável — serve como checklist quando a elicitação termina, para achar o que ninguém lembrou. SQUARE (Mead, SEI) é o processo que escolhe a técnica.
+Apoio, não técnica: OWASP ASVS é o catálogo de requisito testável — serve como checklist quando a elicitação termina, para achar o que ninguém lembrou. SQUARE (Mead, SEI) é o processo que escolhe a técnica. Confuse case não é técnica nomeada com fonte canônica — é uma variação informal do misuse case para cobrir erro humano sem intenção (usuário digita CEP inválido; o formulário rejeita com mensagem clara); use como lembrete, não como técnica.
 
 #### Saída
 
@@ -435,19 +438,19 @@ Modelo tradicional: o time de segurança recebia o sistema pronto, fazia um pent
 
 ## 7. Shift-left e shift-right
 
-Duas práticas centrais do DevSecOps. Shift-left é o *Pushing Left* da seção 1 aplicado ao pipeline.
+Aqui o princípio da seção 1 vira prática de pipeline. **Shift-left é o pushing left aplicado ao CI/CD** — não é ideia nova, é a mesma regra de custo executada a cada commit. O que o DevSecOps acrescenta é o par que falta: o lado direito.
 
-### Shift-left
+### Shift-left — o pushing left no pipeline
 
 Trazer segurança para o mais cedo possível. Em vez de testar no final, testar em cada commit: SAST no push, SCA nas dependências, secrets scanning antes do merge.
 
-### Shift-right
+### Shift-right — o que o pushing left sozinho não cobre
 
-Monitorar em produção. CVEs novos aparecem todo dia; o time precisa saber quais afetam o que roda e responder rápido.
+Empurrar para a esquerda previne, mas não enxerga o que já está rodando. Shift-right é monitorar em produção: CVEs novos aparecem todo dia, e o time precisa saber quais afetam o que roda e responder rápido.
 
 ### Juntas
 
-Shift-left previne. Shift-right detecta. Um sem o outro deixa buracos: só shift-left ignora o que já está em produção; só shift-right corrige tarde demais.
+Shift-left previne, shift-right detecta. Um sem o outro deixa buraco: só shift-left ignora o que já está em produção; só shift-right corrige tarde demais.
 
 ---
 
@@ -473,25 +476,25 @@ Se uma verificação falhar, o pipeline para. Nada vai para produção com falha
 
 ## 9. Ferramentas do DevSecOps
 
-Cada letra do DevSecOps tem ferramentas correspondentes.
+Cada letra do DevSecOps tem ferramentas correspondentes. Os nomes abaixo são exemplo, não recomendação: um por categoria, só para ancorar a técnica a uma ferramenta concreta. O que se memoriza é o que a técnica faz, não o vendor.
 
 ### SAST — Static Application Security Testing
 
 Analisa o código-fonte sem executá-lo. Encontra padrões de falha conhecidos: SQL injection, buffer overflow, funções inseguras.
 
-Exemplos: Semgrep, SonarQube, CodeQL.
+Exemplo: Semgrep.
 
 ### DAST — Dynamic Application Security Testing
 
 Testa a aplicação rodando, como um atacante. Envia requisições maliciosas e observa as respostas.
 
-Exemplos: OWASP ZAP, Burp Suite.
+Exemplo: OWASP ZAP.
 
 ### SCA — Software Composition Analysis
 
 Verifica dependências de terceiros. Bibliotecas com CVEs conhecidas são sinalizadas.
 
-Exemplos: Dependabot, Snyk, Trivy.
+Exemplo: Trivy.
 
 ### Fuzzing
 
@@ -501,7 +504,7 @@ Envia entradas aleatórias ou malformadas e observa se o programa quebra. Bom pa
 
 Procura credenciais vazadas no código: senhas, tokens, chaves de API.
 
-Exemplos: GitGuardian, gitleaks, trufflehog.
+Exemplo: gitleaks.
 
 ### WAF e RASP
 
@@ -535,7 +538,7 @@ Um não substitui o outro: o DevSecOps é a forma de executar o SDLC seguro em e
 
 | Fase / Conceito | Objetivo | Princípio | Técnica |
 |---|---|---|---|
-| Requisitos | requisito verificável | verificável, rastreável, negação explícita | abuse case, misuse case, confuse case, attack tree, bug bar |
+| Requisitos | requisito verificável | verificável, rastreável, negação explícita | abuse case, misuse case, attack tree, bug bar |
 | Design | desenho seguro antes do código | least privilege, defense in depth, fail secure, zero trust | modelagem de ameaças, DFD, superfície de ataque |
 | Código | código sem falha conhecida | never trust input, nada hard coded, bounds checking | inspeção de Fagan, secure code review, SAST, linting |
 | Testes | falha encontrada com evidência | evidência, severidade, cobertura dos sete alvos | SAST, DAST, SCA, fuzzing, secret scanning, pentest |
