@@ -79,14 +79,14 @@ As cinco fases existem em qualquer metodologia — Waterfall, Agile ou DevOps. O
 
 ### De onde vem cada fase
 
-| Fase (Janca) | Nome anterior neste material | Fonte |
-|---|---|---|
-| Requisitos | Requisitos | Figura I-1, cap. 2 |
-| Design | Design | Figura I-1, cap. 3 |
-| Código | Implementação | Figura I-1, cap. 4 e 5 |
-| Testes | Verificação | Figura I-1, cap. 6 |
-| Deploy e manutenção | Operação | Figura 7-1, cap. 6 e 9 |
-| Descontinuação | Descontinuação | não está no livro; Microsoft SDL e NIST SSDF |
+| Fase (Janca) | Fonte |
+|---|---|
+| Requisitos | Figura I-1, cap. 2 |
+| Design | Figura I-1, cap. 3 |
+| Código | Figura I-1, cap. 4 e 5 |
+| Testes | Figura I-1, cap. 6 |
+| Deploy e manutenção | Figura 7-1, cap. 6 e 9 |
+| Descontinuação | não está no livro; Microsoft SDL e NIST SSDF |
 
 A fase de Operação deixou de ser separada: na Figura 7-1 o deploy e a manutenção são a mesma fase, porque as atividades de segurança são as mesmas (monitorar, alertar, responder).
 
