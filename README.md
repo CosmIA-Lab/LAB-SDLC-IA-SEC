@@ -67,7 +67,7 @@ Regras:
 - Técnica é método com nome na literatura, com fonte (quem, ano). Sem nome, não é técnica.
 - Mecanismo é a implementação concreta.
 - Nem toda técnica tem mecanismo. Nem todo mecanismo tem técnica associada.
-- A tríade funciona quando os três existem; quando falta um, registra só o que tem.
+- Princípio, técnica e mecanismo funcionam quando os três existem; quando falta um, registra só o que tem.
 
 ## Estrutura de raciocínio: rastreabilidade
 

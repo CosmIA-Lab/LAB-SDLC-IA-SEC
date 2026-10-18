@@ -36,24 +36,24 @@ Ponto 1 é o moldura: nomeia as fases e onde cada atividade entra. Os outros nov
 
 ---
 
-## 2. Fundamentos transversais — o que não é fase
+## 2. Conceitos transversais — o que não é fase
 
-Estes princípios valem em todos os pontos. Não são de nenhum ponto; cada ponto apenas os aplica. Fonte canônica no laboratório: ponto 1, seção Fundamentos (Janca, 2020).
+Estes conceitos valem em todos os pontos; não são de nenhum. Cada ponto apenas os aplica. Como no ponto 1, a lista mistura naturezas — a coluna Natureza marca cada uma pela taxonomia do lab (fundamento = premissa; princípio = regra; ameaça = risco). Fonte canônica: ponto 1, seção Fundamentos (Janca, 2020).
 
-| Fundamento | Regra | Onde fica mais forte |
-|---|---|---|
-| CIA | confidencialidade, integridade, disponibilidade são o que se protege | 2, 3, 6 |
-| Assume breach | presuma a invasão já ocorrida; desenhe para conter o dano | 3, 9, 10 |
-| Defense in depth | várias camadas; uma falha não derruba tudo | 3, 4, 9 |
-| Least privilege | mínimo de acesso por componente e por pessoa | 3, 6, 9 |
-| Zero trust | verificar sempre, nunca confiar por padrão | 6, 9 |
-| Fail secure | erro nega acesso, nunca libera | 5, 6 |
-| Redução da superfície de ataque | menos porta aberta, menos coisa para defender | 2, 9 |
-| Validar entrada hostil | todo dado externo é hostil até prova em contrário | 4, 5, 9 |
-| Sem segredo em código | credencial no fonte é credencial vazada | 1, 8 |
-| Cadeia de suprimentos | código que você não escreveu também é seu risco | 8, 9 |
+| Conceito | Natureza | Regra | Onde fica mais forte |
+|---|---|---|---|
+| CIA | fundamento | confidencialidade, integridade, disponibilidade são o que se protege | 2, 3, 6 |
+| Assume breach | fundamento | presuma a invasão já ocorrida; desenhe para conter o dano | 3, 9, 10 |
+| Defense in depth | princípio | várias camadas; uma falha não derruba tudo | 3, 4, 9 |
+| Least privilege | princípio | mínimo de acesso por componente e por pessoa | 3, 6, 9 |
+| Zero trust | princípio | verificar sempre, nunca confiar por padrão | 6, 9 |
+| Fail secure | princípio | erro nega acesso, nunca libera | 5, 6 |
+| Redução da superfície de ataque | princípio | menos porta aberta, menos coisa para defender | 2, 9 |
+| Validar entrada hostil | princípio | todo dado externo é hostil até prova em contrário | 4, 5, 9 |
+| Sem segredo em código | princípio | credencial no fonte é credencial vazada | 1, 8 |
+| Cadeia de suprimentos | ameaça | código que você não escreveu também é seu risco | 8, 9 |
 
-Como usar: ao estudar qualquer ponto, pergunte quais destes fundamentos ele executa. Se a resposta for "nenhum", você entendeu o ponto errado.
+Como usar: ao estudar qualquer ponto, pergunte quais destes conceitos ele executa. Se a resposta for "nenhum", você entendeu o ponto errado.
 
 ---
 
