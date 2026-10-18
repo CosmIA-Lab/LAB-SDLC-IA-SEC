@@ -155,11 +155,10 @@ As técnicas são lentes diferentes para achar falhas. Cada uma faz uma pergunta
 |---|---|---|---|---|
 | Abuse case | McDermott e Fox, 1999 | O que um atacante externo faria? | Inverte o caso de uso normal: desenha o fluxo legítimo e depois o fluxo do atacante | Caso de uso: usuário faz login. Abuse case: atacante tenta login com senha vazada. Requisito: bloqueia após três tentativas falhas |
 | Misuse case | Sindre e Opdahl, 2000 | O que um insider faria? | Insider com acesso legítimo fazendo o que não deve; aparece no mesmo diagrama do caso de uso | Funcionário exporta a base de clientes. Requisito: exportação exige aprovação de dois níveis |
-| Confuse case | extensão dos misuse cases | O que acontece quando alguém erra sem intenção? | O sistema não é à prova de engano; cobre erro humano | Usuário digita CEP inválido. Requisito: formulário rejeita com mensagem clara |
-| Attack tree | Schneier | Qual é o objetivo do atacante e quais os caminhos? | Parte do objetivo na raiz; cada ramo é um caminho pra chegar lá | Raiz: roubar dados de cartão. Ramos: SQL injection, upload sem validação, sessão sem expiração. Cada ramo vira um requisito |
+| Attack tree | Schneier, 1999 | Qual é o objetivo do atacante e quais os caminhos? | Parte do objetivo na raiz; cada ramo é um caminho pra chegar lá | Raiz: roubar dados de cartão. Ramos: SQL injection, upload sem validação, sessão sem expiração. Cada ramo vira um requisito |
 | Bug bar | Microsoft SDL | O que não pode ir pra release? | Define o limiar antes de escrever qualquer requisito; é requisito de processo, não de produto | Nenhuma falha crítica conhecida vai pra release |
 
-Apoio, não técnica: OWASP ASVS é o catálogo de requisito testável — serve como checklist quando a elicitação termina, para achar o que ninguém lembrou. SQUARE (Mead, SEI) é o processo que escolhe a técnica.
+Apoio, não técnica: OWASP ASVS é o catálogo de requisito testável — serve como checklist quando a elicitação termina, para achar o que ninguém lembrou. SQUARE (Mead, SEI) é o processo que escolhe a técnica. Confuse case não é técnica nomeada com fonte canônica — é uma variação informal do misuse case para cobrir erro humano sem intenção (usuário digita CEP inválido; o formulário rejeita com mensagem clara); use como lembrete, não como técnica.
 
 #### Saída
 
@@ -469,25 +468,25 @@ Se uma verificação falhar, o pipeline para. Nada vai para produção com falha
 
 ## 9. Ferramentas do DevSecOps
 
-Cada letra do DevSecOps tem ferramentas correspondentes.
+Cada letra do DevSecOps tem ferramentas correspondentes. Os nomes abaixo são exemplo, não recomendação: um por categoria, só para ancorar a técnica a uma ferramenta concreta. O que se memoriza é o que a técnica faz, não o vendor.
 
 ### SAST — Static Application Security Testing
 
 Analisa o código-fonte sem executá-lo. Encontra padrões de falha conhecidos: SQL injection, buffer overflow, funções inseguras.
 
-Exemplos: Semgrep, SonarQube, CodeQL.
+Exemplo: Semgrep.
 
 ### DAST — Dynamic Application Security Testing
 
 Testa a aplicação rodando, como um atacante. Envia requisições maliciosas e observa as respostas.
 
-Exemplos: OWASP ZAP, Burp Suite.
+Exemplo: OWASP ZAP.
 
 ### SCA — Software Composition Analysis
 
 Verifica dependências de terceiros. Bibliotecas com CVEs conhecidas são sinalizadas.
 
-Exemplos: Dependabot, Snyk, Trivy.
+Exemplo: Trivy.
 
 ### Fuzzing
 
@@ -497,7 +496,7 @@ Envia entradas aleatórias ou malformadas e observa se o programa quebra. Bom pa
 
 Procura credenciais vazadas no código: senhas, tokens, chaves de API.
 
-Exemplos: GitGuardian, gitleaks, trufflehog.
+Exemplo: gitleaks.
 
 ### WAF e RASP
 
@@ -531,7 +530,7 @@ Um não substitui o outro: o DevSecOps é a forma de executar o SDLC seguro em e
 
 | Fase / Conceito | Objetivo | Princípio | Técnica |
 |---|---|---|---|
-| Requisitos | requisito verificável | verificável, rastreável, negação explícita | abuse case, misuse case, confuse case, attack tree, bug bar |
+| Requisitos | requisito verificável | verificável, rastreável, negação explícita | abuse case, misuse case, attack tree, bug bar |
 | Design | desenho seguro antes do código | least privilege, defense in depth, fail secure, zero trust | modelagem de ameaças, DFD, superfície de ataque |
 | Código | código sem falha conhecida | never trust input, nada hard coded, bounds checking | inspeção de Fagan, secure code review, SAST, linting |
 | Testes | falha encontrada com evidência | evidência, severidade, cobertura dos sete alvos | SAST, DAST, SCA, fuzzing, secret scanning, pentest |
