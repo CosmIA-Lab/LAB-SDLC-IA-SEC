@@ -1,0 +1,19 @@
+01-ciclo-de-vida-seguro/cards/index.html
+  s_b4c9dee676f599::t_8180bc522c277d 159-160
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "711314e70f0e6faadbb04d9ef9f93941327ccfc8",
+  "prompts": {},
+  "sessions": {
+    "s_b4c9dee676f599": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "01a15c50-b559-7520-b828-ef2f3c4cb086",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "alan <nascimentoalankst@gmail.com>"
+    }
+  }
+}
