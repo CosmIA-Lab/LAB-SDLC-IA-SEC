@@ -42,7 +42,7 @@
 </head>
 <body>
 <h1>Ponto 1 — Cartas de recall</h1>
-<div class="sub">Responda de cabeça, vire a carta, marque. O que erra volta mais vezes. <kbd>espaço</kbd> vira · <kbd>1</kbd> errei · <kbd>2</kbd> acertei</div>
+<div class="sub">Responda de cabeça, vire a carta, marque. O que erra volta mais vezes. <kbd>0</kbd> ou <kbd>espaço</kbd> vira · <kbd>1</kbd> errei · <kbd>2</kbd> acertei</div>
 
 <div class="decks" id="decks"></div>
 <div class="legend" id="legend"></div>
@@ -181,7 +181,7 @@ const CARDS = [
    a:"Código · Aplicação · Infraestrutura · Banco de dados · APIs · Integrações · Rede. Esquecer um deixa buraco."},
   {d:"fases", topic:"Fase · Testes", objective:"distinguir as quatro análises de segurança",
    q:"SAST (análise estática do fonte), DAST (análise dinâmica da app rodando), SCA (análise de dependências) e fuzzing — uma linha cada?",
-   a:"<b>SAST</b>: fonte sem executar · <b>DAST</b>: aplicação rodando, como atacante · <b>SCA</b>: dependências com CVE · <b>Fuzzing</b>: entrada malformada até quebrar"},
+   a:"<b>SAST</b>: fonte sem executar · <b>DAST</b>: aplicação rodando, como atacante · <b>SCA</b>: dependências com CVE (vulnerabilidade conhecida publicada) · <b>Fuzzing</b>: entrada malformada até quebrar"},
   {d:"fases", topic:"Fase · Testes", objective:"explicar por que as análises repetem em duas fases",
    q:"Por que SAST, DAST e SCA aparecem em Código E em Testes?",
    a:"Não é redundância: no <b>Código</b> roda rápido por commit (retorno ao dev); nos <b>Testes</b> roda completo com evidência (decidir a release)."},
@@ -239,7 +239,7 @@ function next(){
       <div class="face front">
         <div class="head"><span class="tag">${current.topic}</span><div class="obj">Objetivo: ${current.objective}</div></div>
         <div class="q">${current.q}</div>
-        <span class="hint">clique ou espaço para virar</span>
+        <span class="hint">clique, 0 ou espaço para virar</span>
       </div>
       <div class="face back">
         <div class="head"><span class="tag">${current.topic} · resposta</span></div>
@@ -283,7 +283,7 @@ function finish(){
 $("btnNo").onclick = () => answer(false);
 $("btnOk").onclick = () => answer(true);
 document.addEventListener("keydown", e => {
-  if (e.key === " ") { e.preventDefault(); flip(); }
+  if (e.key === " " || e.key === "0") { e.preventDefault(); flip(); }
   if (e.key === "1") answer(false);
   if (e.key === "2") answer(true);
 });
