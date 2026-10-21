@@ -96,7 +96,7 @@ const CARDS = [
    a:"Se é aceito como <b>dado</b> (premissa) → fundamento. Se é <b>regra que não pode falhar</b> → princípio. O princípio deriva do fundamento."},
   {d:"taxonomia", topic:"CIA na taxonomia", objective:"classificar CIA no nível certo",
    q:"CIA (confidencialidade, integridade, disponibilidade) é fundamento, princípio ou objetivo? Por quê?",
-   a:"<b>Fundamento.</b> É o que se protege — o mandato (Janca, Fig. 1-1). Não é regra (não restringe) nem objetivo (não é entrega)."},
+   a:"<b>Fundamento.</b> É o que se protege — o mandato (Janca, 2020). Não é regra (não restringe) nem objetivo (não é entrega)."},
   {d:"taxonomia", topic:"Definição de técnica", objective:"saber o critério que torna algo uma técnica",
    q:"O que faz algo ser classificado como técnica no laboratório?",
    a:"Método <b>nomeado na literatura, com fonte (quem, ano)</b>. Sem nome e fonte, não é técnica — é apoio ou catálogo."},
@@ -197,9 +197,9 @@ const CARDS = [
   {d:"fases", topic:"Fase · Deploy e manutenção", objective:"fixar a regra do pipeline",
    q:"Pipeline CI/CD (integração e entrega contínuas) seguro — a regra de ouro?",
    a:"Se uma verificação falhar, <b>o pipeline para</b>. Nada vai para produção com falha de segurança conhecida."},
-  {d:"fases", topic:"Fonte do ponto 1", objective:"citar a fonte-âncora de cabeça",
-   q:"Fonte-âncora de todo o ponto 1?",
-   a:"<b>Janca, Tanya. <i>Alice and Bob Learn Application Security</i>. Wiley, 2020.</b> Figuras I-1 (cinco fases) e 7-1 (atividades por fase)."},
+  {d:"fases", topic:"Fase · Deploy e manutenção", objective:"listar as atividades de segurança do deploy",
+   q:"Deploy e manutenção — as atividades de segurança da fase?",
+   a:"<b>WAF, RASP, monitoramento, log, alerta e resposta a incidentes.</b> É a fase que opera sob assume breach: detectar e conter o que já passou."},
 ];
 
 let active = new Set(Object.keys(DECKS));
