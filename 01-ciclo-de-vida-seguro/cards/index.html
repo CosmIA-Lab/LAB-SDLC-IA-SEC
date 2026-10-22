@@ -1,294 +1,1112 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Ponto 1 — Cartas de recall</title>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Ponto 1 · SDLC seguro</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=JetBrains+Mono:wght@500&display=swap">
 <style>
-  :root { --bg:#0f1115; --card:#1a1d24; --ink:#e8e8e8; --dim:#8a8f99; --ok:#3fb950; --no:#f85149; --acc:#58a6ff; }
-  * { box-sizing:border-box; }
-  body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background:var(--bg); color:var(--ink); display:flex; flex-direction:column; align-items:center; min-height:100vh; padding:24px 16px; }
-  h1 { font-size:18px; font-weight:600; margin:0 0 4px; }
-  .sub { color:var(--dim); font-size:13px; margin-bottom:16px; text-align:center; }
-  .decks { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-bottom:10px; }
-  .decks button { background:transparent; border:1px solid #333; color:var(--dim); padding:6px 12px; border-radius:20px; cursor:pointer; font-size:13px; }
-  .decks button.on { border-color:var(--acc); color:var(--acc); }
-  .legend { max-width:640px; margin-bottom:20px; font-size:12px; color:var(--dim); line-height:1.6; text-align:left; }
-  .legend b { color:var(--ink); font-weight:600; }
-  .stage { width:100%; max-width:640px; perspective:1200px; }
-  .card { position:relative; width:100%; min-height:320px; transform-style:preserve-3d; transition:transform .45s; cursor:pointer; }
-  .card.flipped { transform:rotateY(180deg); }
-  .face { position:absolute; inset:0; backface-visibility:hidden; background:var(--card); border:1px solid #2a2e37; border-radius:16px; padding:56px 28px 40px; display:flex; flex-direction:column; justify-content:center; }
-  .back { transform:rotateY(180deg); }
-  .head { position:absolute; top:14px; left:20px; right:20px; }
-  .tag { font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--acc); }
-  .obj { font-size:12px; color:var(--dim); margin-top:3px; }
-  .q { font-size:22px; line-height:1.35; font-weight:500; }
-  .a { font-size:17px; line-height:1.5; }
-  .a b { color:var(--acc); }
-  .hint { position:absolute; bottom:14px; right:20px; font-size:12px; color:var(--dim); }
-  .actions { display:flex; gap:12px; margin-top:20px; width:100%; max-width:640px; }
-  .actions button { flex:1; padding:14px; border-radius:12px; border:none; font-size:15px; font-weight:600; cursor:pointer; }
-  .no { background:#3a1518; color:var(--no); } .ok { background:#12301a; color:var(--ok); }
-  .actions button:disabled { opacity:.3; cursor:default; }
-  .bar { width:100%; max-width:640px; margin-top:20px; color:var(--dim); font-size:13px; display:flex; justify-content:space-between; }
-  .track { height:4px; background:#222; border-radius:2px; width:100%; max-width:640px; margin-top:8px; overflow:hidden; }
-  .track i { display:block; height:100%; background:var(--ok); width:0; transition:width .3s; }
-  .done { text-align:center; padding:40px 20px; }
-  .done h2 { color:var(--ok); }
-  .done button { margin-top:16px; background:var(--acc); color:#000; border:none; padding:12px 24px; border-radius:10px; font-weight:600; cursor:pointer; }
-  kbd { background:#222; padding:1px 6px; border-radius:4px; font-size:11px; }
+/* Layout: coluna de estudo. Aba Trilha = passos em sequência com exercícios; aba Cartas = revisão espaçada. */
+:root{
+  --bg:#f3f4f7; --surface:#ffffff; --line:#d9dce5; --fg:#1c2030; --dim:#5d6377;
+  --accent:#3445c4; --accent-soft:#e6e9fb; --ok:#1d7a45; --ok-soft:#dff1e6; --no:#b3322b; --no-soft:#f8e1df;
+  --f-display:"Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+  --f-body:"Atkinson Hyperlegible", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#12141b; --surface:#1b1e28; --line:#2c3040; --fg:#e7e9f0; --dim:#979db0;
+  --accent:#8b98ff; --accent-soft:#252a4a; --ok:#5fd18e; --ok-soft:#173326; --no:#ff8a80; --no-soft:#3a1c1b; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#12141b; --surface:#1b1e28; --line:#2c3040; --fg:#e7e9f0; --dim:#979db0;
+  --accent:#8b98ff; --accent-soft:#252a4a; --ok:#5fd18e; --ok-soft:#173326; --no:#ff8a80; --no-soft:#3a1c1b; color-scheme:dark }
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:16px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 40px}
+.wrap{max-width:680px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+header{display:flex;flex-direction:column;gap:6px}
+.toprow{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.eyebrow{font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+h1{font-family:var(--f-display);font-size:clamp(26px,6vw,34px);line-height:1.1;margin:0;text-wrap:balance;font-weight:700}
+.lede{color:var(--dim);margin:0;max-width:62ch}
+kbd{font-family:var(--f-mono);font-size:12px;background:var(--surface);border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:0 6px}
+button{font:inherit;color:inherit}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+.fsbtn{font-size:13px;font-weight:700;color:var(--accent);background:var(--accent-soft);border:1px solid transparent;border-radius:999px;padding:6px 14px;cursor:pointer;white-space:nowrap;display:inline-flex;gap:8px;align-items:center}
+.fsbtn svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:4px}
+.tabs button{border:0;background:transparent;border-radius:9px;padding:9px;font-weight:700;color:var(--dim);cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--accent);color:var(--surface)}
+
+/* ---------- Trilha ---------- */
+.trail{display:flex;flex-direction:column;gap:18px}
+.tmeta{display:flex;justify-content:space-between;gap:12px;font-family:var(--f-mono);font-size:12px;color:var(--dim);font-variant-numeric:tabular-nums;flex-wrap:wrap}
+.dots{display:flex;gap:4px}
+.dots button{flex:1;height:8px;min-width:0;border:0;border-radius:4px;background:var(--line);cursor:pointer;padding:0}
+.dots button.ok{background:var(--ok)}
+.dots button.cur{background:var(--accent)}
+.lesson{display:flex;flex-direction:column;gap:16px}
+.lesson h2{font-family:var(--f-display);font-size:clamp(24px,5.4vw,30px);line-height:1.15;margin:0;text-wrap:balance}
+.sec{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.prose{display:flex;flex-direction:column;gap:12px;font-size:17px;line-height:1.6;max-width:64ch}
+.prose p{margin:0}
+.prose b{color:var(--accent)}
+.prose .aside{font-size:14px;color:var(--dim);border-left:3px solid var(--line);padding-left:12px}
+
+.flow{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.flow li{display:grid;grid-template-columns:96px minmax(0,1fr);gap:12px;padding:10px 14px;border-top:1px solid var(--line);font-size:15px;line-height:1.45}
+.flow li:first-child{border-top:0}
+.flow .fl{font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);padding-top:3px}
+.flow li:last-child{background:var(--accent-soft)}
+
+.task{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.task.solved{border-color:var(--ok)}
+.kind{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);display:flex;justify-content:space-between;gap:8px}
+.task.solved .kind::after{content:"✓ feito";color:var(--ok)}
+.tq{font-weight:700;font-size:17px;margin:0}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{text-align:left;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px 14px;cursor:pointer;font-size:16px;line-height:1.4}
+.opt:disabled{cursor:default}
+.opt.right{background:var(--ok-soft);border-color:var(--ok);color:var(--fg)}
+.opt.wrong{background:var(--no-soft);border-color:var(--no);color:var(--fg);opacity:.75}
+.fb{margin:0;font-size:15px;line-height:1.5;min-height:0}
+.fb:empty{display:none}
+.fb.ok b{color:var(--ok)} .fb.no b{color:var(--no)}
+
+.seq{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;counter-reset:s}
+.seq li{counter-increment:s;display:flex;gap:10px;align-items:center;padding:9px 12px;border-radius:10px;border:1px dashed var(--line);color:var(--dim);font-size:15px}
+.seq li::before{content:counter(s);font-family:var(--f-mono);font-size:12px;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:var(--line);color:var(--fg);flex:none}
+.seq li.filled{border-style:solid;border-color:var(--ok);background:var(--ok-soft);color:var(--fg)}
+.seq li.filled::before{background:var(--ok);color:var(--surface)}
+.pool{display:flex;flex-wrap:wrap;gap:8px}
+.pool button{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 12px;cursor:pointer;text-align:left;font-size:15px}
+.pool button.shake{border-color:var(--no);background:var(--no-soft);animation:shake .3s}
+@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+
+.sitems{display:flex;flex-direction:column;gap:12px}
+.sitem{display:flex;flex-direction:column;gap:8px;padding-top:12px;border-top:1px solid var(--line)}
+.sitem:first-child{border-top:0;padding-top:0}
+.stext{font-size:16px;line-height:1.45}
+.stext code{display:block;font-family:var(--f-mono);font-size:13px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;overflow-x:auto;white-space:pre}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips button{font-size:13px;background:transparent;border:1px solid var(--line);border-radius:999px;padding:6px 12px;cursor:pointer}
+.chips button:disabled{cursor:default}
+.chips button.right{background:var(--ok-soft);border-color:var(--ok);color:var(--ok);font-weight:700}
+.chips button.wrong{background:var(--no-soft);border-color:var(--no);color:var(--no);text-decoration:line-through}
+
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{font-size:13px;background:transparent;border:1px solid var(--line);border-radius:999px;padding:6px 12px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:700}
+.bars{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;align-items:end;height:130px;border-bottom:1px solid var(--line);padding-top:6px}
+.bars div{background:var(--line);border-radius:6px 6px 0 0;transition:background .2s,height .3s;min-height:6px;cursor:pointer}
+.bars div.on{background:var(--accent)}
+.barlabels{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;font-family:var(--f-mono);font-size:10px;color:var(--dim);text-align:center;margin-top:-6px}
+.costtext{font-size:16px;margin:0;min-height:3em}
+.small{font-size:12px;color:var(--dim);margin:0}
+
+.layers{display:flex;flex-direction:column;gap:6px}
+.attack{font-family:var(--f-mono);font-size:12px;color:var(--no)}
+.layer{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;border:1px solid var(--ok);background:var(--ok-soft)}
+.layer.down{border-color:var(--no);background:var(--no-soft);border-style:dashed}
+.layer button{font-size:13px;font-weight:700;border:1px solid currentColor;background:transparent;border-radius:999px;padding:4px 12px;cursor:pointer;color:var(--ok);white-space:nowrap}
+.layer.down button{color:var(--no)}
+.verdict{margin:0;font-weight:700}
+.verdict.ok{color:var(--ok)} .verdict.no{color:var(--no)}
+
+.tnav{display:grid;grid-template-columns:1fr 2fr;gap:12px}
+.tnav button{padding:14px;border-radius:12px;font-weight:700;font-size:16px;cursor:pointer}
+.ghostbtn{background:transparent;border:1px solid var(--line);color:var(--dim)}
+.ghostbtn:disabled{opacity:.4;cursor:default}
+.primary{background:var(--accent);border:1px solid var(--accent);color:var(--surface)}
+.endbox{background:var(--accent-soft);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:8px}
+.endbox h3{font-family:var(--f-display);margin:0;font-size:20px}
+.endbox p{margin:0}
+
+/* ---------- Cartas ---------- */
+.decks{display:flex;flex-wrap:wrap;gap:8px}
+.decks button{font-size:14px;background:transparent;color:var(--dim);border:1px solid var(--line);border-radius:999px;padding:6px 14px;cursor:pointer}
+.decks button[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
+.decks button .n{font-family:var(--f-mono);font-size:11px;opacity:.75;margin-left:6px}
+.deckdesc{font-size:14px;color:var(--dim);margin:-6px 0 0;min-height:1.5em}
+.play{display:flex;flex-direction:column;gap:18px}
+.stage{perspective:1400px}
+.card{display:grid;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.3,.7,.2,1);cursor:pointer;outline:none}
+.card:focus-visible .face{box-shadow:0 0 0 3px var(--accent)}
+.card.flipped{transform:rotateY(180deg)}
+.face{grid-area:1/1;backface-visibility:hidden;-webkit-backface-visibility:hidden;background:var(--surface);border:1px solid var(--line);border-radius:14px;
+  padding:20px 22px 22px;min-height:300px;display:flex;flex-direction:column;gap:14px}
+.back{transform:rotateY(180deg)}
+.meta{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.tag{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.deckname{font-family:var(--f-mono);font-size:11px;color:var(--dim)}
+.obj{font-size:13px;color:var(--dim);margin:-8px 0 0}
+.q{font-family:var(--f-display);font-weight:600;font-size:clamp(20px,4.6vw,24px);line-height:1.3;margin:auto 0;text-wrap:balance}
+.a{font-size:17px;line-height:1.6;margin:auto 0}
+.a b,.q b{color:var(--accent)}
+.hint{font-size:12px;color:var(--dim);text-align:right}
+.miss{font-family:var(--f-mono);font-size:11px;color:var(--no);background:var(--no-soft);padding:2px 8px;border-radius:999px}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.actions button{font-weight:700;font-size:16px;padding:14px;border-radius:12px;border:1px solid transparent;cursor:pointer;display:flex;justify-content:center;gap:10px;align-items:center}
+.actions button kbd{background:transparent;border-color:currentColor;opacity:.6}
+#btnNo{background:var(--no-soft);color:var(--no)}
+#btnOk{background:var(--ok-soft);color:var(--ok)}
+.actions button:disabled{opacity:.35;cursor:default}
+.progress{display:flex;flex-direction:column;gap:8px}
+.stats{display:flex;justify-content:space-between;font-family:var(--f-mono);font-size:12px;color:var(--dim);font-variant-numeric:tabular-nums;gap:12px;flex-wrap:wrap}
+.track{height:6px;background:var(--line);border-radius:3px;overflow:hidden}
+.track i{display:block;height:100%;width:0;background:var(--ok);transition:width .3s}
+.done{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:24px 22px;display:flex;flex-direction:column;gap:12px}
+.done h2{font-family:var(--f-display);margin:0;font-size:24px}
+.done p{margin:0;color:var(--dim)}
+.done ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
+.done .row{display:flex;gap:10px;flex-wrap:wrap}
+.done button{font-weight:700;padding:11px 18px;border-radius:10px;border:1px solid var(--accent);cursor:pointer;background:var(--accent);color:var(--surface)}
+.done button.ghost{background:transparent;color:var(--accent)}
+
+/* Tela cheia: só o conteúdo de estudo. */
+body.focus{padding-block:12px 16px}
+body.focus .wrap{max-width:860px;gap:12px}
+body.focus h1,body.focus .lede,body.focus .tabs,body.focus .decks,body.focus .deckdesc{display:none}
+body.focus .face{min-height:calc(100dvh - 230px)}
+body.focus .q{font-size:clamp(22px,3.6vw,30px)}
+body.focus .a{font-size:clamp(17px,2.4vw,20px)}
+
+/* Celular na horizontal. */
+@media (orientation: landscape) and (max-height: 560px){
+  body{padding-block:12px 16px}
+  .wrap{max-width:none;gap:12px}
+  .trail{max-width:820px;width:100%;margin:0 auto}
+  .lede{display:none}
+  h1{font-size:22px}
+  .play{display:grid;grid-template-columns:minmax(0,1fr) 190px;grid-template-rows:1fr auto;gap:12px}
+  .stage{grid-row:1 / span 2;min-width:0}
+  .actions{grid-template-columns:1fr;grid-template-rows:1fr 1fr}
+  .actions button{flex-direction:column;gap:4px}
+  .face{min-height:calc(100dvh - 40px);padding:16px 20px}
+  .q{font-size:clamp(19px,2.8vw,24px)}
+  .a{font-size:16px}
+  body.focus .face{min-height:calc(100dvh - 76px)}
+  .flow li{grid-template-columns:110px minmax(0,1fr)}
+}
+
+@media (prefers-reduced-motion: reduce){
+  .card{transition:none}
+  .card.flipped{transform:none}
+  .card.flipped .front{visibility:hidden}
+  .back{transform:none;visibility:hidden}
+  .card.flipped .back{visibility:visible}
+  .track i,.bars div{transition:none}
+  .pool button.shake{animation:none}
+}
 </style>
-</head>
-<body>
-<h1>Ponto 1 — Cartas de recall</h1>
-<div class="sub">Responda de cabeça, vire a carta, marque. O que erra volta mais vezes. <kbd>0</kbd> ou <kbd>espaço</kbd> vira · <kbd>1</kbd> errei · <kbd>2</kbd> acertei</div>
 
-<div class="decks" id="decks"></div>
-<div class="legend" id="legend"></div>
+<div class="wrap">
+  <header>
+    <div class="toprow">
+      <span class="eyebrow">LAB-SDLC-IA-SEC · Ponto 1</span>
+      <button class="fsbtn" id="btnFs" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><span id="fsLabel">Tela cheia</span></button>
+    </div>
+    <h1>SDLC seguro e DevSecOps</h1>
+    <p class="lede" id="lede"></p>
+  </header>
 
-<div class="stage" id="stage"></div>
-<div class="actions" id="actions">
-  <button class="no" id="btnNo" disabled>Errei</button>
-  <button class="ok" id="btnOk" disabled>Acertei</button>
+  <div class="tabs" role="tablist" aria-label="Modo de estudo">
+    <button role="tab" id="tabTrail" aria-selected="true">Trilha guiada</button>
+    <button role="tab" id="tabCards" aria-selected="false">Cartas de revisão</button>
+  </div>
+
+  <section class="trail" id="trailView">
+    <div class="tmeta"><span id="tPos"></span><span id="tDone"></span></div>
+    <div class="dots" id="dots" aria-label="Passos"></div>
+    <div class="lesson" id="lesson"></div>
+    <div class="tnav">
+      <button class="ghostbtn" id="tPrev">Anterior</button>
+      <button class="primary" id="tNext">Próximo</button>
+    </div>
+  </section>
+
+  <section id="cardsView" hidden>
+    <div style="display:flex;flex-direction:column;gap:18px">
+      <nav class="decks" id="decks" aria-label="Baralhos"></nav>
+      <p class="deckdesc" id="deckdesc"></p>
+      <div class="play">
+        <div class="stage" id="stage"></div>
+        <div class="actions">
+          <button id="btnNo" disabled>Errei <kbd>1</kbd></button>
+          <button id="btnOk" disabled>Acertei <kbd>2</kbd></button>
+        </div>
+        <div class="progress">
+          <div class="stats"><span id="left"></span><span id="score"></span></div>
+          <div class="track"><i id="prog"></i></div>
+        </div>
+      </div>
+    </div>
+  </section>
 </div>
-<div class="bar"><span id="left"></span><span id="score"></span></div>
-<div class="track"><i id="prog"></i></div>
 
 <script>
-// Cada baralho tem nome direto e uma descrição de uma linha (nada de metáfora).
-const DECKS = {
-  sequencia: { name:"Sequência do argumento", sub:"o ponto 1 inteiro, passo a passo, na ordem em que um puxa o próximo" },
-  taxonomia: { name:"Taxonomia", sub:"os quatro níveis: fundamento → princípio → técnica → mecanismo" },
-  conceitos: { name:"Conceitos de base", sub:"os fundamentos e princípios que valem em todas as fases (CIA, least privilege…)" },
-  fases:     { name:"As cinco fases", sub:"o ciclo de requisitos a deploy, com objetivo, princípios e técnicas de cada fase" },
-};
-
-// Cada carta: deck · topic (tópico do ponto) · objective (o que a carta treina) · q · a.
-// Regra de autoria: toda sigla é expandida na primeira aparição; nome literal, nunca metáfora.
-const CARDS = [
-  // ---- Sequência do argumento ----
-  {d:"sequencia", topic:"Visão geral do ponto 1", objective:"reconstruir o argumento inteiro na ordem",
-   q:"Quais são os seis passos encadeados que formam o argumento do ponto 1?",
-   a:"<b>custo cresce no tempo</b> → <b>pushing left</b> → <b>falha ≠ bug</b> → <b>conceitos de base</b> → <b>cinco fases</b> → <b>DevSecOps</b>"},
-  {d:"sequencia", topic:"O custo no tempo", objective:"entender por que o momento da descoberta importa",
-   q:"Por que a pergunta de engenharia é <i>quando</i> a falha é descoberta, e não <i>se</i>?",
-   a:"Todo software erra. O momento define o custo: no requisito é uma frase reescrita; em produção é incidente, forense e notificação de clientes."},
-  {d:"sequencia", topic:"Pushing left", objective:"classificar pushing left na taxonomia",
-   q:"Pushing left (trazer a segurança para o início do ciclo) é princípio, técnica ou estratégia? Por quê?",
-   a:"<b>Estratégia.</b> Não restringe nada — decide <i>quando</i> aplicar os princípios (cedo). Raiz: curva de custo (Boehm, 1981); nome: Janca, 2020."},
-  {d:"sequencia", topic:"Falha × bug", objective:"distinguir erro de desenho de erro de implementação",
-   q:"Falha (flaw) × bug: onde nasce e como se corrige cada um?",
-   a:"<b>Falha</b>: erro de desenho, nasce em requisito/design, corrige com <b>reprojeto</b>. <b>Bug</b>: erro de implementação, nasce no código, corrige com <b>patch</b>."},
-  {d:"sequencia", topic:"Shift-left e shift-right", objective:"relacionar os dois com pushing left",
-   q:"Shift-left (testar cedo) e shift-right (monitorar produção): qual a relação com pushing left?",
-   a:"<b>Shift-left</b> = pushing left aplicado ao pipeline (testar a cada commit). <b>Shift-right</b> = o complemento: monitorar produção. Um previne, o outro detecta."},
-  {d:"sequencia", topic:"SDLC seguro × DevSecOps", objective:"distinguir o processo da prática",
-   q:"SDLC seguro (ciclo de vida de desenvolvimento de software) × DevSecOps: natureza e pergunta de cada um?",
-   a:"SDLC seguro = <b>processo</b> (o que fazer em cada fase). DevSecOps = <b>prática</b> (como garantir que aconteça, contínuo e automatizado no pipeline)."},
-
-  // ---- Taxonomia ----
-  {d:"taxonomia", topic:"Os quatro níveis", objective:"nomear os níveis e a pergunta de cada um",
-   q:"Quais são os quatro níveis da taxonomia do laboratório, com a pergunta que cada um responde?",
-   a:"<b>Fundamento</b>: o que tomamos como dado? · <b>Princípio</b>: que regra não quebra? · <b>Técnica</b>: qual método nomeado? · <b>Mecanismo</b>: o que executa?"},
-  {d:"taxonomia", topic:"Fundamento × princípio", objective:"separar premissa de regra",
-   q:"Teste de fronteira: como saber se algo é fundamento ou princípio?",
-   a:"Se é aceito como <b>dado</b> (premissa) → fundamento. Se é <b>regra que não pode falhar</b> → princípio. O princípio deriva do fundamento."},
-  {d:"taxonomia", topic:"CIA na taxonomia", objective:"classificar CIA no nível certo",
-   q:"CIA (confidencialidade, integridade, disponibilidade) é fundamento, princípio ou objetivo? Por quê?",
-   a:"<b>Fundamento.</b> É o que se protege — o mandato (Janca, 2020). Não é regra (não restringe) nem objetivo (não é entrega)."},
-  {d:"taxonomia", topic:"Definição de técnica", objective:"saber o critério que torna algo uma técnica",
-   q:"O que faz algo ser classificado como técnica no laboratório?",
-   a:"Método <b>nomeado na literatura, com fonte (quem, ano)</b>. Sem nome e fonte, não é técnica — é apoio ou catálogo."},
-
-  // ---- Conceitos de base ----
-  {d:"conceitos", topic:"CIA", objective:"definir as três letras e por que vêm primeiro",
-   q:"CIA — o que são as três letras e por que vêm primeiro?",
-   a:"<b>Confidencialidade</b> (só quem deve acessa), <b>Integridade</b> (dado é o que deveria ser), <b>Disponibilidade</b> (está lá quando preciso). É o mandato da segurança — critério contra o qual todo requisito é medido."},
-  {d:"conceitos", topic:"Assume breach", objective:"nomear a postura e o que ela torna necessário",
-   q:"Assume breach (presumir a invasão) — qual é a postura e o que ela torna necessário?",
-   a:"Presumir que a invasão <b>já aconteceu</b> e desenhar para <b>conter o dano</b>. Torna defense in depth e least privilege necessários, não opcionais."},
-  {d:"conceitos", topic:"Ameaça interna", objective:"tirar a consequência de projeto",
-   q:"Ameaça interna (quem tem crachá) — qual a consequência de projeto?",
-   a:"Quem tem acesso legítimo também é vetor (malícia ou acidente). Logo o <b>perímetro não basta</b>: controles precisam valer dentro, para contas autenticadas."},
-  {d:"conceitos", topic:"Defense in depth", objective:"enunciar a regra em uma frase",
-   q:"Defense in depth (defesa em camadas) — a regra em uma frase?",
-   a:"Várias barreiras <b>independentes</b>; a falha de uma não expõe tudo. O atacante precisa vencer todas; o defensor só precisa que uma segure."},
-  {d:"conceitos", topic:"Least privilege", objective:"enunciar a regra e o ganho",
-   q:"Least privilege (menor privilégio) — regra e ganho?",
-   a:"Cada componente e pessoa recebe o <b>mínimo de acesso</b> que permite o trabalho. Reduz o alcance de um erro ou comprometimento."},
-  {d:"conceitos", topic:"Cadeia de suprimentos", objective:"entender por que é o seu risco",
-   q:"Cadeia de suprimentos (código de terceiros que você usa) — por que é seu risco?",
-   a:"Código de terceiros roda com <b>seus privilégios</b> e toca <b>seus dados</b>. Dependência vulnerável compromete tanto quanto bug próprio. Exige inventário."},
-  {d:"conceitos", topic:"Sem segurança por obscuridade", objective:"saber o que deve ser secreto",
-   q:"Sem segurança por obscuridade — o que deve ser secreto?",
-   a:"<b>A chave, não o mecanismo.</b> Sistema seguro continua seguro com o desenho conhecido. 'Ninguém vai descobrir' é aposta contra o tempo."},
-  {d:"conceitos", topic:"Superfície de ataque", objective:"definir superfície e a regra de redução",
-   q:"Redução da superfície de ataque — o que é superfície e qual a regra?",
-   a:"Conjunto de pontos atacáveis (portas, endpoints, parâmetros, integrações). <b>Desligar o que não se usa, expor só o necessário</b> — menos a defender."},
-  {d:"conceitos", topic:"Sem segredo em código", objective:"saber o porquê e onde o segredo fica",
-   q:"Sem segredo em código — por quê e onde fica o segredo?",
-   a:"Repositório é clonado, copiado e o histórico guarda tudo: segredo no fonte é segredo vazado. Fica em <b>cofre ou variável de ambiente</b> em runtime."},
-  {d:"conceitos", topic:"Zero trust", objective:"saber o que se verifica e o que isso combate",
-   q:"Never trust, always verify (zero trust) — o que se verifica e o que isso combate?",
-   a:"Todo dado e requisição são <b>não confiáveis até prova</b>, inclusive da rede interna. Combate a confiança implícita que insiders e invasores já dentro exploram."},
-  {d:"conceitos", topic:"Segurança usável", objective:"enunciar a regra",
-   q:"Segurança usável — a regra?",
-   a:"Controle que atrapalha é controle que o usuário <b>contorna</b>. Projetar o controle para ser o caminho mais fácil é parte da segurança."},
-  {d:"conceitos", topic:"Fatores de autenticação", objective:"nomear as três categorias e o que é MFA de verdade",
-   q:"Fatores de autenticação — as três categorias e o que é MFA (autenticação multifator) de verdade?",
-   a:"Algo que você <b>sabe</b> · <b>tem</b> · <b>é</b>. MFA = mais de uma <b>categoria</b>, não dois fatores do mesmo tipo."},
-  {d:"conceitos", topic:"Classificação dos conceitos", objective:"classificar cada conceito na taxonomia",
-   q:"Natureza de cada um: CIA, assume breach, ameaça interna, cadeia de suprimentos, fatores de autenticação?",
-   a:"CIA e assume breach → <b>fundamento</b>. Ameaça interna e cadeia → <b>ameaça</b>. Fatores de autenticação → <b>taxonomia</b>. Os outros sete → princípio."},
-  {d:"conceitos", topic:"Fronteira do ponto 1", objective:"saber o que NÃO pertence ao ponto 1",
-   q:"Por que fail secure (falhar de forma segura) NÃO está entre os conceitos de base do ponto 1?",
-   a:"É <b>princípio de arquitetura</b> — pertence ao ponto 3, com fonte própria. Não é um dos conceitos de base do cap. 1."},
-
-  // ---- As cinco fases ----
-  {d:"fases", topic:"As cinco fases", objective:"listar as fases em ordem",
-   q:"As cinco fases, em ordem (mnemônico R-D-C-T-D)?",
-   a:"<b>R</b>equisitos → <b>D</b>esign → <b>C</b>ódigo → <b>T</b>estes → <b>D</b>eploy e manutenção. (+ Descontinuação, fora do ciclo clássico: Microsoft SDL, NIST SSDF.)"},
-  {d:"fases", topic:"Fase · Requisitos", objective:"nomear objetivo e princípios da fase",
-   q:"Requisitos — objetivo e os três princípios?",
-   a:"Objetivo: ativos, classificação e requisito <b>verificável</b>. Princípios: <b>verificabilidade</b>, <b>rastreabilidade</b>, <b>negação explícita</b>."},
-  {d:"fases", topic:"Fase · Requisitos", objective:"nomear as técnicas com fonte",
-   q:"Requisitos — as técnicas com fonte (quem, ano)?",
-   a:"<b>Abuse case</b> (McDermott e Fox, 1999) · <b>Misuse case</b> (Sindre e Opdahl, 2000) · <b>Attack tree</b> (Schneier, 1999) · <b>Bug bar</b> (Microsoft SDL)"},
-  {d:"fases", topic:"Fase · Requisitos", objective:"distinguir abuse case de misuse case",
-   q:"Abuse case (caso de abuso) × misuse case (caso de uso indevido) — a diferença?",
-   a:"<b>Abuse</b> (abuso): atacante <b>externo</b>, de fora, inverte o caso de uso. <b>Misuse</b> (uso indevido; <i>mis-</i> = errado): <b>insider</b> (quem já está dentro, com acesso legítimo) usando mal esse acesso. Pista literal: externo <b>abusa</b>; de dentro faz <b>mau uso</b>."},
-  {d:"fases", topic:"Fase · Requisitos", objective:"reconhecer um requisito verificável",
-   q:"Requisito ruim × requisito bom — o exemplo?",
-   a:"Ruim: 'seja seguro'. Bom: '<b>rota autenticada rejeita token expirado com 401</b>'. Sem teste, não entrou no ciclo."},
-  {d:"fases", topic:"Fase · Design", objective:"nomear as técnicas com fonte",
-   q:"Design — técnicas com fonte (quem, ano)?",
-   a:"<b>Modelagem de ameaças</b> (Shostack, 2014 — 4 perguntas) · <b>DFD — diagrama de fluxo de dados</b> (DeMarco, 1979) · <b>Análise de superfície de ataque</b> (Manadhata e Wing, 2004)"},
-  {d:"fases", topic:"Fase · Design", objective:"recitar as quatro perguntas de Shostack",
-   q:"As quatro perguntas da modelagem de ameaças (Shostack)?",
-   a:"O que estamos construindo? · O que pode dar errado? · O que fazemos a respeito? · Fizemos um bom trabalho?"},
-  {d:"fases", topic:"Fase · Design", objective:"fixar o custo relativo da fase",
-   q:"Design — regra de ouro sobre custo?",
-   a:"Design errado custa <b>uma reunião</b>; código errado custa <b>meses</b>. É onde nasce a falha de design — a que patch nenhum corrige."},
-  {d:"fases", topic:"Fase · Código", objective:"nomear a técnica-raiz e a fonte",
-   q:"Código — técnica-raiz do code review e sua fonte?",
-   a:"<b>Inspeção formal de código — Fagan, 1976</b>. Revisão estruturada com papéis e checklist; raiz do code review moderno."},
-  {d:"fases", topic:"Fase · Código", objective:"fixar a regra de ouro da fase",
-   q:"Código — regra de ouro?",
-   a:"Se está escrevendo <b>criptografia, autenticação ou sessão do zero, pare</b> — já existe implementação revisada."},
-  {d:"fases", topic:"Fase · Testes", objective:"listar os sete alvos de teste",
-   q:"Testes — os sete alvos?",
-   a:"Código · Aplicação · Infraestrutura · Banco de dados · APIs · Integrações · Rede. Esquecer um deixa buraco."},
-  {d:"fases", topic:"Fase · Testes", objective:"distinguir as quatro análises de segurança",
-   q:"SAST (análise estática do fonte), DAST (análise dinâmica da app rodando), SCA (análise de dependências) e fuzzing — uma linha cada?",
-   a:"<b>SAST</b>: fonte sem executar · <b>DAST</b>: aplicação rodando, como atacante · <b>SCA</b>: dependências com CVE (vulnerabilidade conhecida publicada) · <b>Fuzzing</b>: entrada malformada até quebrar"},
-  {d:"fases", topic:"Fase · Testes", objective:"explicar por que as análises repetem em duas fases",
-   q:"Por que SAST, DAST e SCA aparecem em Código E em Testes?",
-   a:"Não é redundância: no <b>Código</b> roda rápido por commit (retorno ao dev); nos <b>Testes</b> roda completo com evidência (decidir a release)."},
-  {d:"fases", topic:"Fase · Deploy e manutenção", objective:"nomear a técnica de resposta a incidentes e a fonte",
-   q:"Deploy e manutenção — técnica de resposta a incidentes e sua fonte?",
-   a:"<b>NIST SP 800-61</b>: conter, erradicar, recuperar, aprender. Regra de ouro: <b>fire drill</b> antes do incidente."},
-  {d:"fases", topic:"Fase · Deploy e manutenção", objective:"nomear os três princípios da fase",
-   q:"Deploy — os três princípios?",
-   a:"<b>Assume breach</b> (operar como se já estivesse dentro) · <b>Log sem segredo</b> · <b>Detecção vale o que vale a resposta</b> (alerta que ninguém lê não existe)."},
-  {d:"fases", topic:"Fase · Deploy e manutenção", objective:"saber o limite de WAF e RASP",
-   q:"WAF (firewall de aplicação web) e RASP (autoproteção em runtime) — o que fazem e o que NÃO fazem?",
-   a:"WAF filtra antes da aplicação; RASP protege de dentro. <b>Nenhum corrige a falha</b>: compram tempo até o patch."},
-  {d:"fases", topic:"Fase · Deploy e manutenção", objective:"fixar a regra do pipeline",
-   q:"Pipeline CI/CD (integração e entrega contínuas) seguro — a regra de ouro?",
-   a:"Se uma verificação falhar, <b>o pipeline para</b>. Nada vai para produção com falha de segurança conhecida."},
-  {d:"fases", topic:"Fase · Deploy e manutenção", objective:"listar as atividades de segurança do deploy",
-   q:"Deploy e manutenção — as atividades de segurança da fase?",
-   a:"<b>WAF, RASP, monitoramento, log, alerta e resposta a incidentes.</b> É a fase que opera sob assume breach: detectar e conter o que já passou."},
-];
-
-let active = new Set(Object.keys(DECKS));
-let queue = [], current = null, flipped = false, right = 0, wrong = 0, seen = 0, total = 0;
-
 const $ = id => document.getElementById(id);
-
-function buildDecks(){
-  $("decks").innerHTML = Object.entries(DECKS).map(([k,v]) =>
-    `<button data-d="${k}" class="${active.has(k)?'on':''}" title="${v.sub}">${v.name}</button>`).join("") +
-    `<button data-d="__all" class="on">Todas</button>`;
-  $("decks").querySelectorAll("button").forEach(b => b.onclick = () => {
-    const d = b.dataset.d;
-    if (d === "__all") active = new Set(Object.keys(DECKS));
-    else { if (active.has(d) && active.size > 1) active.delete(d); else active.add(d); }
-    start();
-  });
-  $("legend").innerHTML = Object.values(DECKS).map(v =>
-    `<b>${v.name}</b> — ${v.sub}`).join("<br>");
-}
-
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const store = {
+  get(k, d){ try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch(e) { return d; } },
+  set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e) {} }
+};
 function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];} return a; }
 
-function start(){
-  buildDecks();
-  queue = shuffle(CARDS.filter(c => active.has(c.d)).map(c => ({...c, miss:0})));
-  total = queue.length; right = wrong = seen = 0;
-  next();
+// Trilha: cada passo segue a ordem do README. Tipos de tarefa: mc, order, sort, cost, layers.
+const STEPS = [
+{sec:"1 · Pushing left", title:"Todo software erra",
+ body:`<p>A questão de engenharia nunca foi evitar o erro. É decidir <b>em que fase do ciclo</b> ele é descoberto, porque é a fase que define o custo.</p>
+<p>Siga a mesma falha, uma SQL injection, pelas fases do ciclo. Toque em cada fase.</p>`,
+ tasks:[
+  {type:"cost"},
+  {type:"mc", q:"O que define o custo de corrigir uma falha?",
+   options:[
+    {t:"A gravidade técnica da falha, independentemente de quando é achada", why:"A mesma SQL injection custa uma query reescrita no PR e um incidente em produção. A falha é igual; o momento muda tudo."},
+    {t:"A fase do ciclo em que ela é descoberta", ok:true, why:"Isso. Quanto mais tarde a falha é corrigida, mais cara ela fica."},
+    {t:"O tamanho do time de segurança", why:"O README não liga o custo ao tamanho do time, e sim à fase em que a falha aparece."}]}
+ ]},
+
+{sec:"1 · Pushing left", title:"A estratégia: empurrar para a esquerda",
+ body:`<p>Da curva de custo nasce a ideia que organiza todo o ciclo: <b>pushing left</b>, empurrar a segurança para as fases iniciais, <b>antes de o código existir</b>.</p>
+<p>A curva de custo vem de Boehm (<i>Software Engineering Economics</i>, 1981). O nome "pushing left" é de Janca (2020). Todo o resto do ponto 1 é sobre como executar essa estratégia cedo.</p>`,
+ tasks:[
+  {type:"mc", q:"Um time decide fazer modelagem de ameaças antes de abrir o primeiro pull request. Isso é aplicar…",
+   options:[
+    {t:"Pushing left", ok:true, why:"Sim: a segurança entra no design, antes de existir código."},
+    {t:"Shift-right", why:"Shift-right é monitorar produção. Aqui a segurança entrou antes do código."},
+    {t:"Assume breach", why:"Assume breach é presumir que o atacante já entrou. A decisão aqui é sobre quando aplicar segurança."}]}
+ ]},
+
+{sec:"1 · Pushing left", title:"Falha de design × bug de implementação",
+ body:`<p>Essa distinção decide em que fase a correção cabe.</p>
+<p><b>Falha (flaw)</b>: o sistema faz o que foi desenhado, e <b>o desenho está errado</b>. Nasce em requisitos ou design e se corrige com <b>reprojeto</b>.</p>
+<p><b>Bug</b>: o desenho está certo e <b>o código não cumpre</b>. Nasce no código e se corrige com <b>patch</b>.</p>`,
+ tasks:[
+  {type:"sort", q:"Classifique cada situação.", buckets:["Falha de design","Bug"], items:[
+    {t:"O sistema funciona como desenhado, mas o desenho deixa qualquer usuário autenticado exportar a base inteira.", b:0, why:"O código cumpre o desenho; o erro está no desenho."},
+    {t:"O desenho exige query parametrizada, mas alguém concatenou a entrada do usuário na query.", b:1, why:"O desenho estava certo; a implementação não cumpriu."},
+    {t:"Ninguém previu expiração de sessão no requisito.", b:0, why:"Nasceu no requisito: corrige-se com reprojeto, não com patch."},
+    {t:"O desenho prevê limite de tamanho, mas o código esqueceu de verificar o índice do array.", b:1, why:"Erro de implementação, localizado: corrige-se com patch."}]}
+ ]},
+
+{sec:"2 · Fundamentos", title:"O que se protege, e de quem",
+ body:`<p>Antes das fases vêm os conceitos que valem no ciclo inteiro (Janca, 2020, cap. 1). Os primeiros dizem o que se protege e de onde vem a ameaça.</p>
+<p><b>CIA</b>: confidencialidade (só quem deve acessa), integridade (o dado é o que deveria ser) e disponibilidade (está lá quando é preciso). É o critério contra o qual todo requisito é medido.</p>
+<p><b>Assume breach</b>: presumir que a invasão já aconteceu e desenhar para conter o dano. Assim segmentação, logs, menor privilégio e detecção viram o plano principal.</p>
+<p><b>Ameaça interna</b>: quem tem acesso legítimo também é vetor, por malícia ou por acidente. <b>Cadeia de suprimentos</b>: código de terceiros roda com os seus privilégios e toca os seus dados.</p>`,
+ tasks:[
+  {type:"sort", q:"Qual conceito explica cada situação?", buckets:["CIA","Assume breach","Ameaça interna","Cadeia de suprimentos"], items:[
+    {t:"Bloquear dispositivos desconhecidos, mesmo incomodando o usuário.", b:0, why:"Controles que incomodam existem para proteger confidencialidade, integridade ou disponibilidade."},
+    {t:"Segmentar a rede porque o atacante pode já estar dentro.", b:1, why:"É a postura madura: desenhar para limitar o dano."},
+    {t:"Um funcionário clica no link errado e entrega a senha.", b:2, why:"Acesso legítimo também é vetor, aqui por acidente."},
+    {t:"Uma biblioteca de terceiros com vulnerabilidade compromete o sistema.", b:3, why:"Código que você não escreveu também é risco seu. Daí o inventário."}]}
+ ]},
+
+{sec:"2 · Fundamentos", title:"Camadas e acesso mínimo",
+ body:`<p>Nenhum controle é infalível. <b>Defense in depth</b> é colocar várias barreiras independentes: o atacante precisa vencer todas, e o defensor só precisa que uma segure.</p>
+<p>Teste com o exemplo do README, uma SQL injection contra quatro camadas. Derrube as camadas e veja quando o ataque passa.</p>`,
+ tasks:[
+  {type:"layers"},
+  {type:"sort", q:"Qual princípio cada medida aplica?", buckets:["Least privilege","Superfície de ataque","Zero trust"], items:[
+    {t:"A conta de serviço do relatório só tem permissão de leitura.", b:0, why:"Mínimo de acesso: o que não pode escrever, não vaza escrita."},
+    {t:"Desligar um endpoint antigo que ninguém usa mais.", b:1, why:"Menos porta aberta, menos coisa para defender."},
+    {t:"Verificar identidade e autorização mesmo para chamadas vindas da rede interna.", b:2, why:"Never trust, always verify: estar na rede interna não é prova de nada."}]}
+ ]},
+
+{sec:"2 · Fundamentos", title:"Segredos e pessoas",
+ body:`<p><b>Sem segurança por obscuridade</b>: um sistema seguro continua seguro com o desenho conhecido. O secreto é a chave, não o mecanismo.</p>
+<p><b>Sem segredo em código</b>: o repositório é clonado e o histórico guarda tudo. Segredos ficam em cofre ou em variável de ambiente injetada em runtime.</p>
+<p><b>Segurança usável</b>: senha impossível vira post-it; aprovação lenta vira atalho. <b>Fatores de autenticação</b>: algo que você sabe, tem ou é. MFA combina <b>categorias diferentes</b>.</p>
+<p class="aside">Fail secure não entra nos conceitos de base: é princípio de arquitetura, tratado no ponto 3.</p>`,
+ tasks:[
+  {type:"sort", q:"Cada combinação é MFA de verdade?", buckets:["É MFA","Não é MFA"], items:[
+    {t:"Senha + código gerado no celular", b:0, why:"Algo que você sabe + algo que você tem."},
+    {t:"Senha + pergunta secreta", b:1, why:"As duas são algo que você sabe: mesma categoria."},
+    {t:"Digital + PIN", b:0, why:"Algo que você é + algo que você sabe."},
+    {t:"Duas senhas diferentes", b:1, why:"Dois fatores do mesmo tipo não são MFA."}]},
+  {type:"mc", q:"Uma API pública documenta todo o seu protocolo. O que precisa continuar secreto?",
+   options:[
+    {t:"O desenho do protocolo", why:"Esconder o desenho é segurança por obscuridade, e alguém acaba descobrindo."},
+    {t:"As chaves e credenciais", ok:true, why:"O segredo é a chave, não o mecanismo."},
+    {t:"O código-fonte da API", why:"O sistema deve continuar seguro mesmo com o código conhecido."}]}
+ ]},
+
+{sec:"3 · O ciclo", title:"As cinco fases",
+ body:`<p>O SDLC seguro é o mesmo ciclo de vida de software, com segurança embutida em cada fase, e não um teste no final.</p>
+<p>As cinco fases existem em qualquer metodologia, seja Waterfall, Agile ou DevOps. Muda a duração e a frequência de cada volta. Deploy e manutenção são uma fase só, porque as atividades são as mesmas: monitorar, alertar, responder.</p>`,
+ tasks:[
+  {type:"order", q:"Toque nas fases na ordem do ciclo.", items:["Requisitos","Design","Código","Testes","Deploy e manutenção"],
+   done:"Depois do deploy, a lição aprendida vira requisito do próximo ciclo. A descontinuação fica fora das cinco: vem do Microsoft SDL e do NIST SSDF."}
+ ]},
+
+{sec:"4 · Fase 1", title:"Requisitos: o que o sistema deve garantir",
+ flow:[["Objetivo","Identificar ativos, classificar dados e escrever requisitos verificáveis"],["Princípios","Verificabilidade, rastreabilidade, negação explícita"],["Técnicas","Abuse case, misuse case, attack tree, bug bar"],["Saída","Requisito com critério de aceite"]],
+ body:`<p>A fase responde <i>o que</i> garantir, não <i>como</i> implementar. Ativos são dados, segredos, funções e infraestrutura. Os dados se classificam em <b>Público, Interno, Confidencial e Restrito</b>, usando a CIA como lente.</p>
+<p>A <b>revisão da stack</b> é a primeira decisão de segurança: um framework que trata a saída por padrão elimina uma classe inteira de falha antes da primeira linha de código.</p>`,
+ tasks:[
+  {type:"mc", q:"Qual destes é um requisito de segurança verificável?",
+   options:[
+    {t:"O sistema deve ser seguro", why:"Não dá para testar. Se não dá para testar, não serve."},
+    {t:"Usar boas práticas de autenticação", why:"Vago: não diz que comportamento um teste deveria observar."},
+    {t:"Rota autenticada rejeita token expirado com 401", ok:true, why:"Tem comportamento observável e critério de aceite. Esse é o exemplo do README."}]},
+  {type:"order", q:"Rastreabilidade: ponha a cadeia em ordem.", items:["Ativo","Requisito","Controle","Teste"],
+   done:"Cada ativo gera um requisito, que vira um controle, que é provado por um teste."}
+ ]},
+
+{sec:"4 · Fase 1", title:"Requisitos: quatro lentes para achar falhas",
+ body:`<p>Cada técnica faz uma pergunta diferente ao sistema, e o requisito nasce da resposta.</p>
+<p><b>Abuse case</b> (McDermott e Fox, 1999) inverte o caso de uso: login → atacante tenta com senha vazada → bloquear após três tentativas. <b>Misuse case</b> (Sindre e Opdahl, 2000) aparece no mesmo diagrama do caso de uso: funcionário exporta a base → exportação exige aprovação de dois níveis.</p>
+<p><b>Attack tree</b> (Schneier, 1999) põe o objetivo do atacante na raiz e os caminhos nos ramos. <b>Bug bar</b> (Microsoft SDL) define o limiar do que não vai para a release, antes de qualquer requisito.</p>
+<p class="aside">OWASP ASVS é o catálogo de requisitos testáveis usado como checklist ao fim da elicitação. SQUARE (Mead, SEI) é o processo que escolhe a técnica.</p>`,
+ tasks:[
+  {type:"sort", q:"Que técnica faz cada pergunta?", buckets:["Abuse case","Misuse case","Attack tree","Bug bar"], items:[
+    {t:"O que um atacante externo faria?", b:0, why:"Inverte o fluxo legítimo do caso de uso."},
+    {t:"O que um insider faria com o acesso que já tem?", b:1, why:"No README, o misuse case olha para quem já está dentro."},
+    {t:"Qual o objetivo do atacante e quais os caminhos até ele?", b:2, why:"Objetivo na raiz; cada ramo é um caminho, e cada ramo vira requisito."},
+    {t:"O que não pode ir para a release?", b:3, why:"É requisito de processo, definido antes de qualquer requisito de produto."}]}
+ ]},
+
+{sec:"4 · Fase 2", title:"Design: o desenho antes do código",
+ flow:[["Objetivo","Arquitetura segura: onde os dados fluem, onde entram as ameaças, que controle mitiga cada uma"],["Princípios","Least privilege, defense in depth, fail secure, zero trust"],["Técnicas","Modelagem de ameaças (Shostack, 2014), DFD (DeMarco, 1979), superfície de ataque (Manadhata e Wing, 2004)"],["Saída","Desenho com ameaças mapeadas e mitigações definidas"]],
+ body:`<p>É a fase mais barata para corrigir: mudar um desenho custa uma reunião; reescrever código custa meses. E é onde nasce a falha de design, a que patch nenhum corrige.</p>
+<p>O <b>DFD</b> mostra processos, armazenamentos e fluxos, e é o insumo da modelagem de ameaças. STRIDE e PASTA são taxonomias que alimentam essa modelagem.</p>`,
+ tasks:[
+  {type:"order", q:"Ponha as quatro perguntas de Shostack em ordem.", items:["O que estamos construindo?","O que pode dar errado?","O que fazemos a respeito?","Fizemos um bom trabalho?"],
+   done:"Construir, ameaçar, mitigar, conferir. A resposta da terceira pergunta são as mitigações que saem da fase."},
+  {type:"mc", q:"O serviço de autorização caiu. Pelo princípio de fail secure, o sistema deve…",
+   options:[
+    {t:"Liberar o acesso para não parar o negócio", why:"Erro nunca libera acesso."},
+    {t:"Negar o acesso até o serviço voltar", ok:true, why:"Fail secure: o erro nega, nunca libera."},
+    {t:"Liberar só para usuários antigos", why:"Ainda é liberar sem verificação."}]},
+  {type:"mc", q:"Por que copiar dados reais de produção para o ambiente de teste é um problema?",
+   options:[
+    {t:"Porque deixa os testes mais lentos", why:"O problema não é desempenho."},
+    {t:"Porque o ambiente de teste não tem os controles da produção", ok:true, why:"Por isso o README chama isso de vazamento com data marcada, e a separação é regra de desenho."},
+    {t:"Porque dados reais quebram os testes automatizados", why:"O risco é de exposição, não de quebra."}]}
+ ]},
+
+{sec:"4 · Fase 3", title:"Código: não repetir falhas conhecidas",
+ flow:[["Objetivo","Código sem padrões de falha conhecidos, provado antes do merge"],["Princípios","Never trust input, nada hard coded, verbo e rota corretos, sessão não se improvisa, bounds checking, erro sem ajuda ao atacante"],["Técnicas","Inspeção formal (Fagan, 1976), secure code review (OWASP), SAST, linting"],["Saída","Código revisado, com teste e sem achado crítico aberto"]],
+ body:`<p>É onde requisito e desenho viram comportamento real. A regra de ouro: se você está escrevendo <b>criptografia, autenticação ou sessão do zero, pare</b>. Já existe implementação revisada.</p>
+<p>Faça um code review. Para cada trecho, aponte o princípio que ele quebra.</p>`,
+ tasks:[
+  {type:"sort", q:"Que princípio cada trecho quebra?", code:true, buckets:["Nada hard coded","Erro sem ajuda ao atacante","Verbo e rota corretos","Sessão não se improvisa"], items:[
+    {t:`const API_KEY = "chave-producao-123";`, b:0, why:"Chave no código vira chave vazada. Vai para o cofre ou variável de ambiente."},
+    {t:`catch (e) { res.send(e.stack); }`, b:1, why:"Stack trace não vai para o usuário: falhar sem vazar detalhe."},
+    {t:`app.get("/conta/:id/apagar", apagarConta);`, b:2, why:"Uma operação que apaga não pode usar GET. O método HTTP precisa corresponder ao efeito."},
+    {t:`const token = md5(usuario + Date.now());`, b:3, why:"Sessão caseira. Use o mecanismo do framework."}]},
+  {type:"mc", q:"O teste unitário de segurança da fase de código prova o quê?",
+   options:[
+    {t:"Que o código compila", why:"Isso é o build."},
+    {t:"O requisito negativo escrito na fase 1", ok:true, why:"O que não deve acontecer vira teste. É a rastreabilidade fechando."},
+    {t:"Que não há dependências vulneráveis", why:"Isso é papel do SCA."}]}
+ ]},
+
+{sec:"4 · Fase 4", title:"Testes: o sistema inteiro, com evidência",
+ flow:[["Objetivo","Encontrar falhas antes de produção, com evidência para corrigir"],["Princípios","Evidência, severidade antes da correção, cobertura do sistema"],["Técnicas","SAST, DAST, SCA, fuzzing, secret scanning, pentest"],["Saída","Achado com severidade, prova e decisão"]],
+ body:`<p>A fase não testa só o código. São <b>sete alvos</b>: código, aplicação, infraestrutura, banco de dados, APIs, integrações e rede. Esquecer um deixa buraco.</p>
+<p>Achado sem prova de reprodução não é achado. E é o bug bar da fase 1 que decide o que bloqueia a release.</p>`,
+ tasks:[
+  {type:"sort", q:"Em que alvo cada achado foi encontrado?", buckets:["Infraestrutura","Banco de dados","APIs","Rede"], items:[
+    {t:"Serviço exposto com configuração padrão no servidor.", b:0, why:"Sistema operacional, serviço exposto e configuração são infraestrutura."},
+    {t:"Conta de serviço com mais permissão do que precisa.", b:1, why:"Permissão e conta de serviço são verificadas no banco."},
+    {t:"Endpoint devolve dados de outro cliente.", b:2, why:"Autorização e exposição de dado por endpoint."},
+    {t:"Tráfego entre serviços circula em claro.", b:3, why:"Segmentação, porta aberta e tráfego em claro são rede."}]},
+  {type:"mc", q:"Um achado tem severidade e prova de reprodução. Quais são as decisões possíveis?",
+   options:[
+    {t:"Corrigir agora, aceitar o risco ou bloquear a release", ok:true, why:"Essa é a saída da fase de testes."},
+    {t:"Corrigir agora ou ignorar", why:"Faltam as outras saídas, e ignorar não é uma delas."},
+    {t:"Sempre bloquear a release", why:"Quem decide o que bloqueia é o bug bar, pela severidade."}]}
+ ]},
+
+{sec:"4 · Fase 5", title:"Deploy e manutenção: detectar e responder",
+ flow:[["Objetivo","Pôr em produção sem abrir brecha; detectar e responder sem derrubar o serviço"],["Princípios","Assume breach, log sem segredo, detecção vale o que vale a resposta"],["Técnicas","Resposta a incidentes (NIST SP 800-61), gestão de vulnerabilidades"],["Saída","Produção monitorada, incidente contido, lição virando requisito"]],
+ body:`<p>Deploy seguro é release só com verificação aprovada e segredo fora do artefato. Depois vêm WAF, RASP, monitoramento, log, alerta, rastreio de CVEs, patch management, varredura contínua e inventário.</p>
+<p>Regra de ouro: <b>fire drill antes do incidente</b>. Plano de resposta que nunca foi ensaiado falha no dia.</p>`,
+ tasks:[
+  {type:"mc", q:"O WAF está bloqueando ataques contra uma falha conhecida. Já dá para fechar o chamado?",
+   options:[
+    {t:"Sim, o WAF resolveu", why:"WAF e RASP não corrigem a falha."},
+    {t:"Não: o WAF compra tempo até o patch", ok:true, why:"A falha continua no código até ser corrigida."},
+    {t:"Sim, desde que o RASP também esteja ativo", why:"Nenhum dos dois corrige a falha; os dois só compram tempo."}]},
+  {type:"order", q:"Gestão de vulnerabilidades: ponha o ciclo em ordem.", items:["Identificar","Priorizar","Corrigir","Verificar"],
+   done:"E a resposta a incidentes segue contenção, erradicação, recuperação e lição aprendida."},
+  {type:"mc", q:"Alertas disparam todo dia, mas ninguém lê. Pelo princípio da fase, esse monitoramento…",
+   options:[
+    {t:"Funciona, porque os eventos ficam registrados", why:"Registro sem resposta não protege ninguém."},
+    {t:"Não existe na prática", ok:true, why:"Detecção vale o que vale a resposta: alerta que ninguém lê não existe."},
+    {t:"Precisa de mais alertas", why:"O problema é a falta de resposta, não de alerta."}]}
+ ]},
+
+{sec:"4 · Fase extra", title:"Descontinuação",
+ body:`<p>Não está no ciclo clássico; vem do Microsoft SDL e do NIST SSDF. Entra porque <b>o sistema que sai do ar continua guardando dado e credencial</b>.</p>
+<p>Objetivo: encerrar sem vazar dados nem deixar credenciais ativas. Atividades: remoção segura de dados, revogação de credenciais e transferência controlada para o sistema sucessor. Não há técnica nomeada; é um checklist.</p>`,
+ tasks:[
+  {type:"mc", q:"O sistema antigo foi desligado, mas as chaves de API dele ainda funcionam. O que faltou?",
+   options:[
+    {t:"Remoção segura de dados", why:"Isso trata os dados, não as credenciais."},
+    {t:"Revogação de credenciais", ok:true, why:"Tokens, chaves e senhas precisam ser invalidados no encerramento."},
+    {t:"Transferência controlada", why:"Isso passa os dados para o sistema sucessor."}]}
+ ]},
+
+{sec:"6 · DevSecOps", title:"Do processo escrito à prática",
+ body:`<p>As fases dizem <i>o que</i> fazer. Mas processo escrito não é processo executado: depende de alguém lembrar, toda vez.</p>
+<p><b>DevSecOps</b> (Development + Security + Operations) integra a segurança ao pipeline de CI/CD, de forma automatizada e contínua. A segurança vira responsabilidade compartilhada: cada commit dispara verificações, e uma falha bloqueia o deploy.</p>
+<p>O oposto é o modelo tradicional: a segurança recebia o sistema pronto, fazia um pentest no final, achava falhas caras e devolvia.</p>`,
+ tasks:[
+  {type:"mc", q:"Qual problema o DevSecOps resolve que o SDLC seguro sozinho não resolve?",
+   options:[
+    {t:"Dizer quais atividades fazer em cada fase", why:"Isso o SDLC seguro já faz: é o processo."},
+    {t:"Fazer a segurança acontecer sempre, sem depender de alguém lembrar", ok:true, why:"É a automação no pipeline que garante a execução."},
+    {t:"Eliminar a necessidade de testes manuais", why:"O README não diz isso: o pentest continua na fase de testes."}]}
+ ]},
+
+{sec:"7 · Shift-left e shift-right", title:"Prevenir e detectar",
+ body:`<p><b>Shift-left</b> é o pushing left aplicado ao pipeline: testar a cada commit. <b>Shift-right</b> é monitorar produção, porque CVEs novos aparecem todo dia.</p>
+<p>Um sem o outro deixa buraco: só shift-left ignora o que já está em produção; só shift-right corrige tarde demais.</p>`,
+ tasks:[
+  {type:"sort", q:"Cada prática é shift-left ou shift-right?", buckets:["Shift-left","Shift-right"], items:[
+    {t:"SAST rodando a cada push", b:0, why:"Segurança no início, a cada commit."},
+    {t:"Secrets scanning antes do merge", b:0, why:"Barra o segredo antes de entrar no código principal."},
+    {t:"Acompanhar CVEs novos que afetam o que já roda", b:1, why:"Olha para produção."},
+    {t:"SCA nas dependências durante o build", b:0, why:"Verifica terceiros antes do deploy."},
+    {t:"Alertas de comportamento suspeito em produção", b:1, why:"Detecta o que já está rodando."}]}
+ ]},
+
+{sec:"8 · Pipeline", title:"O pipeline com segurança",
+ body:`<p>O pipeline é a sequência automatizada do commit ao deploy. Com segurança embutida, cada etapa ganha uma verificação.</p>
+<p>Regra de ouro: <b>se uma verificação falhar, o pipeline para</b>. Nada vai para produção com falha de segurança conhecida.</p>`,
+ tasks:[
+  {type:"order", q:"Monte o pipeline na ordem.", items:["Commit","Build","Testes","Análise de segurança (SAST, SCA, secrets)","Deploy em staging","DAST","Deploy em produção"],
+   done:"O DAST vem depois do staging porque precisa da aplicação rodando."},
+  {type:"sort", q:"Que técnica cada ferramenta executa?", buckets:["SAST","DAST","SCA","Secrets"], items:[
+    {t:"Semgrep", b:0, why:"Analisa o código-fonte sem executar."},
+    {t:"OWASP ZAP", b:1, why:"Ataca a aplicação rodando."},
+    {t:"Trivy", b:2, why:"Sinaliza dependências com CVEs conhecidas."},
+    {t:"gitleaks", b:3, why:"Procura credenciais vazadas no repositório."}]}
+ ]},
+
+{sec:"10 · Síntese", title:"SDLC seguro × DevSecOps",
+ body:`<p>Um não substitui o outro: o DevSecOps é a forma de executar o SDLC seguro em escala.</p>`,
+ tasks:[
+  {type:"sort", q:"A que cada característica pertence?", buckets:["SDLC seguro","DevSecOps"], items:[
+    {t:"É um processo", b:0, why:"As cinco fases com segurança embutida."},
+    {t:"Responde: o que fazer em cada fase?", b:0, why:"Define as atividades."},
+    {t:"É uma prática", b:1, why:"Como o processo roda no dia a dia."},
+    {t:"Responde: como garantir que aconteça, de forma contínua?", b:1, why:"Automação no pipeline."},
+    {t:"Serve para qualquer projeto", b:0, why:"Não depende de CI/CD."},
+    {t:"Exige projetos com CI/CD", b:1, why:"Vive dentro do pipeline."}]}
+ ],
+ end:true},
+];
+
+
+const DECKS = {
+  custo:{name:"Pushing left", sub:"Por que o momento da descoberta define o custo, e a diferença entre falha e bug."},
+  base:{name:"Conceitos de base", sub:"Os doze conceitos que valem em todas as fases (Janca, cap. 1)."},
+  req:{name:"Requisitos", sub:"Fase 1: ativos, classificação, requisito verificável e técnicas de elicitação."},
+  design:{name:"Design", sub:"Fase 2: arquitetura segura antes do código, modelagem de ameaças."},
+  codigo:{name:"Código", sub:"Fase 3: codificação segura, code review, SAST no commit."},
+  testes:{name:"Testes", sub:"Fase 4: os sete alvos, evidência e as técnicas de teste."},
+  deploy:{name:"Deploy e descontinuação", sub:"Fase 5 e a fase extra: produção monitorada, resposta e encerramento."},
+  devsecops:{name:"Ciclo e DevSecOps", sub:"O ciclo completo, shift-left e shift-right, pipeline e ferramentas."},
+};
+
+const CARDS = [
+// ---- Pushing left ----
+{d:"custo",topic:"O custo no tempo",objective:"explicar por que a fase da descoberta importa",
+ q:"Todo software erra. Então qual é a pergunta de engenharia que importa?",
+ a:"Não é evitar o erro, e sim <b>em que fase do ciclo ele é descoberto</b>, porque é a fase que define o custo. Quanto mais tarde, mais caro."},
+{d:"custo",topic:"O custo no tempo",objective:"comparar o custo da correção em três momentos",
+ q:"Como muda o custo de corrigir uma falha no requisito/design, no commit e em produção?",
+ a:"<b>Requisito e design</b>: não há código, corrigir é mudar um documento. <b>Commit</b>: o código é pequeno e o contexto está fresco. <b>Produção</b>: a falha já afetou dados, clientes ou receita."},
+{d:"custo",topic:"O custo no tempo",objective:"dar o exemplo concreto da SQL injection",
+ q:"Exemplo do README: a mesma SQL injection corrigida no pull request e em produção. O que acontece em cada caso?",
+ a:"<b>No pull request</b>: reescreve a query, adiciona um teste, fim. <b>Em produção</b>: incidente, investigação forense, notificação de clientes e patch emergencial fora do horário."},
+{d:"custo",topic:"Pushing left",objective:"definir pushing left e suas fontes",
+ q:"O que é pushing left, e de onde vêm a ideia e o nome?",
+ a:"Empurrar a segurança para as <b>fases iniciais</b>, antes de o código existir. A base é a curva de custo (<b>Boehm, <i>Software Engineering Economics</i>, 1981</b>); o nome é de <b>Janca, 2020</b>."},
+{d:"custo",topic:"Falha × bug",objective:"definir falha de design",
+ q:"O que é uma falha de design (flaw), onde nasce e como se corrige?",
+ a:"O sistema faz o que foi desenhado, e <b>o desenho está errado</b>. Nasce em <b>requisitos ou design</b>. Custa caro depois de codificada e se corrige com <b>reprojeto</b>."},
+{d:"custo",topic:"Falha × bug",objective:"definir bug de implementação",
+ q:"O que é um bug de implementação, onde nasce e como se corrige?",
+ a:"O desenho está certo e <b>o código não cumpre</b>. Nasce no <b>código</b>. O custo é menor e localizado, e se corrige com <b>patch</b>."},
+
+// ---- Conceitos de base ----
+{d:"base",topic:"CIA",objective:"definir as três propriedades",
+ q:"O que significa cada letra da CIA?",
+ a:"<b>Confidencialidade</b>: só quem deve acessa. <b>Integridade</b>: o dado é o que deveria ser, sem alteração indevida. <b>Disponibilidade</b>: o sistema está lá quando é preciso."},
+{d:"base",topic:"CIA",objective:"entender por que a CIA vem primeiro",
+ q:"Por que a CIA é chamada de mandato da segurança e vem antes de tudo?",
+ a:"São as três propriedades que toda equipe de segurança existe para proteger. Cada controle que incomoda, como <b>tirar direito de administrador</b> ou <b>bloquear dispositivo desconhecido</b>, protege uma delas. É o critério contra o qual todo requisito e todo risco é medido."},
+{d:"base",topic:"Assume breach",objective:"contrastar postura ingênua e madura",
+ q:"Assume breach: qual a diferença entre a postura ingênua e a madura?",
+ a:"A ingênua desenha para <b>impedir a entrada</b>. A madura presume que a entrada <b>já aconteceu ou vai acontecer</b> e desenha para <b>limitar o dano</b>."},
+{d:"base",topic:"Assume breach",objective:"saber o que muda na prática",
+ q:"Se o atacante já está dentro, o que deixa de ser luxo e vira o plano principal?",
+ a:"<b>Segmentação, logs, menor privilégio e detecção.</b> Por isso assume breach torna defense in depth e least privilege necessários, não opcionais."},
+{d:"base",topic:"Ameaça interna",objective:"dar exemplos e a consequência de projeto",
+ q:"Ameaça interna: dê um exemplo por malícia, um por acidente, e diga a consequência de projeto.",
+ a:"Malícia: funcionário que <b>exporta a base de clientes</b>. Acidente: quem <b>clica no link errado</b> ou configura mal. Consequência: o perímetro não basta; os controles precisam valer <b>dentro</b>, para contas autenticadas."},
+{d:"base",topic:"Defense in depth",objective:"aplicar camadas a um caso concreto",
+ q:"Defense in depth contra SQL injection: quais são as quatro camadas do exemplo?",
+ a:"<b>Validação de entrada</b> e <b>query parametrizada</b> e <b>WAF</b> e <b>menor privilégio no banco</b>. O atacante precisa vencer todas; o defensor só precisa que uma segure."},
+{d:"base",topic:"Least privilege",objective:"dar exemplos do ganho",
+ q:"Least privilege: qual a regra, e quais os dois exemplos de ganho?",
+ a:"Cada componente e pessoa recebe o <b>menor acesso que permite o trabalho</b>. Uma <b>conta de serviço que só lê</b> não vaza o que não pode escrever; um <b>usuário sem admin</b> não instala o que não deveria. É o mais barato de aplicar e o mais ignorado por conveniência."},
+{d:"base",topic:"Cadeia de suprimentos",objective:"entender o risco e a resposta",
+ q:"Cadeia de suprimentos: do que é feita uma aplicação moderna, por que isso é risco seu e o que fazer?",
+ a:"A maior parte é <b>código de terceiros</b>: bibliotecas, frameworks, imagens, serviços. Roda com <b>seus privilégios</b> e toca <b>seus dados</b>. É preciso saber o que se usa (<b>inventário</b>), <b>de onde vem</b> e se <b>está atualizado</b>."},
+{d:"base",topic:"Sem segurança por obscuridade",objective:"saber o que deve ser secreto",
+ q:"Segurança por obscuridade: por que esconder o desenho não protege?",
+ a:"Um sistema seguro continua seguro mesmo quando o atacante conhece a arquitetura e o código. O secreto é <b>a chave, não o mecanismo</b>. Apostar que 'ninguém vai descobrir' é apostar contra o tempo."},
+{d:"base",topic:"Superfície de ataque",objective:"definir e saber reduzir",
+ q:"O que é a superfície de ataque e como reduzi-la?",
+ a:"O conjunto de pontos por onde o sistema pode ser atacado: <b>portas, endpoints, parâmetros, integrações, funcionalidades</b>. Reduz-se <b>desligando o que não se usa e expondo só o necessário</b>, antes de qualquer controle ser escrito."},
+{d:"base",topic:"Sem segredo em código",objective:"explicar o vazamento e onde guardar",
+ q:"Por que senha, token ou chave no código-fonte é segredo vazado? Onde eles devem ficar?",
+ a:"O repositório é <b>clonado, copiado, compartilhado</b>, e o <b>histórico guarda tudo</b>. Segredos vivem em <b>cofre ou variáveis de ambiente injetadas em runtime</b>."},
+{d:"base",topic:"Zero trust",objective:"saber o que se verifica",
+ q:"Never trust, always verify: o que se verifica sempre, e que confiança isso elimina?",
+ a:"Verifica-se <b>identidade, autorização e integridade da entrada</b>, mesmo vindo da rede interna ou de outro sistema seu. Elimina a confiança implícita de 'está na rede interna', que insiders e invasores já dentro exploram."},
+{d:"base",topic:"Segurança usável",objective:"dar os exemplos de contorno",
+ q:"Segurança usável: quais os dois exemplos de controle que o usuário contorna?",
+ a:"<b>Senha impossível vira post-it</b>; <b>aprovação lenta vira atalho</b>. Segurança que ignora o humano falha pelo lado humano. O controle deve ser o caminho mais fácil."},
+{d:"base",topic:"Fatores de autenticação",objective:"nomear categorias com exemplo",
+ q:"Quais as três categorias de fator de autenticação, com um exemplo de cada?",
+ a:"Algo que você <b>sabe</b> (senha) · algo que você <b>tem</b> (telefone, token físico) · algo que você <b>é</b> (biometria)."},
+{d:"base",topic:"Fatores de autenticação",objective:"saber o que é MFA de verdade",
+ q:"O que é MFA de verdade, e por que ela protege quando a senha vaza?",
+ a:"Combinar fatores de <b>categorias diferentes</b>, não dois do mesmo tipo. Uma senha vazada não basta quando o segundo fator está <b>em outra categoria</b>."},
+
+// ---- Requisitos ----
+{d:"req",topic:"Requisitos · objetivo",objective:"enunciar o objetivo da fase",
+ q:"Qual o objetivo da fase de requisitos?",
+ a:"<b>Identificar ativos, classificar dados e escrever requisitos de segurança verificáveis.</b> Responde <i>o que</i> o sistema deve garantir, não <i>como</i> implementar."},
+{d:"req",topic:"Requisitos · atividades",objective:"listar as cinco atividades",
+ q:"Quais são as cinco atividades da fase de requisitos?",
+ a:"<b>Identificar ativos</b> · <b>classificar dados</b> · <b>escrever requisitos</b> · <b>security user story</b> · <b>revisão da stack</b>."},
+{d:"req",topic:"Requisitos · ativos",objective:"saber o que é ativo",
+ q:"Que tipos de coisa contam como ativo a proteger?",
+ a:"<b>Dados, segredos, funções e infraestrutura</b>: tudo o que vale proteger."},
+{d:"req",topic:"Requisitos · classificação",objective:"nomear os níveis e a lente usada",
+ q:"Quais são os quatro níveis de classificação de dados, e qual critério se aplica ao classificar?",
+ a:"<b>Público, Interno, Confidencial, Restrito.</b> O critério é a <b>CIA</b>: não é atividade nem produto, é a lente aplicada a cada dado."},
+{d:"req",topic:"Requisitos · user story",objective:"definir security user story",
+ q:"O que é uma security user story?",
+ a:"O requisito de segurança escrito <b>no formato que o time ágil já usa</b>."},
+{d:"req",topic:"Requisitos · revisão da stack",objective:"entender por que é a primeira decisão de segurança",
+ q:"Por que a revisão da stack é a primeira decisão de segurança do projeto?",
+ a:"Avaliar linguagem, framework e serviços antes de adotar elimina falhas cedo: um <b>framework que trata a saída por padrão</b> elimina uma classe inteira de falha antes da primeira linha de código."},
+{d:"req",topic:"Requisitos · produtos",objective:"listar o que a fase produz",
+ q:"Quais são os três produtos da fase de requisitos?",
+ a:"<b>Tipo de requisito</b> (funcional, não funcional, restrição) · <b>premissas</b> (o que assume e o que não promete) · <b>critério de aceite</b> (o teste que prova que o requisito funciona)."},
+{d:"req",topic:"Requisitos · princípios",objective:"enunciar os três princípios",
+ q:"Quais os três princípios da fase de requisitos e a regra de cada um?",
+ a:"<b>Verificabilidade</b>: se não dá para testar, não serve. <b>Rastreabilidade</b>: ativo → requisito → controle → teste. <b>Negação explícita</b>: o que não deve acontecer vira requisito negativo."},
+{d:"req",topic:"Requisitos · regra de ouro",objective:"reconhecer requisito verificável",
+ q:"Dê o exemplo de requisito ruim e de requisito bom.",
+ a:"Ruim: 'seja seguro'. Bom: '<b>rota autenticada rejeita token expirado com 401</b>'."},
+{d:"req",topic:"Requisitos · abuse case",objective:"aplicar abuse case",
+ q:"Abuse case (McDermott e Fox, 1999): como funciona? Dê o exemplo do login.",
+ a:"Pergunta o que um <b>atacante externo</b> faria e <b>inverte o caso de uso</b>: desenha o fluxo legítimo e depois o do atacante. Login → atacante tenta com <b>senha vazada</b> → requisito: <b>bloquear após três tentativas falhas</b>."},
+{d:"req",topic:"Requisitos · misuse case",objective:"aplicar misuse case",
+ q:"Misuse case (Sindre e Opdahl, 2000): como funciona? Dê o exemplo.",
+ a:"Pergunta o que um <b>insider</b> faria com acesso legítimo; aparece <b>no mesmo diagrama do caso de uso</b>. Funcionário exporta a base de clientes → requisito: <b>exportação exige aprovação de dois níveis</b>."},
+{d:"req",topic:"Requisitos · attack tree",objective:"aplicar attack tree",
+ q:"Attack tree (Schneier, 1999): como funciona? Dê o exemplo do cartão.",
+ a:"O <b>objetivo do atacante na raiz</b>; cada ramo é um caminho. Raiz: roubar dados de cartão. Ramos: <b>SQL injection, upload sem validação, sessão sem expiração</b>. Cada ramo vira um requisito."},
+{d:"req",topic:"Requisitos · bug bar",objective:"entender o bug bar",
+ q:"Bug bar (Microsoft SDL): que pergunta faz e quando é definido?",
+ a:"<b>O que não pode ir para a release?</b> É definido <b>antes de escrever qualquer requisito</b>; é requisito de processo, não de produto. Ex.: nenhuma falha crítica conhecida vai para a release."},
+{d:"req",topic:"Requisitos · apoios",objective:"saber onde entram ASVS, SQUARE e confuse case",
+ q:"Onde entram OWASP ASVS, SQUARE e o chamado confuse case?",
+ a:"<b>ASVS</b>: catálogo de requisito testável, usado como checklist quando a elicitação termina. <b>SQUARE</b> (Mead, SEI): processo que escolhe a técnica. <b>Confuse case</b>: erro humano sem intenção (CEP inválido rejeitado com mensagem clara), variação informal do misuse case."},
+{d:"req",topic:"Requisitos · saída",objective:"saber a saída da fase",
+ q:"Qual é a saída da fase de requisitos?",
+ a:"<b>Requisito com critério de aceite.</b> Sem teste, não entrou no ciclo."},
+
+// ---- Design ----
+{d:"design",topic:"Design · custo",objective:"explicar por que é a fase mais barata",
+ q:"Por que o design é a fase mais barata para corrigir erro?",
+ a:"Mudar um desenho custa <b>uma reunião</b>; reescrever código custa <b>meses</b>. É também onde nasce a falha de design, a que <b>patch nenhum corrige</b>."},
+{d:"design",topic:"Design · objetivo",objective:"enunciar o objetivo",
+ q:"Qual o objetivo da fase de design?",
+ a:"Definir a arquitetura segura <b>antes de escrever código</b>: <b>onde os dados fluem</b>, <b>onde entram as ameaças</b> e <b>quais controles mitigam cada uma</b>."},
+{d:"design",topic:"Design · atividades",objective:"listar as seis atividades",
+ q:"Quais as seis atividades da fase de design?",
+ a:"<b>Modelagem de ameaças</b> · <b>design review</b> (por alguém que não escreveu o desenho) · <b>diagrama de fluxo de dados</b> · <b>superfície de ataque</b> · <b>mitigação</b> · <b>separação de ambientes</b>."},
+{d:"design",topic:"Design · separação de ambientes",objective:"explicar o risco de dado real em teste",
+ q:"Por que dado de produção em ambiente de teste é 'vazamento com data marcada'?",
+ a:"Porque <b>o teste não tem os controles que a produção tem</b>. Por isso a separação é regra de <b>desenho</b>, não de operação: produção não empresta dado para teste nem para desenvolvimento."},
+{d:"design",topic:"Design · princípios",objective:"enunciar os quatro princípios",
+ q:"Quais os quatro princípios da fase de design e a regra de cada um?",
+ a:"<b>Least privilege</b>: mínimo de acesso por componente. <b>Defense in depth</b>: várias camadas. <b>Fail secure</b>: erro nega acesso, nunca libera. <b>Zero trust</b>: verificar sempre."},
+{d:"design",topic:"Design · fail secure",objective:"entender fail secure",
+ q:"Fail secure: o que acontece quando o sistema dá erro?",
+ a:"O erro <b>nega o acesso, nunca libera</b>."},
+{d:"design",topic:"Design · modelagem de ameaças",objective:"recitar as quatro perguntas",
+ q:"Quais as quatro perguntas da modelagem de ameaças (Shostack, 2014)?",
+ a:"<b>O que estamos construindo?</b> · <b>O que pode dar errado?</b> · <b>O que fazemos a respeito?</b> · <b>Fizemos um bom trabalho?</b>"},
+{d:"design",topic:"Design · DFD",objective:"saber o que o DFD mostra e para que serve",
+ q:"Diagrama de fluxo de dados (DeMarco, 1979): o que mostra e para que serve na fase?",
+ a:"Mostra <b>processos, armazenamentos e fluxos</b>. É o <b>insumo da modelagem de ameaças</b>."},
+{d:"design",topic:"Design · superfície de ataque",objective:"saber o que a análise faz",
+ q:"Análise de superfície de ataque (Manadhata e Wing, 2004): o que faz?",
+ a:"<b>Lista os pontos de entrada</b> do sistema e <b>prioriza por risco</b>."},
+{d:"design",topic:"Design · STRIDE e PASTA",objective:"saber onde STRIDE e PASTA entram",
+ q:"Onde entram STRIDE (Microsoft) e PASTA?",
+ a:"São <b>taxonomias que alimentam a modelagem de ameaças</b>: ajudam a responder 'o que pode dar errado?'."},
+{d:"design",topic:"Design · saída",objective:"saber a saída da fase",
+ q:"Qual é a saída da fase de design?",
+ a:"<b>Desenho com ameaças mapeadas e mitigações definidas.</b> Sem mitigação, o desenho não saiu da fase."},
+
+// ---- Código ----
+{d:"codigo",topic:"Código · objetivo",objective:"enunciar o objetivo",
+ q:"Qual o objetivo da fase de código?",
+ a:"Escrever código que <b>não repita os padrões de falha conhecidos</b>, e <b>provar isso antes do merge</b>. É onde requisito e desenho viram comportamento real."},
+{d:"codigo",topic:"Código · atividades",objective:"listar as sete atividades",
+ q:"Quais as sete atividades da fase de código?",
+ a:"<b>Codificação segura</b> · <b>validação de entrada</b> · <b>tratamento de erro e log</b> · <b>code review</b> · <b>SAST no commit</b> · <b>linting</b> · <b>teste unitário de segurança</b>."},
+{d:"codigo",topic:"Código · codificação segura",objective:"definir codificação segura e validação",
+ q:"O que significam codificação segura e validação de entrada?",
+ a:"<b>Codificação segura</b>: escolher a construção segura do framework em vez da insegura. <b>Validação de entrada</b>: tratar todo dado externo como hostil até prova em contrário."},
+{d:"codigo",topic:"Código · erro e log",objective:"saber o que é bom tratamento de erro",
+ q:"Tratamento de erro e log: qual o objetivo?",
+ a:"<b>Falhar sem vazar detalhe</b> e <b>registrar o que permite investigar depois</b>. Stack trace não vai para o usuário."},
+{d:"codigo",topic:"Código · teste unitário de segurança",objective:"ligar o teste à fase 1",
+ q:"O que o teste unitário de segurança prova?",
+ a:"O <b>requisito negativo da fase 1</b>: aquilo que não deve acontecer."},
+{d:"codigo",topic:"Código · princípios",objective:"enunciar os seis princípios",
+ q:"Quais os seis princípios da fase de código?",
+ a:"<b>Never trust, always verify</b> · <b>nada hard coded</b> · <b>verbo e rota corretos</b> · <b>identidade e sessão não se improvisam</b> · <b>bounds checking</b> · <b>erro não é mensagem de ajuda ao atacante</b>."},
+{d:"codigo",topic:"Código · princípios",objective:"explicar três princípios menos óbvios",
+ q:"O que dizem 'verbo e rota corretos', 'bounds checking' e 'identidade e sessão não se improvisam'?",
+ a:"<b>Verbo e rota</b>: cada operação usa o método HTTP que corresponde ao efeito dela. <b>Bounds checking</b>: todo limite de tamanho e de índice é verificado. <b>Identidade e sessão</b>: usar o mecanismo do framework, nunca escrever o seu."},
+{d:"codigo",topic:"Código · regra de ouro",objective:"fixar a regra de ouro",
+ q:"Qual a regra de ouro da fase de código?",
+ a:"Se está escrevendo <b>criptografia, autenticação ou sessão do zero, pare</b>: já existe implementação revisada."},
+{d:"codigo",topic:"Código · técnicas",objective:"nomear as técnicas de revisão",
+ q:"Inspeção formal de código (Fagan, 1976) e secure code review (OWASP): o que é cada uma?",
+ a:"<b>Fagan</b>: revisão estruturada com <b>papéis e checklist</b>, raiz do code review moderno. <b>Secure code review</b> (OWASP Code Review Guide): revisão focada nos <b>controles de segurança</b>, manual ou apoiada por SAST."},
+{d:"codigo",topic:"Código · catálogos",objective:"saber o papel de OWASP Top 10 e CWE",
+ q:"Para que servem OWASP Top 10 e CWE na fase de código?",
+ a:"São <b>catálogos de padrão de falha</b>: dizem quais construções evitar e o que o review e o SAST procuram."},
+{d:"codigo",topic:"Código · saída",objective:"saber a saída da fase",
+ q:"Qual é a saída da fase de código?",
+ a:"<b>Código revisado, com teste que prova o requisito e sem achado crítico em aberto.</b>"},
+
+// ---- Testes ----
+{d:"testes",topic:"Testes · objetivo",objective:"enunciar o objetivo",
+ q:"Qual o objetivo da fase de testes?",
+ a:"<b>Encontrar falhas antes de produção, com evidência que permita corrigir.</b>"},
+{d:"testes",topic:"Testes · alvos",objective:"listar os sete alvos",
+ q:"Quais são os sete alvos de teste (Janca, 2020)?",
+ a:"<b>Código · Aplicação · Infraestrutura · Banco de dados · APIs · Integrações · Rede.</b> Esquecer um deixa buraco."},
+{d:"testes",topic:"Testes · alvos",objective:"saber o que se verifica em infraestrutura, banco e rede",
+ q:"O que se verifica em infraestrutura, em banco de dados e em rede?",
+ a:"<b>Infraestrutura</b>: sistema operacional, serviço exposto, configuração. <b>Banco</b>: permissão, conta de serviço, dado em repouso. <b>Rede</b>: segmentação, porta aberta, tráfego em claro."},
+{d:"testes",topic:"Testes · alvos",objective:"saber o que se verifica em APIs e integrações",
+ q:"O que se verifica em APIs e em integrações?",
+ a:"<b>APIs</b>: autenticação, autorização e exposição de dado <b>por endpoint</b>. <b>Integrações</b>: o que entra e sai de sistemas de terceiros."},
+{d:"testes",topic:"Testes · princípios",objective:"enunciar os três princípios",
+ q:"Quais os três princípios da fase de testes?",
+ a:"<b>Evidência</b>: achado sem prova de reprodução não é achado. <b>Severidade antes da correção</b>: o bug bar da fase 1 decide o que bloqueia a release. <b>Cobertura do sistema, não do código</b>: testar os sete alvos."},
+{d:"testes",topic:"Testes · técnicas",objective:"descrever as seis técnicas",
+ q:"Quais as seis técnicas de teste e o que cada uma faz?",
+ a:"<b>SAST</b>: fonte sem executar · <b>DAST</b>: app rodando, como atacante · <b>SCA</b>: dependências de terceiros · <b>Fuzzing</b>: entrada malformada até quebrar · <b>Secret scanning</b>: credencial vazada no repositório · <b>Pentest</b>: ataque real simulado, geralmente por time externo."},
+{d:"testes",topic:"Testes · saída",objective:"saber a saída e as três decisões",
+ q:"Qual a saída da fase de testes, e quais as três decisões possíveis?",
+ a:"<b>Achado com severidade e prova de reprodução.</b> Decisão: <b>corrige agora</b>, <b>aceita o risco</b> ou <b>bloqueia a release</b>."},
+
+// ---- Deploy e descontinuação ----
+{d:"deploy",topic:"Deploy · objetivo",objective:"enunciar o objetivo",
+ q:"Qual o objetivo da fase de deploy e manutenção?",
+ a:"Colocar em produção <b>sem abrir brecha</b>, e <b>detectar e responder</b> ao que aparecer depois, <b>sem derrubar o serviço</b>."},
+{d:"deploy",topic:"Deploy · uma fase só",objective:"saber por que deploy e manutenção são uma fase",
+ q:"Por que deploy e manutenção são uma fase só?",
+ a:"Porque as atividades de segurança são as mesmas: <b>monitorar, alertar, responder</b>."},
+{d:"deploy",topic:"Deploy · atividades",objective:"descrever deploy seguro e alerta",
+ q:"O que caracteriza um deploy seguro? E um alerta útil?",
+ a:"<b>Deploy seguro</b>: release só com verificação aprovada e <b>segredo fora do artefato</b>. <b>Alerta</b>: avisar alguém que pode agir, <b>no tempo de agir</b>."},
+{d:"deploy",topic:"Deploy · atividades",objective:"descrever as atividades de manutenção",
+ q:"Rastreio de CVEs, patch management, varredura contínua e inventário: o que é cada um?",
+ a:"<b>Rastreio de CVEs</b>: saber quais afetam o que roda. <b>Patch management</b>: corrigir sem downtime. <b>Varredura contínua</b>: o que estava seguro ontem pode não estar hoje. <b>Inventário</b>: não se protege o que não se sabe que existe."},
+{d:"deploy",topic:"Deploy · WAF e RASP",objective:"saber o que fazem e o limite",
+ q:"WAF e RASP: o que cada um faz, e o que nenhum dos dois faz?",
+ a:"<b>WAF</b> filtra a requisição maliciosa antes de chegar na aplicação. <b>RASP</b> protege de dentro da aplicação em execução. <b>Nenhum corrige a falha</b>: compram tempo até o patch."},
+{d:"deploy",topic:"Deploy · princípios",objective:"enunciar os três princípios",
+ q:"Quais os três princípios da fase de deploy e manutenção?",
+ a:"<b>Assume breach</b>: operar como se o atacante já estivesse dentro. <b>Log sem segredo</b>: registra o evento, nunca a credencial nem o dado sensível. <b>Detecção vale o que vale a resposta</b>: alerta que ninguém lê não existe."},
+{d:"deploy",topic:"Deploy · regra de ouro",objective:"fixar a regra de ouro",
+ q:"Qual a regra de ouro da fase de deploy e manutenção?",
+ a:"<b>Simulação (fire drill) antes do incidente.</b> Plano de resposta que nunca foi ensaiado falha no dia."},
+{d:"deploy",topic:"Deploy · técnicas",objective:"nomear as duas técnicas",
+ q:"Quais as duas técnicas da fase, e o que cada uma faz?",
+ a:"<b>Resposta a incidentes (NIST SP 800-61)</b>: contenção, erradicação, recuperação e lição aprendida. <b>Gestão de vulnerabilidades</b>: identificar, priorizar, corrigir e verificar."},
+{d:"deploy",topic:"Deploy · saída",objective:"saber a saída e como fecha o ciclo",
+ q:"Qual a saída da fase de deploy e manutenção?",
+ a:"Produção monitorada, incidente contido e <b>a lição virando requisito do próximo ciclo</b>."},
+{d:"deploy",topic:"Descontinuação",objective:"saber por que a fase existe e de onde vem",
+ q:"Por que a descontinuação entra, se não está no ciclo clássico? De onde ela vem?",
+ a:"Porque <b>o sistema que sai do ar continua guardando dado e credencial</b>. Vem do <b>Microsoft SDL</b> e do <b>NIST SSDF</b>."},
+{d:"deploy",topic:"Descontinuação",objective:"listar as três atividades",
+ q:"Descontinuação: qual o objetivo e as três atividades?",
+ a:"Encerrar <b>sem vazar dados nem deixar credenciais ativas</b>. Atividades: <b>remoção segura de dados</b> (apagar ou anonimizar sem resíduo), <b>revogação de credenciais</b>, <b>transferência controlada</b> para o sistema sucessor. Não há técnica nomeada: é checklist."},
+
+// ---- Ciclo e DevSecOps ----
+{d:"devsecops",topic:"O ciclo",objective:"listar as fases em ordem",
+ q:"Quais as cinco fases do SDLC seguro, em ordem?",
+ a:"<b>Requisitos → Design → Código → Testes → Deploy e manutenção</b>, e então um novo ciclo."},
+{d:"devsecops",topic:"O ciclo",objective:"saber que as fases independem da metodologia",
+ q:"As cinco fases mudam entre Waterfall, Agile e DevOps?",
+ a:"Não. As fases existem em qualquer metodologia; <b>o que muda é a duração e a frequência de cada volta</b>."},
+{d:"devsecops",topic:"O ciclo",objective:"definir SDLC seguro",
+ q:"O que é o SDLC seguro, em uma frase?",
+ a:"O mesmo ciclo de vida de software, com <b>segurança embutida em cada fase</b>, e não um teste no final."},
+{d:"devsecops",topic:"Atividades por fase",objective:"explicar a repetição entre fases",
+ q:"Por que SAST, DAST, SCA e code review aparecem em Código e em Testes?",
+ a:"Não é redundância. No <b>Código</b>, rodam rápido e por commit, para dar retorno ao desenvolvedor. Nos <b>Testes</b>, rodam completos e com evidência, para decidir a release."},
+{d:"devsecops",topic:"DevSecOps",objective:"definir DevSecOps",
+ q:"O que é DevSecOps e o que cada parte do nome representa?",
+ a:"A prática de <b>integrar segurança no pipeline de CI/CD</b>, automatizada e contínua. <b>Development</b>: quem escreve o código. <b>Security</b>: ferramentas e práticas. <b>Operations</b>: deploy, monitoramento e infraestrutura."},
+{d:"devsecops",topic:"DevSecOps",objective:"saber a ideia central e o oposto",
+ q:"Qual a ideia central do DevSecOps, e qual é o modelo oposto?",
+ a:"Segurança é <b>responsabilidade compartilhada</b>; cada commit dispara verificações e falha bloqueia o deploy. O oposto: segurança recebia o sistema pronto, fazia <b>pentest no final</b>, achava falhas caras e devolvia."},
+{d:"devsecops",topic:"DevSecOps",objective:"saber o problema que o DevSecOps resolve",
+ q:"Que problema do processo escrito o DevSecOps resolve?",
+ a:"Processo escrito não é processo executado: <b>depende de alguém lembrar, toda vez</b>. O DevSecOps faz a segurança acontecer sempre, sem depender de disciplina humana."},
+{d:"devsecops",topic:"Shift-left",objective:"descrever shift-left na prática",
+ q:"O que é shift-left na prática do pipeline?",
+ a:"O <b>pushing left aplicado ao CI/CD</b>: testar a cada commit. <b>SAST no push</b>, <b>SCA nas dependências</b>, <b>secrets scanning antes do merge</b>."},
+{d:"devsecops",topic:"Shift-right",objective:"descrever shift-right",
+ q:"O que é shift-right, e o que ele cobre que o shift-left não cobre?",
+ a:"<b>Monitorar em produção.</b> O shift-left previne, mas não enxerga o que já roda: <b>CVEs novos aparecem todo dia</b> e é preciso saber quais afetam o que roda."},
+{d:"devsecops",topic:"Shift-left e shift-right",objective:"explicar por que os dois são necessários",
+ q:"O que acontece se você só fizer shift-left? E só shift-right?",
+ a:"<b>Só shift-left</b>: ignora o que já está em produção. <b>Só shift-right</b>: corrige tarde demais. Shift-left previne, shift-right detecta."},
+{d:"devsecops",topic:"Pipeline",objective:"listar as sete etapas",
+ q:"Quais as sete etapas típicas de um pipeline com segurança?",
+ a:"<b>Commit</b> → <b>Build</b> → <b>Testes</b> → <b>Análise de segurança</b> (SAST, SCA, secrets) → <b>Deploy em staging</b> → <b>DAST</b> → <b>Deploy em produção</b>."},
+{d:"devsecops",topic:"Pipeline",objective:"fixar a regra de ouro",
+ q:"Qual a regra de ouro do pipeline?",
+ a:"Se uma verificação falhar, <b>o pipeline para</b>. Nada vai para produção com falha de segurança conhecida."},
+{d:"devsecops",topic:"Pipeline",objective:"saber por que o DAST vem depois do staging",
+ q:"Por que o DAST vem depois do deploy em staging, e não junto com SAST e SCA?",
+ a:"Porque o DAST testa <b>a aplicação rodando</b>, como um atacante, enviando requisições e observando respostas. Precisa de um ambiente no ar."},
+{d:"devsecops",topic:"Ferramentas",objective:"associar técnica a ferramenta",
+ q:"Dê um exemplo de ferramenta para SAST, DAST, SCA e secrets scanning.",
+ a:"<b>SAST</b>: Semgrep · <b>DAST</b>: OWASP ZAP · <b>SCA</b>: Trivy · <b>Secrets</b>: gitleaks."},
+{d:"devsecops",topic:"Ferramentas",objective:"saber o que SAST e fuzzing encontram",
+ q:"Que tipo de falha o SAST encontra? E para que o fuzzing é bom?",
+ a:"<b>SAST</b>: padrões conhecidos, como SQL injection, buffer overflow e funções inseguras. <b>Fuzzing</b>: falhas de <b>memória e parsing</b>."},
+{d:"devsecops",topic:"SDLC seguro × DevSecOps",objective:"comparar os dois",
+ q:"SDLC seguro × DevSecOps: natureza, pergunta e escala de cada um.",
+ a:"<b>SDLC seguro</b>: processo · o que fazer? · qualquer projeto. <b>DevSecOps</b>: prática · como fazer? · projetos com CI/CD. Um não substitui o outro: o DevSecOps executa o SDLC seguro <b>em escala</b>."},
+].map((c,i)=>({...c,id:i}));
+
+/* ================= Modo ================= */
+let mode = store.get("p1-mode", "trilha");
+const LEDES = {
+  trilha: "Siga o ponto 1 na ordem do README: cada passo explica uma ideia e termina com um exercício. Seu progresso fica salvo neste navegador.",
+  cartas: "Responda de cabeça, vire a carta e marque com honestidade. A carta que você erra volta logo e precisa de dois acertos para sair da fila."
+};
+function setMode(m){
+  mode = m; store.set("p1-mode", m);
+  $("trailView").hidden = m !== "trilha";
+  $("cardsView").hidden = m !== "cartas";
+  $("tabTrail").setAttribute("aria-selected", m === "trilha");
+  $("tabCards").setAttribute("aria-selected", m === "cartas");
+  $("lede").textContent = LEDES[m];
+}
+$("tabTrail").onclick = () => setMode("trilha");
+$("tabCards").onclick = () => setMode("cartas");
+
+/* ================= Trilha ================= */
+let cur = Math.min(store.get("p1-step", 0), STEPS.length - 1);
+const doneSteps = new Set(store.get("p1-done", []));
+
+const COST = [
+  {p:"Requisitos", h:12, t:"Ainda não existe código. Corrigir é reescrever uma frase do documento."},
+  {p:"Design", h:20, t:"Ainda sem código: mudar o desenho custa uma reunião."},
+  {p:"Código", h:34, t:"No pull request: reescreve a query, adiciona um teste, fim. O código é pequeno e o contexto está fresco."},
+  {p:"Testes", h:55, t:"Achada antes de produção e com evidência para corrigir, mas o código já existe e precisa ser refeito."},
+  {p:"Produção", h:100, t:"Incidente, investigação forense, notificação de clientes e patch emergencial fora do horário. A falha já afetou dados, clientes ou receita."}
+];
+const LAYERS = ["Validação de entrada","Query parametrizada","WAF","Menor privilégio no banco"];
+
+function renderDots(){
+  $("dots").innerHTML = STEPS.map((s,k) =>
+    `<button class="${k===cur?'cur':''} ${doneSteps.has(k)&&k!==cur?'ok':''}" data-k="${k}" aria-label="Passo ${k+1}: ${esc(s.title)}" title="${esc(s.title)}"></button>`).join("");
+  $("dots").querySelectorAll("button").forEach(b => b.onclick = () => go(+b.dataset.k));
+  $("tPos").textContent = `Passo ${cur+1} de ${STEPS.length} · ${STEPS[cur].sec}`;
+  $("tDone").textContent = `${doneSteps.size} concluídos`;
 }
 
+function go(k){
+  cur = Math.max(0, Math.min(STEPS.length-1, k));
+  store.set("p1-step", cur);
+  renderStep();
+  window.scrollTo(0, 0);
+}
+
+function renderStep(){
+  const s = STEPS[cur];
+  const L = $("lesson");
+  L.innerHTML = `<span class="sec">${s.sec}</span><h2>${s.title}</h2>` +
+    (s.flow ? `<ol class="flow">${s.flow.map(([l,t]) => `<li><span class="fl">${l}</span><span>${t}</span></li>`).join("")}</ol>` : "") +
+    `<div class="prose">${s.body}</div>` +
+    s.tasks.map((t,i) => `<div class="task" id="task${i}"></div>`).join("") +
+    (s.end ? `<div class="endbox"><h3>Fim da trilha</h3><p>Você percorreu o ponto 1 inteiro, da curva de custo ao DevSecOps. Agora fixe com as cartas de revisão: elas cobrem os mesmos tópicos em formato de pergunta e resposta.</p></div>` : "");
+  const gated = s.tasks.filter(t => ["mc","order","sort"].includes(t.type)).length;
+  let solved = 0;
+  const complete = el => () => {
+    el.classList.add("solved"); solved++;
+    if (solved >= gated) { doneSteps.add(cur); store.set("p1-done", [...doneSteps]); renderDots(); }
+  };
+  s.tasks.forEach((t,i) => {
+    const el = $("task"+i);
+    ({mc:mountMC, order:mountOrder, sort:mountSort, cost:mountCost, layers:mountLayers})[t.type](el, t, complete(el));
+  });
+  if (!gated) { doneSteps.add(cur); store.set("p1-done", [...doneSteps]); }
+  $("tPrev").disabled = cur === 0;
+  $("tNext").textContent = cur === STEPS.length-1 ? "Ir para as cartas" : "Próximo";
+  renderDots();
+}
+$("tPrev").onclick = () => go(cur-1);
+$("tNext").onclick = () => cur === STEPS.length-1 ? (setMode("cartas"), window.scrollTo(0,0)) : go(cur+1);
+
+function mountMC(el, t, complete){
+  el.innerHTML = `<span class="kind">Escolha uma</span><p class="tq">${t.q}</p>
+    <div class="opts">${t.options.map((o,k) => `<button class="opt" data-k="${k}">${o.t}</button>`).join("")}</div><p class="fb" aria-live="polite"></p>`;
+  const fb = el.querySelector(".fb");
+  el.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    const o = t.options[b.dataset.k];
+    b.classList.add(o.ok ? "right" : "wrong"); b.disabled = true;
+    fb.className = "fb " + (o.ok ? "ok" : "no");
+    fb.innerHTML = (o.ok ? "<b>Certo.</b> " : "<b>Ainda não.</b> ") + o.why;
+    if (o.ok) { el.querySelectorAll(".opt").forEach(x => x.disabled = true); complete(); }
+  });
+}
+
+function mountOrder(el, t, complete){
+  let pos = 0;
+  let pool = shuffle(t.items.slice());
+  if (pool.every((x,i) => x === t.items[i])) pool.reverse();
+  el.innerHTML = `<span class="kind">Ponha em ordem</span><p class="tq">${t.q}</p>
+    <ol class="seq">${t.items.map(() => `<li>toque na próxima</li>`).join("")}</ol>
+    <div class="pool">${pool.map(x => `<button>${esc(x)}</button>`).join("")}</div><p class="fb" aria-live="polite"></p>`;
+  const lis = el.querySelectorAll(".seq li"), fb = el.querySelector(".fb");
+  lis.forEach((li,i) => { if (i>0) li.textContent = ""; });
+  el.querySelectorAll(".pool button").forEach(b => b.onclick = () => {
+    if (b.textContent === t.items[pos]) {
+      lis[pos].textContent = b.textContent; lis[pos].classList.add("filled"); b.remove(); pos++;
+      fb.className = "fb"; fb.innerHTML = "";
+      if (pos < lis.length) lis[pos].textContent = "toque na próxima";
+      if (pos === t.items.length) { fb.className = "fb ok"; fb.innerHTML = "<b>Certo.</b> " + (t.done || ""); complete(); }
+    } else {
+      b.classList.remove("shake"); void b.offsetWidth; b.classList.add("shake");
+      fb.className = "fb no";
+      fb.innerHTML = pos === 0 ? "<b>Ainda não.</b> Qual vem primeiro?" : `<b>Ainda não.</b> O que vem logo depois de “${esc(t.items[pos-1])}”?`;
+    }
+  });
+}
+
+function mountSort(el, t, complete){
+  let left = t.items.length;
+  el.innerHTML = `<span class="kind">Classifique</span><p class="tq">${t.q}</p>
+    <div class="sitems">${t.items.map((it,i) => `<div class="sitem" data-i="${i}">
+      <div class="stext">${t.code ? `<code>${esc(it.t)}</code>` : esc(it.t)}</div>
+      <div class="chips">${t.buckets.map((b,k) => `<button data-k="${k}">${esc(b)}</button>`).join("")}</div>
+      <p class="fb" aria-live="polite"></p></div>`).join("")}</div>`;
+  el.querySelectorAll(".sitem").forEach(row => {
+    const it = t.items[row.dataset.i], fb = row.querySelector(".fb");
+    row.querySelectorAll(".chips button").forEach(b => b.onclick = () => {
+      if (+b.dataset.k === it.b) {
+        b.classList.add("right");
+        row.querySelectorAll(".chips button").forEach(x => x.disabled = true);
+        fb.className = "fb ok"; fb.innerHTML = "<b>Certo.</b> " + it.why;
+        if (--left === 0) complete();
+      } else {
+        b.classList.add("wrong"); b.disabled = true;
+        fb.className = "fb no"; fb.innerHTML = "<b>Ainda não.</b> Tente outra opção.";
+      }
+    });
+  });
+}
+
+function mountCost(el){
+  let sel = 0;
+  el.innerHTML = `<span class="kind">Explore</span><p class="tq">Onde a SQL injection é descoberta?</p>
+    <div class="seg">${COST.map((c,k) => `<button data-k="${k}">${c.p}</button>`).join("")}</div>
+    <div class="bars">${COST.map((c,k) => `<div data-k="${k}" style="height:${c.h}%" aria-hidden="true"></div>`).join("")}</div>
+    <div class="barlabels">${COST.map(c => `<span>${c.p}</span>`).join("")}</div>
+    <p class="costtext" aria-live="polite"></p>
+    <p class="small">Altura ilustrativa: o README descreve a tendência de crescimento, não valores.</p>`;
+  const draw = () => {
+    el.querySelectorAll(".seg button").forEach((b,k) => b.setAttribute("aria-pressed", k===sel));
+    el.querySelectorAll(".bars div").forEach((b,k) => b.classList.toggle("on", k===sel));
+    el.querySelector(".costtext").innerHTML = `<b>${COST[sel].p}.</b> ${COST[sel].t}`;
+  };
+  el.querySelectorAll("[data-k]").forEach(b => b.onclick = () => { sel = +b.dataset.k; draw(); });
+  draw();
+}
+
+function mountLayers(el){
+  const up = LAYERS.map(() => true);
+  el.innerHTML = `<span class="kind">Explore</span><p class="tq">Derrube as camadas. Quando o ataque passa?</p>
+    <div class="layers"><span class="attack">↓ SQL injection chegando</span>${LAYERS.map((l,k) =>
+      `<div class="layer" data-k="${k}"><span>${l}</span><button aria-pressed="false">Segura</button></div>`).join("")}</div>
+    <p class="verdict" aria-live="polite"></p>`;
+  const draw = () => {
+    el.querySelectorAll(".layer").forEach((row,k) => {
+      row.classList.toggle("down", !up[k]);
+      const b = row.querySelector("button"); b.textContent = up[k] ? "Segura" : "Falhou"; b.setAttribute("aria-pressed", !up[k]);
+    });
+    const holding = LAYERS.filter((l,k) => up[k]);
+    const v = el.querySelector(".verdict");
+    if (holding.length) { v.className = "verdict ok"; v.textContent = `Ataque contido. ${holding.length === 1 ? "Ainda segura" : "Ainda seguram"}: ${holding.join(", ")}.`; }
+    else { v.className = "verdict no"; v.textContent = "O ataque passou: só acontece quando todas as quatro camadas falham."; }
+  };
+  el.querySelectorAll(".layer button").forEach((b,k) => b.onclick = () => { up[k] = !up[k]; draw(); });
+  draw();
+}
+
+/* ================= Cartas ================= */
+let deck = "__all";
+let queue = [], current = null, flipped = false, right = 0, wrong = 0, total = 0, missedIds = new Set();
+let history = store.get("p1-hist-v2", {}) || {};
+
+function buildDecks(){
+  const count = k => k === "__all" ? CARDS.length : CARDS.filter(c => c.d === k).length;
+  const entries = [["__all",{name:"Todas"}], ...Object.entries(DECKS)];
+  $("decks").innerHTML = entries.map(([k,v]) =>
+    `<button data-d="${k}" aria-pressed="${deck===k}">${v.name}<span class="n">${count(k)}</span></button>`).join("");
+  $("decks").querySelectorAll("button").forEach(b => b.onclick = () => { deck = b.dataset.d; start(); });
+  $("deckdesc").textContent = deck === "__all" ? "Todos os baralhos misturados." : DECKS[deck].sub;
+}
+function start(onlyIds){
+  buildDecks();
+  let pool = CARDS.filter(c => deck === "__all" || c.d === deck);
+  if (onlyIds) pool = CARDS.filter(c => onlyIds.has(c.id));
+  queue = shuffle(pool.map(c => ({...c, miss:0})));
+  total = queue.length; right = wrong = 0; missedIds = new Set();
+  next();
+}
 function next(){
   flipped = false;
   if (!queue.length) return finish();
   current = queue.shift();
+  const past = history[current.id] || 0;
+  const deckName = DECKS[current.d].name;
   $("stage").innerHTML = `
-    <div class="card" id="card">
-      <div class="face front">
-        <div class="head"><span class="tag">${current.topic}</span><div class="obj">Objetivo: ${current.objective}</div></div>
-        <div class="q">${current.q}</div>
-        <span class="hint">clique, 0 ou espaço para virar</span>
-      </div>
-      <div class="face back">
-        <div class="head"><span class="tag">${current.topic} · resposta</span></div>
-        <div class="a">${current.a}</div>
-      </div>
-    </div>`;
+  <div class="card" id="card" tabindex="0" role="button" aria-label="Carta. Pressione espaço para virar.">
+    <div class="face front">
+      <div class="meta"><span class="tag">${current.topic}</span><span class="deckname">${deckName}</span></div>
+      <p class="obj">Objetivo: ${current.objective}</p>
+      <div class="q">${current.q}</div>
+      <div class="meta">${past ? `<span class="miss">errou ${past}× antes</span>` : "<span></span>"}<span class="hint">toque ou espaço para virar</span></div>
+    </div>
+    <div class="face back" aria-live="polite">
+      <div class="meta"><span class="tag">${current.topic} · resposta</span><span class="deckname">${deckName}</span></div>
+      <div class="a">${current.a}</div>
+    </div>
+  </div>`;
   $("card").onclick = flip;
   $("btnNo").disabled = $("btnOk").disabled = true;
   update();
 }
-
 function flip(){
-  if (flipped) return;
+  if (flipped || !current) return;
   flipped = true;
   $("card").classList.add("flipped");
   $("btnNo").disabled = $("btnOk").disabled = false;
 }
-
 function answer(ok){
-  if (!flipped) return;
-  seen++;
-  if (ok) { right++; if (current.miss > 0) { current.miss--; queue.splice(Math.min(queue.length, 6), 0, current); } }
-  else { wrong++; current.miss = 2; queue.splice(Math.min(queue.length, 3), 0, current); }
+  if (!flipped || !current) return;
+  if (ok) {
+    right++;
+    if (current.miss > 0) { current.miss--; queue.splice(Math.min(queue.length, 6), 0, current); }
+  } else {
+    wrong++; current.miss = 2; missedIds.add(current.id);
+    history[current.id] = (history[current.id] || 0) + 1; store.set("p1-hist-v2", history);
+    queue.splice(Math.min(queue.length, 3), 0, current);
+  }
   next();
 }
-
 function update(){
-  $("left").textContent = `${queue.length + 1} na fila`;
-  $("score").textContent = `✓ ${right}   ✗ ${wrong}`;
-  const done = total ? Math.max(0, 1 - (queue.length + 1) / Math.max(total, seen + queue.length + 1)) : 0;
-  $("prog").style.width = (done * 100) + "%";
+  const pending = new Set(queue.map(c => c.id)); if (current) pending.add(current.id);
+  const mastered = total - pending.size;
+  $("left").textContent = `${mastered} de ${total} dominadas · ${queue.length + 1} na fila`;
+  $("score").textContent = `✓ ${right}  ✗ ${wrong}`;
+  $("prog").style.width = (total ? mastered / total * 100 : 0) + "%";
 }
-
 function finish(){
-  $("stage").innerHTML = `<div class="done"><h2>Deck fechado</h2><p>${right} acertos · ${wrong} erros em ${seen} viradas.</p><p style="color:var(--dim)">Se alguma fonte não veio de cabeça, o ponto ainda não está internalizado.</p><button id="again">De novo</button></div>`;
-  $("again").onclick = start;
+  current = null;
+  const missed = CARDS.filter(c => missedIds.has(c.id));
+  $("stage").innerHTML = `<div class="done">
+    <h2>Baralho fechado</h2>
+    <p>${right} acertos e ${wrong} erros em ${right + wrong} viradas.</p>
+    ${missed.length ? `<p>Cartas que você errou nesta rodada:</p><ul>${missed.map(c => `<li>${c.topic}</li>`).join("")}</ul>`
+                    : `<p>Nenhum erro. Se alguma fonte (quem, ano) não veio de cabeça, marque como erro na próxima rodada.</p>`}
+    <div class="row">
+      <button id="again">Recomeçar</button>
+      ${missed.length ? `<button class="ghost" id="retry">Só as que errei</button>` : ""}
+    </div></div>`;
+  $("again").onclick = () => start();
+  if (missed.length) { const ids = new Set(missedIds); $("retry").onclick = () => start(ids); }
   $("btnNo").disabled = $("btnOk").disabled = true;
+  $("left").textContent = `${total} de ${total} dominadas`;
   $("prog").style.width = "100%";
 }
-
 $("btnNo").onclick = () => answer(false);
 $("btnOk").onclick = () => answer(true);
-document.addEventListener("keydown", e => {
-  if (e.key === " " || e.key === "0") { e.preventDefault(); flip(); }
-  if (e.key === "1") answer(false);
-  if (e.key === "2") answer(true);
-});
 
+/* ================= Teclado e tela cheia ================= */
+document.addEventListener("keydown", e => {
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  if (e.key === "f" || e.key === "F") return toggleFocus();
+  if (e.key === "Escape" && document.body.classList.contains("focus")) return toggleFocus(false);
+  if (mode === "trilha") {
+    if (e.key === "ArrowRight") go(cur+1);
+    else if (e.key === "ArrowLeft") go(cur-1);
+    return;
+  }
+  if (e.key === " " || e.key === "0" || (e.key === "Enter" && e.target.id === "card")) { e.preventDefault(); flip(); }
+  else if (e.key === "1") answer(false);
+  else if (e.key === "2") answer(true);
+});
+function setFocus(on){
+  document.body.classList.toggle("focus", on);
+  $("fsLabel").textContent = on ? "Sair" : "Tela cheia";
+  $("btnFs").setAttribute("aria-pressed", on);
+}
+async function toggleFocus(force){
+  const on = typeof force === "boolean" ? force : !document.body.classList.contains("focus");
+  setFocus(on);
+  const el = document.documentElement;
+  try {
+    if (on) {
+      if (el.requestFullscreen) await el.requestFullscreen({navigationUI:"hide"});
+      else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+    } else {
+      if (document.fullscreenElement) await document.exitFullscreen();
+      else if (document.webkitFullscreenElement) document.webkitExitFullscreen();
+    }
+  } catch(e) {}
+  if (on) window.scrollTo(0, 0);
+}
+function onFsChange(){ if (!(document.fullscreenElement || document.webkitFullscreenElement)) setFocus(false); }
+document.addEventListener("fullscreenchange", onFsChange);
+document.addEventListener("webkitfullscreenchange", onFsChange);
+$("btnFs").onclick = () => toggleFocus();
+
+setMode(mode);
+renderStep();
 start();
 </script>
-</body>
-</html>
+
+</body></html>

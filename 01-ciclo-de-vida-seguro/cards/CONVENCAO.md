@@ -1,7 +1,20 @@
-# Convenção de autoria das cartas
+# Convenção de autoria do estudo interativo
 
-Regras para escrever ou revisar qualquer carta de recall, deste ponto ou dos próximos.
+Regras para escrever ou revisar o estudo de um ponto, deste ou dos próximos.
 O objetivo é aprender e revisar — não só ser cobrado.
+
+Cada ponto tem um `cards/index.html` com dois modos no mesmo app:
+
+- **Trilha guiada** (`STEPS`): os passos na ordem do `README.md` do ponto, cada
+  um com explicação e um exercício. É o modo de aprender a primeira vez. Tipos de
+  exercício: múltipla escolha (`mc`), ordenar (`order`), classificar (`sort`),
+  curva de custo (`cost`) e camadas de defesa (`layers`). Todo exercício ensina
+  no feedback, nunca só pontua.
+- **Cartas de revisão** (`CARDS`/`DECKS`): retrieval practice para fixar depois.
+
+As duas superfícies saem do `README.md` do ponto e seguem as mesmas regras de
+conteúdo abaixo. O conteúdo é conteudista: ensina o que a coisa é, nunca cobra
+meta-pergunta sobre o fluxo de estudo ou a convenção.
 
 ## Schema de uma carta
 
@@ -40,10 +53,14 @@ você responder.
 
 | Baralho | Descrição |
 |---|---|
-| Sequência do argumento | o ponto 1 inteiro, passo a passo, na ordem em que um puxa o próximo |
-| Taxonomia | os quatro níveis: fundamento → princípio → técnica → mecanismo |
+| Pushing left | por que o momento da descoberta define o custo, e a diferença entre falha e bug |
 | Conceitos de base | os fundamentos e princípios que valem em todas as fases |
-| As cinco fases | o ciclo de requisitos a deploy, com objetivo, princípios e técnicas de cada fase |
+| Requisitos | fase 1: ativos, classificação, requisito verificável e técnicas de elicitação |
+| Design | fase 2: arquitetura segura antes do código, modelagem de ameaças |
+| Código | fase 3: codificação segura, code review, SAST no commit |
+| Testes | fase 4: os alvos, a evidência e as técnicas de teste |
+| Deploy e descontinuação | fase 5 e a fase extra: produção monitorada, resposta, encerramento |
+| Ciclo e DevSecOps | o ciclo completo, shift-left e shift-right, pipeline e ferramentas |
 
 ## Manutenção
 
