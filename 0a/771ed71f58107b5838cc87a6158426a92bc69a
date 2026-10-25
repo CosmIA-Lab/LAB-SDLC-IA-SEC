@@ -1,0 +1,19 @@
+01-ciclo-de-vida-seguro/arvore.html
+  s_4f6d4a9e95d33a::t_22927d5d44ed7e 1-114
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0a771ed71f58107b5838cc87a6158426a92bc69a",
+  "prompts": {},
+  "sessions": {
+    "s_4f6d4a9e95d33a": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "01a1746a-b26f-706d-b304-e79b1a49a450",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "alan <nascimentoalankst@gmail.com>"
+    }
+  }
+}
