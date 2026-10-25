@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Árvore de memória — Ponto 1</title>
+<style>
+  :root{
+    --bg:#0e1116; --surface:#161b22; --line:#30363d;
+    --fg:#e6edf3; --dim:#8b949e; --accent:#58a6ff; --accent2:#3fb950;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{
+    background:var(--bg); color:var(--fg);
+    font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  }
+  header{
+    position:sticky; top:0; z-index:5; background:var(--surface);
+    border-bottom:1px solid var(--line); padding:12px 18px;
+    display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+  }
+  header h1{font-size:17px; margin:0; font-weight:700}
+  header .spine{color:var(--dim); font-size:13px}
+  header .ctr{margin-left:auto; display:flex; gap:8px}
+  button{
+    border:1px solid var(--line); background:#21262d; color:var(--fg);
+    border-radius:8px; padding:7px 12px; font-weight:600; cursor:pointer;
+  }
+  button:hover{border-color:var(--accent)}
+  .stage{overflow:auto; height:calc(100% - 58px); padding:28px}
+  .mermaid{transform-origin:top center; transition:transform .12s ease}
+  .legend{color:var(--dim); font-size:13px; margin:8px 18px 0}
+  .legend b{color:var(--accent)}
+</style>
+</head>
+<body>
+<header>
+  <h1>Árvore de memória — Ponto 1</h1>
+  <span class="spine">custo → push left → falha≠bug → fundamentos → 5 fases → DevSecOps</span>
+  <div class="ctr">
+    <button id="out">−</button>
+    <button id="in">+</button>
+    <button id="reset">100%</button>
+    <button id="full">⛶ tela cheia</button>
+  </div>
+</header>
+<div class="legend">Espinha mínima acima. <b>P</b> = princípios · <b>T</b> = técnicas. Cada fase repete o molde <b>objetivo → princípios → técnicas → saída</b>.</div>
+<div class="stage">
+<pre class="mermaid">
+flowchart TD
+  classDef spine fill:#1f6feb,stroke:#58a6ff,color:#fff,font-weight:bold;
+  classDef base fill:#161b22,stroke:#30363d,color:#e6edf3;
+  classDef fase fill:#12261a,stroke:#3fb950,color:#e6edf3;
+  classDef ops fill:#2d2212,stroke:#d29922,color:#e6edf3;
+  classDef bridge fill:none,stroke:none,color:#8b949e,font-style:italic;
+
+  S["SDLC-SEC"]:::spine
+  C["CUSTO cresce com o tempo<br/>(curva de Boehm, 1981 = fundamento)"]:::spine
+  PL["PUSH LEFT — empurrar p/ esquerda<br/>(estratégia, não princípio — Janca 2020)"]:::spine
+  FB["FALHA ≠ BUG<br/>falha = desenho → reprojeto<br/>bug = código → patch"]:::base
+  B1["⟪ age cedo em TODO o ciclo →<br/>o que vale ANTES de qualquer fase? ⟫"]:::bridge
+  FUND["FUNDAMENTOS — 12 conceitos de base<br/>CIA · assume breach · ameaça interna<br/>defense in depth · least privilege · cadeia de suprimentos<br/>sem obscuridade · superfície de ataque · sem segredo no código<br/>zero trust · segurança usável · fatores de autenticação"]:::base
+  B2["⟪ fixada a base, qual é o ciclo? ⟫"]:::bridge
+
+  F1["1 · REQUISITOS — o que garantir<br/>P: verificável · rastreável · negação explícita<br/>T: abuse case (McDermott/Fox 99) · misuse (Sindre/Opdahl 00)<br/>attack tree (Schneier 99) · bug bar (MS SDL)<br/>→ requisito com teste"]:::fase
+  F2["2 · DESIGN — desenho seguro antes do código<br/>(fase mais barata; nasce a FALHA)<br/>P: least privilege · defense in depth · fail secure · zero trust<br/>T: modelagem de ameaças (Shostack 2014, 4 perguntas)<br/>DFD (DeMarco 79) · superfície (Manadhata/Wing 04)<br/>→ desenho com mitigações"]:::fase
+  F3["3 · CÓDIGO — código sem falha conhecida<br/>P: never trust input · nada hard coded · bounds checking<br/>erro não ajuda o atacante<br/>T: inspeção de Fagan (76) · secure code review (OWASP) · SAST no commit<br/>→ código revisado + teste"]:::fase
+  F4["4 · TESTES — falha com evidência<br/>(7 alvos: código·app·infra·BD·APIs·integrações·rede)<br/>P: evidência · severidade (bug bar) · cobertura dos 7 alvos<br/>T: SAST · DAST · SCA · fuzzing · secret scanning · pentest<br/>→ achado com severidade + prova + decisão"]:::fase
+  F5["5 · DEPLOY + MANUTENÇÃO — detectar e responder em produção<br/>P: assume breach · log sem segredo · detecção vale a resposta<br/>T: resposta a incidentes (NIST 800-61) · gestão de vulnerabilidades<br/>→ incidente contido → vira requisito do próximo ciclo"]:::fase
+  FX["(extra) DESCONTINUAÇÃO — encerrar sem vazar<br/>MS SDL / NIST SSDF · só checklist"]:::fase
+
+  B3["⟪ processo escrito ≠ executado →<br/>como garantir SEMPRE? ⟫"]:::bridge
+  DSO["DEVSECOPS — Dev + Sec + Ops<br/>responsabilidade compartilhada, automatizada, contínua"]:::ops
+  SH["SHIFT-LEFT (push left por commit) + SHIFT-RIGHT (monitorar produção)<br/>previne × detecta — um sem o outro deixa buraco"]:::ops
+  PP["PIPELINE: commit→build→testes→análise(SAST/SCA/secrets)→staging→DAST→prod<br/>regra de ouro: verificação falha → pipeline PARA"]:::ops
+  TL["FERRAMENTAS: SAST(Semgrep) · DAST(ZAP) · SCA(Trivy) · secrets(gitleaks)<br/>fuzzing · WAF/RASP (compram tempo, não corrigem)"]:::ops
+  VS["SDLC ≠ DevSecOps: processo (o quê) × prática (como, em escala)"]:::ops
+
+  S-->C-->PL
+  PL-->FB
+  PL-->B1-->FUND-->B2
+  B2-->F1-->F2-->F3-->F4-->F5-->FX
+  FX-->B3-->DSO
+  DSO-->SH
+  DSO-->PP
+  DSO-->TL
+  DSO-->VS
+</pre>
+</div>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({startOnLoad:true, theme:"dark", flowchart:{nodeSpacing:40, rankSpacing:48, useMaxWidth:false}});
+
+  const el = () => document.querySelector(".mermaid svg") || document.querySelector(".mermaid");
+  let z = 1;
+  const apply = () => { const svg = document.querySelector(".mermaid"); if(svg) svg.style.transform = `scale(${z})`; };
+  document.getElementById("in").onclick    = () => { z = Math.min(2.5, z+0.15); apply(); };
+  document.getElementById("out").onclick   = () => { z = Math.max(0.4, z-0.15); apply(); };
+  document.getElementById("reset").onclick = () => { z = 1; apply(); };
+  document.getElementById("full").onclick  = () => {
+    if(!document.fullscreenElement) document.documentElement.requestFullscreen();
+    else document.exitFullscreen();
+  };
+  addEventListener("keydown", e => {
+    if(e.key === "+" || e.key === "=") document.getElementById("in").click();
+    if(e.key === "-") document.getElementById("out").click();
+    if(e.key === "0") document.getElementById("reset").click();
+    if(e.key === "f") document.getElementById("full").click();
+  });
+</script>
+</body>
+</html>
