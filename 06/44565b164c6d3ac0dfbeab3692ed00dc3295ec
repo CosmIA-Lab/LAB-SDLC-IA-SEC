@@ -1,0 +1,19 @@
+01-ciclo-de-vida-seguro/arvore.html
+  s_4f6d4a9e95d33a::t_bbc1cbae0a49a3 10-12,15-19,21-23,25-62,68,70-72,76-78,81-195,197-203,209-212
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0644565b164c6d3ac0dfbeab3692ed00dc3295ec",
+  "prompts": {},
+  "sessions": {
+    "s_4f6d4a9e95d33a": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "01a1746a-b26f-706d-b304-e79b1a49a450",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "alan <nascimentoalankst@gmail.com>"
+    }
+  }
+}
