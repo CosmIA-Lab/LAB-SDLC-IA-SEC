@@ -7,107 +7,209 @@
 <style>
   :root{
     --bg:#0e1116; --surface:#161b22; --line:#30363d;
-    --fg:#e6edf3; --dim:#8b949e; --accent:#58a6ff; --accent2:#3fb950;
+    --fg:#e6edf3; --dim:#9aa4b0;
+    --spine:#58a6ff; --base:#8b949e; --fase:#3fb950; --ops:#d29922;
+    --fs:17px;
   }
   *{box-sizing:border-box}
-  html,body{margin:0;height:100%}
-  body{
-    background:var(--bg); color:var(--fg);
-    font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
-  }
-  header{
-    position:sticky; top:0; z-index:5; background:var(--surface);
+  html,body{margin:0}
+  body{background:var(--bg); color:var(--fg);
+    font:var(--fs)/1.55 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;}
+
+  header{position:sticky; top:0; z-index:5; background:var(--surface);
     border-bottom:1px solid var(--line); padding:12px 18px;
-    display:flex; align-items:center; gap:14px; flex-wrap:wrap;
-  }
-  header h1{font-size:17px; margin:0; font-weight:700}
-  header .spine{color:var(--dim); font-size:13px}
+    display:flex; align-items:center; gap:14px; flex-wrap:wrap;}
+  header h1{font-size:1.05rem; margin:0; font-weight:700}
+  header .spine{color:var(--dim); font-size:.8rem}
   header .ctr{margin-left:auto; display:flex; gap:8px}
-  button{
-    border:1px solid var(--line); background:#21262d; color:var(--fg);
-    border-radius:8px; padding:7px 12px; font-weight:600; cursor:pointer;
-  }
-  button:hover{border-color:var(--accent)}
-  .stage{overflow:auto; height:calc(100% - 58px); padding:28px}
-  .mermaid{transform-origin:top center; transition:transform .12s ease}
-  .legend{color:var(--dim); font-size:13px; margin:8px 18px 0}
-  .legend b{color:var(--accent)}
+  button{border:1px solid var(--line); background:#21262d; color:var(--fg);
+    border-radius:8px; padding:7px 12px; font-weight:600; cursor:pointer; font-size:.9rem}
+  button:hover{border-color:var(--spine)}
+
+  main{max-width:860px; margin:0 auto; padding:26px 18px 80px;
+    display:flex; flex-direction:column; align-items:stretch;}
+
+  /* conector vertical entre nós */
+  .link{width:3px; height:26px; background:var(--line); align-self:center; border-radius:2px}
+
+  .node{border:1px solid var(--line); border-left-width:6px; border-radius:12px;
+    background:var(--surface); padding:14px 18px;}
+  .node .title{font-weight:800; font-size:1.06rem; margin:0 0 2px}
+  .node .meta{color:var(--dim); font-size:.92rem; margin:0 0 6px}
+  .node .row{margin:3px 0}
+  .node .k{display:inline-block; min-width:1.4em; font-weight:800; color:var(--dim)}
+  .node .out{margin-top:6px; color:var(--fase); font-weight:600}
+
+  .spine-n{border-left-color:var(--spine)}
+  .spine-n .title{color:var(--spine)}
+  .base-n{border-left-color:var(--base)}
+  .fase-n{border-left-color:var(--fase)}
+  .ops-n{border-left-color:var(--ops)}
+  .ops-n .title{color:var(--ops)}
+
+  .bridge{align-self:center; max-width:620px; text-align:center;
+    color:var(--dim); font-style:italic; font-size:.95rem; padding:10px 14px;}
+  .bridge::before{content:"⟪ "} .bridge::after{content:" ⟫"}
+
+  /* ramos laterais (indentados) */
+  .branch{margin-left:38px; position:relative}
+  .branch::before{content:""; position:absolute; left:-20px; top:-14px; height:36px;
+    width:20px; border-left:3px solid var(--line); border-bottom:3px solid var(--line);
+    border-bottom-left-radius:10px}
+
+  .spine-sum{align-self:center; margin:4px 0 18px; color:var(--dim); font-size:.9rem;
+    text-align:center}
+  .spine-sum b{color:var(--spine)}
 </style>
 </head>
 <body>
 <header>
   <h1>Árvore de memória — Ponto 1</h1>
-  <span class="spine">custo → push left → falha≠bug → fundamentos → 5 fases → DevSecOps</span>
+  <span class="spine">molde de cada fase: objetivo → princípios → técnicas → saída</span>
   <div class="ctr">
-    <button id="out">−</button>
-    <button id="in">+</button>
-    <button id="reset">100%</button>
+    <button id="out">A−</button>
+    <button id="in">A+</button>
+    <button id="reset">reset</button>
     <button id="full">⛶ tela cheia</button>
   </div>
 </header>
-<div class="legend">Espinha mínima acima. <b>P</b> = princípios · <b>T</b> = técnicas. Cada fase repete o molde <b>objetivo → princípios → técnicas → saída</b>.</div>
-<div class="stage">
-<pre class="mermaid">
-flowchart TD
-  classDef spine fill:#1f6feb,stroke:#58a6ff,color:#fff,font-weight:bold;
-  classDef base fill:#161b22,stroke:#30363d,color:#e6edf3;
-  classDef fase fill:#12261a,stroke:#3fb950,color:#e6edf3;
-  classDef ops fill:#2d2212,stroke:#d29922,color:#e6edf3;
-  classDef bridge fill:none,stroke:none,color:#8b949e,font-style:italic;
 
-  S["SDLC-SEC"]:::spine
-  C["CUSTO cresce com o tempo<br/>(curva de Boehm, 1981 = fundamento)"]:::spine
-  PL["PUSH LEFT — empurrar p/ esquerda<br/>(estratégia, não princípio — Janca 2020)"]:::spine
-  FB["FALHA ≠ BUG<br/>falha = desenho → reprojeto<br/>bug = código → patch"]:::base
-  B1["⟪ age cedo em TODO o ciclo →<br/>o que vale ANTES de qualquer fase? ⟫"]:::bridge
-  FUND["FUNDAMENTOS — 12 conceitos de base<br/>CIA · assume breach · ameaça interna<br/>defense in depth · least privilege · cadeia de suprimentos<br/>sem obscuridade · superfície de ataque · sem segredo no código<br/>zero trust · segurança usável · fatores de autenticação"]:::base
-  B2["⟪ fixada a base, qual é o ciclo? ⟫"]:::bridge
-
-  F1["1 · REQUISITOS — o que garantir<br/>P: verificável · rastreável · negação explícita<br/>T: abuse case (McDermott/Fox 99) · misuse (Sindre/Opdahl 00)<br/>attack tree (Schneier 99) · bug bar (MS SDL)<br/>→ requisito com teste"]:::fase
-  F2["2 · DESIGN — desenho seguro antes do código<br/>(fase mais barata; nasce a FALHA)<br/>P: least privilege · defense in depth · fail secure · zero trust<br/>T: modelagem de ameaças (Shostack 2014, 4 perguntas)<br/>DFD (DeMarco 79) · superfície (Manadhata/Wing 04)<br/>→ desenho com mitigações"]:::fase
-  F3["3 · CÓDIGO — código sem falha conhecida<br/>P: never trust input · nada hard coded · bounds checking<br/>erro não ajuda o atacante<br/>T: inspeção de Fagan (76) · secure code review (OWASP) · SAST no commit<br/>→ código revisado + teste"]:::fase
-  F4["4 · TESTES — falha com evidência<br/>(7 alvos: código·app·infra·BD·APIs·integrações·rede)<br/>P: evidência · severidade (bug bar) · cobertura dos 7 alvos<br/>T: SAST · DAST · SCA · fuzzing · secret scanning · pentest<br/>→ achado com severidade + prova + decisão"]:::fase
-  F5["5 · DEPLOY + MANUTENÇÃO — detectar e responder em produção<br/>P: assume breach · log sem segredo · detecção vale a resposta<br/>T: resposta a incidentes (NIST 800-61) · gestão de vulnerabilidades<br/>→ incidente contido → vira requisito do próximo ciclo"]:::fase
-  FX["(extra) DESCONTINUAÇÃO — encerrar sem vazar<br/>MS SDL / NIST SSDF · só checklist"]:::fase
-
-  B3["⟪ processo escrito ≠ executado →<br/>como garantir SEMPRE? ⟫"]:::bridge
-  DSO["DEVSECOPS — Dev + Sec + Ops<br/>responsabilidade compartilhada, automatizada, contínua"]:::ops
-  SH["SHIFT-LEFT (push left por commit) + SHIFT-RIGHT (monitorar produção)<br/>previne × detecta — um sem o outro deixa buraco"]:::ops
-  PP["PIPELINE: commit→build→testes→análise(SAST/SCA/secrets)→staging→DAST→prod<br/>regra de ouro: verificação falha → pipeline PARA"]:::ops
-  TL["FERRAMENTAS: SAST(Semgrep) · DAST(ZAP) · SCA(Trivy) · secrets(gitleaks)<br/>fuzzing · WAF/RASP (compram tempo, não corrigem)"]:::ops
-  VS["SDLC ≠ DevSecOps: processo (o quê) × prática (como, em escala)"]:::ops
-
-  S-->C-->PL
-  PL-->FB
-  PL-->B1-->FUND-->B2
-  B2-->F1-->F2-->F3-->F4-->F5-->FX
-  FX-->B3-->DSO
-  DSO-->SH
-  DSO-->PP
-  DSO-->TL
-  DSO-->VS
-</pre>
+<div class="spine-sum">
+  espinha mínima: <b>custo → push left → falha≠bug → fundamentos → 5 fases → DevSecOps → shift L/R → pipeline</b>
 </div>
 
-<script type="module">
-  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
-  mermaid.initialize({startOnLoad:true, theme:"dark", flowchart:{nodeSpacing:40, rankSpacing:48, useMaxWidth:false}});
+<main id="tree">
+  <div class="node spine-n"><p class="title">SDLC-SEC</p></div>
+  <div class="link"></div>
 
-  const el = () => document.querySelector(".mermaid svg") || document.querySelector(".mermaid");
-  let z = 1;
-  const apply = () => { const svg = document.querySelector(".mermaid"); if(svg) svg.style.transform = `scale(${z})`; };
-  document.getElementById("in").onclick    = () => { z = Math.min(2.5, z+0.15); apply(); };
-  document.getElementById("out").onclick   = () => { z = Math.max(0.4, z-0.15); apply(); };
-  document.getElementById("reset").onclick = () => { z = 1; apply(); };
+  <div class="node spine-n">
+    <p class="title">CUSTO cresce com o tempo</p>
+    <p class="meta">curva de Boehm, 1981 — é o fundamento de tudo</p>
+  </div>
+  <div class="link"></div>
+
+  <div class="node spine-n">
+    <p class="title">PUSH LEFT — empurrar p/ esquerda</p>
+    <p class="meta">estratégia, não princípio (Janca, 2020): decide quando aplicar os princípios</p>
+    <div class="branch node base-n" style="margin-top:14px">
+      <p class="title" style="font-size:1rem">FALHA ≠ BUG</p>
+      <p class="row">falha = erro de desenho → corrige com <b>reprojeto</b></p>
+      <p class="row">bug = erro de implementação → corrige com <b>patch</b></p>
+    </div>
+  </div>
+  <div class="link"></div>
+
+  <div class="bridge">age cedo em TODO o ciclo → o que vale ANTES de qualquer fase?</div>
+  <div class="link"></div>
+
+  <div class="node base-n">
+    <p class="title">FUNDAMENTOS — 12 conceitos de base</p>
+    <p class="meta">valem no ciclo inteiro; por isso vêm antes das fases</p>
+    <p class="row">CIA · assume breach · ameaça interna · defense in depth</p>
+    <p class="row">least privilege · cadeia de suprimentos · sem obscuridade</p>
+    <p class="row">superfície de ataque · sem segredo no código · zero trust</p>
+    <p class="row">segurança usável · fatores de autenticação</p>
+  </div>
+  <div class="link"></div>
+
+  <div class="bridge">fixada a base, qual é o ciclo?</div>
+  <div class="link"></div>
+
+  <div class="node fase-n">
+    <p class="title">1 · REQUISITOS</p>
+    <p class="meta">o que o sistema deve garantir</p>
+    <p class="row"><span class="k">P</span>verificável · rastreável · negação explícita</p>
+    <p class="row"><span class="k">T</span>abuse case (McDermott/Fox 99) · misuse (Sindre/Opdahl 00) · attack tree (Schneier 99) · bug bar (MS SDL)</p>
+    <p class="out">→ requisito com teste</p>
+  </div>
+  <div class="link"></div>
+
+  <div class="node fase-n">
+    <p class="title">2 · DESIGN</p>
+    <p class="meta">desenho seguro antes do código — fase mais barata; aqui nasce a FALHA</p>
+    <p class="row"><span class="k">P</span>least privilege · defense in depth · fail secure · zero trust</p>
+    <p class="row"><span class="k">T</span>modelagem de ameaças (Shostack 2014, 4 perguntas) · DFD (DeMarco 79) · superfície (Manadhata/Wing 04)</p>
+    <p class="out">→ desenho com mitigações</p>
+  </div>
+  <div class="link"></div>
+
+  <div class="node fase-n">
+    <p class="title">3 · CÓDIGO</p>
+    <p class="meta">código sem falha conhecida</p>
+    <p class="row"><span class="k">P</span>never trust input · nada hard coded · bounds checking · erro não ajuda o atacante</p>
+    <p class="row"><span class="k">T</span>inspeção de Fagan (76) · secure code review (OWASP) · SAST no commit</p>
+    <p class="out">→ código revisado + teste</p>
+  </div>
+  <div class="link"></div>
+
+  <div class="node fase-n">
+    <p class="title">4 · TESTES</p>
+    <p class="meta">falha encontrada com evidência — 7 alvos: código·app·infra·BD·APIs·integrações·rede</p>
+    <p class="row"><span class="k">P</span>evidência · severidade (bug bar) · cobertura dos 7 alvos</p>
+    <p class="row"><span class="k">T</span>SAST · DAST · SCA · fuzzing · secret scanning · pentest</p>
+    <p class="out">→ achado com severidade + prova + decisão</p>
+  </div>
+  <div class="link"></div>
+
+  <div class="node fase-n">
+    <p class="title">5 · DEPLOY + MANUTENÇÃO</p>
+    <p class="meta">detectar e responder em produção</p>
+    <p class="row"><span class="k">P</span>assume breach · log sem segredo · detecção vale a resposta</p>
+    <p class="row"><span class="k">T</span>resposta a incidentes (NIST 800-61) · gestão de vulnerabilidades</p>
+    <p class="out">→ incidente contido → vira requisito do próximo ciclo</p>
+  </div>
+  <div class="link"></div>
+
+  <div class="node fase-n">
+    <p class="title">extra · DESCONTINUAÇÃO</p>
+    <p class="meta">encerrar sem vazar (MS SDL / NIST SSDF) — só checklist, sem técnica nomeada</p>
+  </div>
+  <div class="link"></div>
+
+  <div class="bridge">processo escrito ≠ processo executado → como garantir SEMPRE?</div>
+  <div class="link"></div>
+
+  <div class="node ops-n">
+    <p class="title">DEVSECOPS — Dev + Sec + Ops</p>
+    <p class="meta">responsabilidade compartilhada, automatizada, contínua</p>
+    <div class="branch node ops-n" style="margin-top:14px">
+      <p class="title" style="font-size:1rem">SHIFT-LEFT + SHIFT-RIGHT</p>
+      <p class="row">shift-left = push left por commit · shift-right = monitorar produção</p>
+      <p class="row">previne × detecta — um sem o outro deixa buraco</p>
+    </div>
+    <div class="branch node ops-n" style="margin-top:12px">
+      <p class="title" style="font-size:1rem">PIPELINE CI/CD</p>
+      <p class="row">commit → build → testes → análise (SAST/SCA/secrets) → staging → DAST → prod</p>
+      <p class="row">regra de ouro: verificação falha → pipeline PARA</p>
+    </div>
+    <div class="branch node ops-n" style="margin-top:12px">
+      <p class="title" style="font-size:1rem">FERRAMENTAS</p>
+      <p class="row">SAST (Semgrep) · DAST (ZAP) · SCA (Trivy) · secrets (gitleaks) · fuzzing</p>
+      <p class="row">WAF / RASP — compram tempo, não corrigem</p>
+    </div>
+    <div class="branch node ops-n" style="margin-top:12px">
+      <p class="title" style="font-size:1rem">SDLC ≠ DevSecOps</p>
+      <p class="row">processo (o quê) × prática (como, em escala)</p>
+    </div>
+  </div>
+</main>
+
+<script>
+  const root = document.documentElement;
+  let fs = 17;
+  const apply = () => root.style.setProperty("--fs", fs + "px");
+  document.getElementById("in").onclick    = () => { fs = Math.min(26, fs+1); apply(); };
+  document.getElementById("out").onclick   = () => { fs = Math.max(12, fs-1); apply(); };
+  document.getElementById("reset").onclick = () => { fs = 17; apply(); };
   document.getElementById("full").onclick  = () => {
     if(!document.fullscreenElement) document.documentElement.requestFullscreen();
     else document.exitFullscreen();
   };
   addEventListener("keydown", e => {
-    if(e.key === "+" || e.key === "=") document.getElementById("in").click();
-    if(e.key === "-") document.getElementById("out").click();
-    if(e.key === "0") document.getElementById("reset").click();
-    if(e.key === "f") document.getElementById("full").click();
+    if(e.key==="+"||e.key==="=") document.getElementById("in").click();
+    if(e.key==="-") document.getElementById("out").click();
+    if(e.key==="0") document.getElementById("reset").click();
+    if(e.key==="f") document.getElementById("full").click();
   });
 </script>
 </body>
