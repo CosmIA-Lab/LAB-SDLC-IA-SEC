@@ -1,0 +1,19 @@
+01-ciclo-de-vida-seguro/arvore-memoria.md
+  s_4f6d4a9e95d33a::t_951d3df62219ba 1-85
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "d1a61e4163697b6e59b82f35270b523506570d81",
+  "prompts": {},
+  "sessions": {
+    "s_4f6d4a9e95d33a": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "01a1746a-b26f-706d-b304-e79b1a49a450",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "alan <nascimentoalankst@gmail.com>"
+    }
+  }
+}
