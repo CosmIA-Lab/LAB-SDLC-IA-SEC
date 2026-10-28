@@ -1,0 +1,25 @@
+00-mapa-de-estudo.md
+  s_7cc7673de0adc8::t_fb7ae984dcc9d0 67
+01-ciclo-de-vida-seguro/README.md
+  s_7cc7673de0adc8::t_a0f58b09bdebf4 255
+02-modelagem-de-ameacas/README.md
+  s_7cc7673de0adc8::t_3f6e260b43e88a 5-7,11,13,15,17,19-23,25-29,31,33-37,41,43,45,47-56,58,60,62,64-68,72-203,205-210,212,214,216,218-353,357-361,363-369,371-471,477-494
+02-modelagem-de-ameacas/arvore-memoria.md
+  s_7cc7673de0adc8::t_48c8d231cacd82 1-98
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "583ae392f076218fa222914492ba7a4ecd0b92bf",
+  "prompts": {},
+  "sessions": {
+    "s_7cc7673de0adc8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9ffe1f51-e813-456c-ad90-77b82c1de23c",
+        "model": "unknown"
+      },
+      "human_author": "alan <nascimentoalankst@gmail.com>"
+    }
+  }
+}
