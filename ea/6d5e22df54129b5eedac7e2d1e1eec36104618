@@ -1,0 +1,19 @@
+02-modelagem-de-ameacas/arvore.html
+  s_7cc7673de0adc8::t_a19b509f3a7283 6,9,11-13,18,21-25,27-74,77-79,81-83,85,90-91,93-95,98,102-341,346,348-350,354-360,365
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "ea6d5e22df54129b5eedac7e2d1e1eec36104618",
+  "prompts": {},
+  "sessions": {
+    "s_7cc7673de0adc8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9ffe1f51-e813-456c-ad90-77b82c1de23c",
+        "model": "unknown"
+      },
+      "human_author": "alan <nascimentoalankst@gmail.com>"
+    }
+  }
+}
