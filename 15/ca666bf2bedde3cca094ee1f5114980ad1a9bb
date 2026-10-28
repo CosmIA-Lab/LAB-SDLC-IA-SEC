@@ -1,0 +1,19 @@
+02-modelagem-de-ameacas/grafo.html
+  s_7cc7673de0adc8::t_289f079a8ceef4 1-276
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "15ca666bf2bedde3cca094ee1f5114980ad1a9bb",
+  "prompts": {},
+  "sessions": {
+    "s_7cc7673de0adc8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9ffe1f51-e813-456c-ad90-77b82c1de23c",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "alan <nascimentoalankst@gmail.com>"
+    }
+  }
+}
