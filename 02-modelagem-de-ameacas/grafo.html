@@ -14,7 +14,7 @@
   header{background:var(--surface); border-bottom:1px solid var(--line); padding:8px 14px; display:flex; gap:10px; align-items:center; flex-wrap:wrap}
   header h1{font-size:.95rem; margin:0}
   header .ctr{margin-left:auto; display:flex; gap:6px; flex-wrap:wrap}
-  button,select,input{border:1px solid var(--line); background:#21262d; color:var(--fg); border-radius:8px; padding:5px 9px; font-weight:600; font-size:.82rem}
+  button,input{border:1px solid var(--line); background:#21262d; color:var(--fg); border-radius:8px; padding:5px 9px; font-weight:600; font-size:.82rem}
   button{cursor:pointer} button:hover{border-color:var(--root)} button.on{border-color:var(--etapa); color:var(--etapa)}
   input{font-weight:500; width:150px}
   #wrap{flex:1; display:flex; min-height:0}
@@ -35,15 +35,10 @@
   <h1>Ponto 2 — Modelagem de ameaças e análise de superfície de ataque · grafo</h1>
   <div class="ctr">
     <input id="q" placeholder="buscar nó…">
-    <select id="filtro">
-      <option value="">todas as camadas</option>
-      <option value="fundamento">fundamentos</option>
-      <option value="principio">princípios</option>
-      <option value="tecnica">técnicas</option>
-      <option value="mecanismo">mecanismos</option>
-      <option value="saida">saídas</option>
-    </select>
-    <button id="lay">layout: hierárquico</button>
+    <button id="l1" class="on">1 espinha</button>
+    <button id="l2">2 etapas</button>
+    <button id="l3">3 tudo</button>
+    <button id="xe" class="on">relações</button>
     <button id="fit">ajustar</button>
     <button id="full">⛶</button>
   </div>
@@ -57,9 +52,11 @@
   <div id="cy"></div>
   <aside id="panel">
     <h2>Como usar</h2>
-    <p>Clique num nó: ele e os vizinhos acendem, o resto apaga, e a explicação aparece aqui. Arraste para mover, role para zoom. Clique no fundo para limpar.</p>
-    <p>Setas são relações nomeadas: <i>nega</i>, <i>fundamenta</i>, <i>alimenta</i>, <i>vira</i>, <i>prova</i>. Leia um caminho inteiro em voz alta — é o parágrafo pronto.</p>
-    <p class="src">Teclas: <b>f</b> tela cheia · <b>l</b> troca layout · <b>0</b> ajustar</p>
+    <p>Começa pela espinha: raiz, a pergunta, as quatro etapas, a superfície e as outras abordagens. Nada mais aparece até você pedir.</p>
+    <p><b>Clique</b> num nó com <b>+N</b>: abre os N filhos dele. Clique de novo: acende os vizinhos e a explicação vem aqui. <b>Clique duplo</b>: fecha o ramo.</p>
+    <p>Setas coloridas são as relações que cruzam ramos: <i style="color:var(--ameaca)">nega</i>, <i style="color:var(--tec)">restaura</i>, <i style="color:var(--fund)">fundamenta</i>, <i style="color:var(--saida)">vira / alimenta</i>. Só aparecem quando as duas pontas estão abertas.</p>
+    <p><b>relações</b> liga/desliga as setas coloridas quando o nível 3 ficar carregado.</p>
+    <p class="src">Teclas: <b>1 2 3</b> nível · <b>0</b> ajustar · <b>f</b> tela cheia</p>
   </aside>
 </div>
 
@@ -136,34 +133,42 @@ const N = [
  ["mS","OpenAPI · nmap · SCA ·\nfeature flag · API gateway","mecanismo","","Inventário vem do contrato; nmap acha canais esquecidos; SCA enumera terceiros; gateway só passa rota declarada."],
  ["sS","inventário por exposição\n+ o que foi removido","saida","","Para o que ficou, a entrada correspondente no DFD."],
 
+ ["outras","outras abordagens","outra","","STRIDE com as quatro perguntas é a via principal, não a única. Cada abordagem aqui responde à mesma pergunta por outro caminho; nenhuma dispensa o desenho com fronteiras."],
  ["pasta","PASTA","outra","UcedaVélez e Morana, 2015","Processo em sete estágios, do objetivo de negócio ao risco. É processo, não taxonomia."],
  ["linddun","LINDDUN","outra","Deng et al., 2011","Taxonomia de privacidade: linkability, identifiability, non-repudiation, detectability, disclosure, unawareness, non-compliance. Usa o mesmo DFD."],
  ["n154","NIST SP 800-154","outra","NIST, 2016 (rascunho)","Modelagem centrada em dados: parte do dado e de onde ele vive."],
  ["manif","Threat Modeling\nManifesto","outra","2020","Quatro perguntas como estrutura mínima; modelagem contínua e do time."],
 ];
 
-const E = [
- ["p2","q0","abre com"],["p2","surf","e também"],
- ["q0","ameaca","enumera"],["ameaca","vuln","explora"],["ameaca","risco","prob × impacto"],["vuln","risco",""],
- ["q0","metodo","exige"],["metodo","stride","justifica"],
+// árvore de abertura: [pai, filho, rótulo]. Cada nó tem um pai; abrir o pai mostra o filho.
+const TREE = [
+ ["p2","q0","abre com"],["p2","q1","1"],["p2","q2","2"],["p2","q3","3"],["p2","q4","4"],["p2","surf","e também"],["p2","outras","além do STRIDE"],
+ ["q0","ameaca","enumera"],["q0","vuln",""],["q0","risco",""],["q0","metodo","exige"],
  ["q0","f1","pressupõe"],["q0","f2","pressupõe"],["q0","f3","pressupõe"],["q0","f4","pressupõe"],
- ["f1","stride","fundamenta"],["f1","pC",""],["f1","pI",""],["f1","pD",""],["f1","pAn",""],["f1","pAz",""],["f1","pNr",""],
- ["f2","dest","fundamenta"],["f3","front","fundamenta"],["f4","surf","fundamenta"],
- ["q0","q1","método"],["q1","q2","depois"],["q2","q3","depois"],["q3","q4","depois"],["q4","q1","desenho mudou"],
- ["q1","dfd","T"],["dfd","elem","tem"],["dfd","front","+"],["q1","pr1","P"],["q1","m1","M"],["q1","s1","→"],
- ["q2","stride","T"],["stride","S",""],["stride","T",""],["stride","R",""],["stride","I",""],["stride","D",""],["stride","E",""],
+ ["f1","pC",""],["f1","pI",""],["f1","pD",""],["f1","pAn",""],["f1","pAz",""],["f1","pNr",""],
+ ["q1","dfd","T"],["q1","front","T"],["q1","pr1","P"],["q1","m1","M"],["q1","s1","→"],["dfd","elem","tem"],
+ ["q2","stride","T"],["q2","spe","T"],["q2","atree","T"],["q2","pr2","P"],["q2","cat","consulta"],["q2","eop","M"],["q2","s2","→"],
+ ["stride","S",""],["stride","T",""],["stride","R",""],["stride","I",""],["stride","D",""],["stride","E",""],
+ ["q3","dest","T"],["q3","mitcat","T"],["q3","prior","T"],["q3","pr3","P"],["q3","m3","M"],["q3","req","→"],
+ ["prior","dread","abandonado"],["prior","cvss","só em produção"],
+ ["q4","check","T"],["q4","teste","T"],["q4","pr4","P"],["q4","m4","M"],["q4","controle","→"],["q4","s4","→"],
+ ["surf","metr","T"],["surf","rasq","T"],["surf","red","T"],["surf","prS","P"],["surf","mS","M"],["surf","sS","→"],
+ ["outras","pasta","processo, 7 estágios"],["outras","linddun","taxonomia de privacidade"],["outras","n154","centrada em dados"],["outras","manif","princípios, 2020"],
+];
+// relações que cruzam ramos: só aparecem quando as duas pontas estão visíveis
+const X = [
+ ["ameaca","vuln","explora"],["ameaca","risco","prob × impacto"],["metodo","stride","justifica"],
+ ["f1","stride","fundamenta"],["f2","dest","fundamenta"],["f3","front","fundamenta"],["f4","surf","fundamenta"],
+ ["q1","q2","depois"],["q2","q3","depois"],["q3","q4","depois"],["q4","q1","desenho mudou"],
+ ["dfd","front","+"],
  ["S","pAn","nega"],["T","pI","nega"],["R","pNr","nega"],["I","pC","nega"],["D","pD","nega"],["E","pAz","nega"],
- ["q2","spe","T"],["spe","stride","cruza"],["spe","elem","com"],
- ["q2","atree","T"],["atree","stride","organiza"],["q2","pr2","P"],["q2","cat","consulta"],["q2","eop","M"],["q2","s2","→"],
- ["s1","q2","alimenta"],["s2","q3","alimenta"],
- ["q3","dest","T"],["q3","mitcat","T"],["mitcat","pAn","restaura"],["mitcat","pI","restaura"],["mitcat","pNr","restaura"],["mitcat","pC","restaura"],["mitcat","pD","restaura"],["mitcat","pAz","restaura"],
- ["q3","prior","T"],["prior","risco","usa"],["prior","dread","abandonado"],["prior","cvss","só em produção"],
- ["q3","pr3","P"],["q3","m3","M"],["q3","req","→"],
- ["req","q4","alimenta"],["q4","check","T"],["q4","teste","T"],["q4","pr4","P"],["q4","m4","M"],
- ["ameaca","req","vira"],["req","controle","vira"],["controle","s4","provado por"],["teste","s4",""],
- ["surf","front","= fluxos que cruzam a\nfronteira externa"],["surf","metr","T"],["surf","rasq","T"],["surf","red","T"],["surf","prS","P"],["surf","mS","M"],["surf","sS","→"],["sS","q1","entra no"],
- ["p2","pasta","alternativa"],["p2","linddun","alternativa"],["p2","n154","alternativa"],["p2","manif","atravessa"],
- ["linddun","dfd","usa"],["pasta","risco","parte do negócio ao"],
+ ["spe","stride","cruza"],["spe","elem","com"],["atree","stride","organiza"],
+ ["s1","q2","alimenta"],["s2","q3","alimenta"],["req","q4","alimenta"],
+ ["mitcat","pAn","restaura"],["mitcat","pI","restaura"],["mitcat","pNr","restaura"],["mitcat","pC","restaura"],["mitcat","pD","restaura"],["mitcat","pAz","restaura"],
+ ["prior","risco","usa"],
+ ["ameaca","req","vira"],["req","controle","vira"],["controle","s4","provado por"],["teste","s4","é o"],
+ ["surf","front","= fluxos que cruzam a\nfronteira externa"],["sS","q1","entra no"],
+ ["linddun","dfd","usa o mesmo"],["pasta","risco","parte do negócio ao"],
 ];
 
 const COLORS = {root:"#58a6ff",etapa:"#58a6ff",fundamento:"#8b949e",propriedade:"#79c0ff",ameaca:"#ff7b72",principio:"#56d4dd",
@@ -171,9 +176,16 @@ const COLORS = {root:"#58a6ff",etapa:"#58a6ff",fundamento:"#8b949e",propriedade:
 const TYPE_PT = {root:"raiz",etapa:"etapa",fundamento:"fundamento",propriedade:"propriedade",ameaca:"ameaça STRIDE",principio:"princípio",
   tecnica:"técnica",mecanismo:"mecanismo",saida:"saída",surf:"superfície",outra:"outra abordagem",catalogo:"catálogo — não é técnica",termo:"termo"};
 
+const PARENT = {}, KIDS = {}, BASE = {}, DEPTH = {};
+TREE.forEach(([p,c]) => { PARENT[c]=p; (KIDS[p]=KIDS[p]||[]).push(c); });
+N.forEach(([id,label]) => BASE[id]=label);
+const depth = id => DEPTH[id] ??= (PARENT[id] ? depth(PARENT[id])+1 : 0);
+N.forEach(([id]) => depth(id));
+
 const elements = [
   ...N.map(([id,label,type,src,desc]) => ({data:{id,label,type,src,desc}})),
-  ...E.map(([s,t,l],i) => ({data:{id:"e"+i,source:s,target:t,label:l}}))
+  ...TREE.map(([s,t,l],i) => ({data:{id:"t"+i,source:s,target:t,label:l,kind:"tree"}})),
+  ...X.map(([s,t,l],i) => ({data:{id:"x"+i,source:s,target:t,label:l,kind:"x"}})),
 ];
 
 const cy = cytoscape({
@@ -182,7 +194,7 @@ const cy = cytoscape({
   wheelSensitivity: .25,
   style: [
     {selector:"node", style:{
-      "label":"data(label)","text-wrap":"wrap","text-max-width":170,"text-valign":"center","text-halign":"center",
+      "label":"data(label)","text-wrap":"wrap","text-max-width":180,"text-valign":"center","text-halign":"center",
       "font-size":12,"color":"#e6edf3","background-color":"#161b22","border-width":3,
       "border-color": e => COLORS[e.data("type")]||"#9aa4b0",
       "shape":"round-rectangle","width":"label","height":"label","padding":"10px"}},
@@ -192,83 +204,132 @@ const cy = cytoscape({
     {selector:"node[type='propriedade']", style:{"shape":"ellipse","padding":"6px","background-color":"#141d2b"}},
     {selector:"node[type='ameaca']", style:{"background-color":"#2a1a1a","font-weight":700}},
     {selector:"node[type='saida']", style:{"shape":"tag","padding":"8px"}},
+    {selector:"node[type='outra']", style:{"background-color":"#1d1726"}},
     {selector:"node[type='catalogo']", style:{"border-style":"dashed","color":"#9aa4b0"}},
     {selector:"node[type='termo']", style:{"border-style":"dotted"}},
+    {selector:"node.closed", style:{"border-width":4,"border-style":"double"}},
     {selector:"edge", style:{
       "width":1.6,"line-color":"#3a4350","target-arrow-color":"#3a4350","target-arrow-shape":"triangle",
       "curve-style":"bezier","arrow-scale":.9,
       "label":"data(label)","font-size":9,"color":"#9aa4b0","text-wrap":"wrap","text-max-width":90,
       "text-background-color":"#0e1116","text-background-opacity":.85,"text-background-padding":2,"text-rotation":"autorotate"}},
+    {selector:"edge[kind='tree']", style:{"curve-style":"taxi","taxi-direction":"downward","taxi-turn":"-20px","taxi-turn-min-distance":"10px","target-arrow-shape":"none","line-color":"#2b323c"}},
+    {selector:"edge[kind='x']", style:{"curve-style":"unbundled-bezier","control-point-distances":[45],"control-point-weights":[.5],"line-color":"#5a6676","target-arrow-color":"#5a6676","color":"#c9d1d9","font-size":10,"z-index":5}},
     {selector:"edge[label='nega']", style:{"line-color":"#ff7b72","target-arrow-color":"#ff7b72","line-style":"dashed"}},
     {selector:"edge[label='restaura']", style:{"line-color":"#3fb950","target-arrow-color":"#3fb950","line-style":"dotted"}},
     {selector:"edge[label='fundamenta']", style:{"line-color":"#8b949e","target-arrow-color":"#8b949e","width":2.2}},
     {selector:"edge[label='vira'],edge[label='provado por'],edge[label='alimenta']", style:{"line-color":"#f778ba","target-arrow-color":"#f778ba","width":2.2}},
+    {selector:"edge[label='depois'],edge[label='desenho mudou']", style:{"line-color":"#58a6ff","target-arrow-color":"#58a6ff","width":2}},
+    {selector:".hidden, .off", style:{"display":"none"}},
     {selector:".dim", style:{"opacity":.12}},
     {selector:".hi", style:{"opacity":1,"border-width":5}},
     {selector:"edge.hi", style:{"width":3,"font-size":11,"color":"#e6edf3"}},
   ]
 });
 
-const LAYOUTS = {
-  hier: {name:"breadthfirst", directed:true, roots:"#p2", spacingFactor:1.05, padding:30, avoidOverlap:true, nodeDimensionsIncludeLabels:true},
-  forca:{name:"cose", animate:false, randomize:false, idealEdgeLength:120, nodeRepulsion:()=>60000, nodeOverlap:30, gravity:.25, numIter:1500, padding:30, nodeDimensionsIncludeLabels:true}
-};
-let current = "hier";
-const run = () => cy.layout(LAYOUTS[current]).run();
-run();
+// ---------- abertura progressiva ----------
+const open = new Set(["p2"]);
+const visible = id => !PARENT[id] || (open.has(PARENT[id]) && visible(PARENT[id]));
+const W = id => { const w = Math.max(...BASE[id].split("\n").map(l => l.length)); return Math.max(120, w*7.4+34); };
+const LEVEL = 140, ROW = 68, IND = 34, GAP = 70;
 
+// raiz no topo; cada filho da raiz é uma coluna; descendentes descem em lista indentada (outline)
+function layout(){
+  const pos = {};
+  const cols = (KIDS.p2||[]);
+  let x0 = 0;
+  cols.forEach(c => {
+    const rows = [];
+    const walk = (id, d) => { rows.push([id,d]); if(open.has(id)) (KIDS[id]||[]).forEach(k => walk(k,d+1)); };
+    walk(c, 0);
+    const width = Math.max(...rows.map(([id,d]) => W(id) + d*IND));
+    rows.forEach(([id,d],i) => { pos[id] = {x: x0 + d*IND + W(id)/2, y: LEVEL + i*ROW}; });
+    x0 += width + GAP;
+  });
+  pos.p2 = {x: (x0-GAP)/2, y: 0};
+  cy.batch(() => {
+    cy.nodes().forEach(n => {
+      const id = n.id(), vis = visible(id);
+      n.toggleClass("hidden", !vis);
+      const k = (KIDS[id]||[]).length;
+      const closed = k && !open.has(id);
+      n.toggleClass("closed", !!closed);
+      n.data("label", closed ? BASE[id] + "\n+" + k : BASE[id]);
+      if(vis) n.position(pos[id]);
+    });
+  });
+}
+function setLevel(maxDepth){
+  open.clear();
+  N.forEach(([id]) => { if(KIDS[id] && DEPTH[id] < maxDepth) open.add(id); });
+  cy.elements().removeClass("dim hi");
+  layout(); cy.fit(undefined, 30);
+  ["l1","l2","l3"].forEach((b,i) => document.getElementById(b).classList.toggle("on", i+1===maxDepth));
+}
+layout(); cy.fit(undefined, 30);
+if(location.hash==="#l2") setLevel(2); if(location.hash==="#l3") setLevel(9);
+
+// ---------- painel ----------
 const panel = document.getElementById("panel");
 const show = n => {
-  const d = n.data();
-  const col = COLORS[d.type];
-  const neigh = n.connectedEdges().map(e => {
+  const d = n.data(), col = COLORS[d.type];
+  const neigh = n.connectedEdges().filter(e => e.data("kind")==="x" || true).map(e => {
     const other = e.source().id()===n.id() ? e.target() : e.source();
     const dir = e.source().id()===n.id() ? "→" : "←";
-    return `<li><b>${dir} ${e.data("label")||""}</b> ${other.data("label").replace(/\n/g," ")}</li>`;
+    return `<li><b>${dir} ${e.data("label")||""}</b> ${BASE[other.id()].replace(/\n/g," ")}</li>`;
   }).join("");
-  panel.innerHTML = `<h2>${d.label.replace(/\n/g," ")}</h2>
+  panel.innerHTML = `<h2>${BASE[d.id]}</h2>
     <div class="type" style="color:${col}">${TYPE_PT[d.type]}</div>
     ${d.src?`<div class="src">${d.src}</div>`:""}
     <p>${d.desc}</p>
     <ul>${neigh}</ul>`;
 };
 cy.on("tap","node", ev => {
-  const n = ev.target, hood = n.closedNeighborhood();
+  const n = ev.target, id = n.id();
+  if(KIDS[id] && !open.has(id)){
+    open.add(id); layout();
+    cy.animate({fit:{eles:n.closedNeighborhood().not(".hidden"), padding:60}}, {duration:250});
+  }
+  const hood = n.closedNeighborhood().not(".hidden");
   cy.elements().addClass("dim").removeClass("hi");
   hood.removeClass("dim").addClass("hi");
   show(n);
 });
+cy.on("dbltap","node", ev => {
+  const id = ev.target.id();
+  const closeSub = x => { open.delete(x); (KIDS[x]||[]).forEach(closeSub); };
+  closeSub(id);
+  cy.elements().removeClass("dim hi");
+  layout();
+});
 cy.on("tap", ev => { if(ev.target===cy) cy.elements().removeClass("dim hi"); });
 
-document.getElementById("lay").onclick = e => {
-  current = current==="hier" ? "forca" : "hier";
-  e.target.textContent = "layout: " + (current==="hier" ? "hierárquico" : "força");
-  run();
-};
+document.getElementById("l1").onclick = () => setLevel(1);
+document.getElementById("l2").onclick = () => setLevel(2);
+document.getElementById("l3").onclick = () => setLevel(9);
+document.getElementById("xe").onclick = e => { e.target.classList.toggle("on"); cy.edges("[kind='x']").toggleClass("off"); };
 document.getElementById("fit").onclick = () => cy.fit(undefined, 30);
 document.getElementById("full").onclick = () => {
   if(!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen();
-};
-document.getElementById("filtro").onchange = e => {
-  const t = e.target.value;
-  cy.elements().removeClass("dim hi");
-  if(!t) return;
-  const keep = cy.nodes(`[type='${t}'], [type='root'], [type='etapa']`);
-  cy.elements().not(keep).not(keep.edgesWith(keep)).addClass("dim");
 };
 document.getElementById("q").oninput = e => {
   const q = e.target.value.trim().toLowerCase();
   cy.elements().removeClass("dim hi");
   if(!q) return;
-  const hit = cy.nodes().filter(n => n.data("label").toLowerCase().includes(q) || (n.data("desc")||"").toLowerCase().includes(q));
+  const hit = cy.nodes().filter(n => BASE[n.id()].toLowerCase().includes(q) || (n.data("desc")||"").toLowerCase().includes(q));
+  hit.forEach(n => { let p = PARENT[n.id()]; while(p){ open.add(p); p = PARENT[p]; } });
+  layout();
   cy.elements().not(hit).addClass("dim"); hit.addClass("hi");
-  if(hit.length===1){ show(hit[0]); cy.animate({center:{eles:hit}, zoom:1.2}, {duration:250}); }
+  if(hit.length===1){ show(hit[0]); cy.animate({center:{eles:hit}, zoom:1.1}, {duration:250}); }
+  else cy.animate({fit:{eles:hit, padding:60}}, {duration:250});
 };
 addEventListener("keydown", ev => {
   if(ev.target.tagName==="INPUT") return;
   if(ev.key==="f") document.getElementById("full").click();
-  if(ev.key==="l") document.getElementById("lay").click();
   if(ev.key==="0") document.getElementById("fit").click();
+  if(ev.key==="1") setLevel(1);
+  if(ev.key==="2") setLevel(2);
+  if(ev.key==="3") setLevel(9);
 });
 addEventListener("resize", () => cy.resize());
 </script>
