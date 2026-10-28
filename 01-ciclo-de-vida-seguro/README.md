@@ -252,7 +252,7 @@ Regra de ouro: design errado custa uma reunião; código errado custa meses.
 | Diagrama de fluxo de dados (DFD) | DeMarco, 1979 | processos, armazenamentos e fluxos; é o insumo da modelagem de ameaças |
 | Análise de superfície de ataque | Manadhata e Wing, 2004 | lista pontos de entrada e prioriza por risco |
 
-STRIDE (Microsoft) e PASTA não são técnicas: são as taxonomias que alimentam a modelagem de ameaças.
+STRIDE (Kohnfelder e Garg, Microsoft, 1999) é a taxonomia de ameaças que alimenta a modelagem; PASTA (UcedaVélez e Morana, 2015) é um processo alternativo de modelagem, centrado em risco. Nenhum dos dois substitui o DFD nem as quatro perguntas.
 
 #### Saída
 
