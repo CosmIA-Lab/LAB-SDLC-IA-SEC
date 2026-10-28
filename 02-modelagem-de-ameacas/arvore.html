@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Árvore de memória — Ponto 2</title>
+<style>
+  :root{
+    --bg:#0e1116; --surface:#161b22; --line:#30363d;
+    --fg:#e6edf3; --dim:#9aa4b0;
+    --spine:#58a6ff; --base:#8b949e; --etapa:#3fb950; --surf:#d29922; --outras:#bc8cff;
+    --fs:17px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--bg); color:var(--fg);
+    font:var(--fs)/1.55 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;}
+
+  header{position:sticky; top:0; z-index:5; background:var(--surface);
+    border-bottom:1px solid var(--line); padding:12px 18px;
+    display:flex; align-items:center; gap:14px; flex-wrap:wrap;}
+  header h1{font-size:1.05rem; margin:0; font-weight:700}
+  header .spine{color:var(--dim); font-size:.8rem}
+  header .ctr{margin-left:auto; display:flex; gap:8px}
+  button{border:1px solid var(--line); background:#21262d; color:var(--fg);
+    border-radius:8px; padding:7px 12px; font-weight:600; cursor:pointer; font-size:.9rem}
+  button:hover{border-color:var(--spine)}
+
+  main{max-width:860px; margin:0 auto; padding:26px 18px 80px;
+    display:flex; flex-direction:column; align-items:stretch;}
+
+  .link{width:3px; height:26px; background:var(--line); align-self:center; border-radius:2px}
+
+  .node{border:1px solid var(--line); border-left-width:6px; border-radius:12px;
+    background:var(--surface); padding:14px 18px;}
+  .node .title{font-weight:800; font-size:1.06rem; margin:0 0 2px}
+  .node .meta{color:var(--dim); font-size:.92rem; margin:0 0 6px}
+  .node .row{margin:3px 0}
+  .node .k{display:inline-block; min-width:1.4em; font-weight:800; color:var(--dim)}
+  .node .out{margin-top:6px; color:var(--etapa); font-weight:600}
+
+  .spine-n{border-left-color:var(--spine)}
+  .spine-n .title{color:var(--spine)}
+  .base-n{border-left-color:var(--base)}
+  .etapa-n{border-left-color:var(--etapa)}
+  .surf-n{border-left-color:var(--surf)}
+  .surf-n .title{color:var(--surf)}
+  .surf-n .out{color:var(--surf)}
+  .outras-n{border-left-color:var(--outras)}
+  .outras-n .title{color:var(--outras)}
+
+  .bridge{align-self:center; max-width:620px; text-align:center;
+    color:var(--dim); font-style:italic; font-size:.95rem; padding:10px 14px;}
+  .bridge::before{content:"⟪ "} .bridge::after{content:" ⟫"}
+
+  .branch{margin-left:38px; position:relative}
+  .branch::before{content:""; position:absolute; left:-20px; top:-14px; height:36px;
+    width:20px; border-left:3px solid var(--line); border-bottom:3px solid var(--line);
+    border-bottom-left-radius:10px}
+
+  .spine-sum{align-self:center; margin:4px 0 18px; color:var(--dim); font-size:.9rem;
+    text-align:center; padding:0 18px}
+  .spine-sum b{color:var(--spine)}
+
+  /* grade STRIDE por elemento */
+  .grid{display:grid; grid-template-columns:auto repeat(6,1fr); gap:4px; margin:10px 0 4px;
+    font-size:.9rem; text-align:center}
+  .grid div{padding:5px 2px; border-radius:6px; background:#21262d}
+  .grid .h{font-weight:800; color:var(--dim)}
+  .grid .r{text-align:left; padding-left:8px; font-weight:600}
+  .grid .y{background:#1f3b2a; color:var(--etapa); font-weight:800}
+  .grid .m{background:#2a2f1f; color:var(--surf); font-weight:700; font-size:.8rem}
+  @media (max-width:480px){ .grid{font-size:.75rem} .grid .r{padding-left:4px} }
+</style>
+</head>
+<body>
+<header>
+  <h1>Árvore de memória — Ponto 2</h1>
+  <span class="spine">molde de cada etapa: objetivo → princípios → técnicas → mecanismos → saída</span>
+  <div class="ctr">
+    <button id="out">A−</button>
+    <button id="in">A+</button>
+    <button id="reset">reset</button>
+    <button id="full">⛶ tela cheia</button>
+  </div>
+</header>
+
+<div class="spine-sum">
+  espinha mínima: <b>o que pode dar errado → ameaça≠vuln≠risco → 4 fundamentos → 4 perguntas → superfície → outras abordagens</b>
+</div>
+
+<main id="tree">
+  <div class="node spine-n"><p class="title">MODELAGEM DE AMEAÇAS</p></div>
+  <div class="link"></div>
+
+  <div class="node spine-n">
+    <p class="title">"O QUE PODE DAR ERRADO?"</p>
+    <p class="meta">a pergunta que a fase de DESIGN precisa responder — antes do código, onde a falha é barata</p>
+    <div class="branch node base-n" style="margin-top:14px">
+      <p class="title" style="font-size:1rem">AMEAÇA ≠ VULNERABILIDADE ≠ RISCO</p>
+      <p class="meta">NIST SP 800-30</p>
+      <p class="row">ameaça = <b>o que pode acontecer</b> · vuln = <b>por onde</b> · risco = <b>prob × impacto</b></p>
+    </div>
+    <div class="branch node base-n" style="margin-top:12px">
+      <p class="title" style="font-size:1rem">MÉTODO, não intuição</p>
+      <p class="row">"pense como atacante" é conselho, não método (Shostack 2014)</p>
+    </div>
+  </div>
+  <div class="link"></div>
+
+  <div class="bridge">antes do método, o que ele pressupõe?</div>
+  <div class="link"></div>
+
+  <div class="node base-n">
+    <p class="title">FUNDAMENTOS — 4 premissas</p>
+    <p class="meta">não se discutem dentro do método; as regras se apoiam nelas</p>
+    <p class="row">toda ameaça <b>viola uma propriedade</b> — CIA + authn · authz · não-repúdio = 6</p>
+    <p class="row">ameaça <b>não se elimina, decide-se</b></p>
+    <p class="row">ameaça <b>concentra-se na fronteira de confiança</b></p>
+    <p class="row">o <b>atacante escolhe a porta</b>; o defensor precisa de todas</p>
+  </div>
+  <div class="link"></div>
+
+  <div class="bridge">como percorrer o sistema sem deixar ameaça de fora?</div>
+  <div class="link"></div>
+
+  <div class="node spine-n">
+    <p class="title">4 PERGUNTAS — Shostack, 2014</p>
+    <p class="meta">construímos? → dá errado? → fazemos? → fizemos bem? — desenho mudou, volta à 1</p>
+  </div>
+  <div class="link"></div>
+
+  <div class="node etapa-n">
+    <p class="title">1 · O QUE ESTAMOS CONSTRUINDO?</p>
+    <p class="meta">desenho por onde o dado passa — e onde muda a confiança</p>
+    <p class="row"><span class="k">P</span>fronteira explícita · nível certo de detalhe · sistema real</p>
+    <p class="row"><span class="k">T</span>DFD (DeMarco 79) + fronteira de confiança (Shostack 14)</p>
+    <p class="row"><span class="k">&nbsp;</span>entidade externa · processo · fluxo · armazenamento · fronteira</p>
+    <p class="row"><span class="k">M</span>Threat Modeling Tool · Threat Dragon · pytm</p>
+    <p class="out">→ DFD com fronteiras marcadas</p>
+  </div>
+  <div class="link"></div>
+
+  <div class="bridge">sei ONDE procurar — O QUE procurar em cada lugar?</div>
+  <div class="link"></div>
+
+  <div class="node etapa-n">
+    <p class="title">2 · O QUE PODE DAR ERRADO?</p>
+    <p class="meta">ameaças por elemento, ligadas ao diagrama</p>
+    <p class="row"><span class="k">P</span>estrutura não intuição · cobertura por elemento · ameaça ligada ao desenho</p>
+    <p class="row"><span class="k">T</span><b>STRIDE</b> (Kohnfelder/Garg, MS 99) — 6 letras = 6 propriedades</p>
+    <p class="row"><span class="k">&nbsp;</span>S spoofing→authn · T tampering→integridade · R repúdio→não-repúdio</p>
+    <p class="row"><span class="k">&nbsp;</span>I disclosure→confid. · D DoS→disponib. · E elevação→authz</p>
+    <p class="row"><span class="k">T</span><b>STRIDE por elemento</b> (Shostack 14) — só o processo recebe as 6</p>
+    <div class="grid">
+      <div class="h"></div><div class="h">S</div><div class="h">T</div><div class="h">R</div><div class="h">I</div><div class="h">D</div><div class="h">E</div>
+      <div class="r">ent. externa</div><div class="y">✓</div><div></div><div class="y">✓</div><div></div><div></div><div></div>
+      <div class="r">processo</div><div class="y">✓</div><div class="y">✓</div><div class="y">✓</div><div class="y">✓</div><div class="y">✓</div><div class="y">✓</div>
+      <div class="r">fluxo</div><div></div><div class="y">✓</div><div></div><div class="y">✓</div><div class="y">✓</div><div></div>
+      <div class="r">armazenam.</div><div></div><div class="y">✓</div><div class="m">se log</div><div class="y">✓</div><div class="y">✓</div><div></div>
+    </div>
+    <p class="row"><span class="k">T</span><b>attack tree</b> (Schneier 99) — raiz = objetivo · ramos E/OU · folha = ameaça</p>
+    <p class="row"><span class="k">&nbsp;</span>CAPEC · ATT&amp;CK · Top 10 = bibliotecas, não técnica</p>
+    <p class="row"><span class="k">M</span>geração por elemento · jogo EoP (Shostack 2010) · registro de ameaças</p>
+    <p class="out">→ lista de ameaças, cada uma com elemento e categoria</p>
+  </div>
+  <div class="link"></div>
+
+  <div class="bridge">dezenas de ameaças — o que fazer com cada uma, e qual primeiro?</div>
+  <div class="link"></div>
+
+  <div class="node etapa-n">
+    <p class="title">3 · O QUE FAZEMOS A RESPEITO?</p>
+    <p class="meta">cada ameaça com destino; mitigação vira requisito</p>
+    <p class="row"><span class="k">P</span>nenhuma sem decisão · mitigação é requisito · risco ordena, não elimina · aceitar exige dono</p>
+    <p class="row"><span class="k">T</span><b>4 destinos</b> (Shostack 14): mitigar · eliminar · transferir · aceitar</p>
+    <p class="row"><span class="k">T</span><b>mitigação por categoria</b>: S→authn · T→integridade · R→log/assinatura · I→cripto/authz · D→rate limit · E→authz/least priv</p>
+    <p class="row"><span class="k">T</span>risco = prob × impacto (NIST 800-30) · DREAD (Howard/LeBlanc 03, abandonado) · bug bar</p>
+    <p class="row"><span class="k">M</span>registro com destino · backlog ligado ao modelo · registro de risco aceito</p>
+    <p class="out">→ mitigação escrita como REQUISITO com critério de aceite</p>
+  </div>
+  <div class="link"></div>
+
+  <div class="bridge">decidir não é provar — como saber que cobriu e que entrou?</div>
+  <div class="link"></div>
+
+  <div class="node etapa-n">
+    <p class="title">4 · FIZEMOS UM BOM TRABALHO?</p>
+    <p class="meta">modelo validado e vivo</p>
+    <p class="row"><span class="k">P</span>cobertura verificável · mitigação prova-se no teste · modelo acompanha desenho · do time</p>
+    <p class="row"><span class="k">T</span>checklist: diagrama · cobertura · destino · teste (Shostack 14) · teste como prova (NIST 800-115)</p>
+    <p class="row"><span class="k">M</span>modelo versionado com o código · revisão no pipeline · id ameaça → teste</p>
+    <p class="out">→ rastreabilidade: ameaça → requisito → controle → teste</p>
+  </div>
+  <div class="link"></div>
+
+  <div class="bridge">as 4 etapas assumem o contorno; o contorno é decisão → quantas portas?</div>
+  <div class="link"></div>
+
+  <div class="node surf-n">
+    <p class="title">SUPERFÍCIE DE ATAQUE</p>
+    <p class="meta">métodos · canais · itens de dado (Manadhata/Wing 2011) — olhar o DFD de fora para dentro</p>
+    <p class="row"><span class="k">P</span>redução antes de proteção · exposição define prioridade · padrão fechado · inclui o que você não escreveu</p>
+    <p class="row"><span class="k">T</span>métrica (Manadhata/Wing 11) · RASQ (Howard/Pincus/Wing 03) · redução (Howard 03, MS SDL)</p>
+    <p class="row"><span class="k">M</span>inventário por OpenAPI · nmap · SCA · feature flag off · API gateway</p>
+    <p class="out">→ inventário por exposição + o que foi removido</p>
+  </div>
+  <div class="link"></div>
+
+  <div class="bridge">STRIDE é a via principal, não a única</div>
+  <div class="link"></div>
+
+  <div class="node outras-n">
+    <p class="title">OUTRAS ABORDAGENS</p>
+    <p class="meta">todas precisam de um desenho e terminam em decisão</p>
+    <div class="branch node outras-n" style="margin-top:14px">
+      <p class="title" style="font-size:1rem">PASTA — UcedaVélez/Morana 2015</p>
+      <p class="row">processo, 7 estágios, parte do objetivo de negócio</p>
+    </div>
+    <div class="branch node outras-n" style="margin-top:12px">
+      <p class="title" style="font-size:1rem">LINDDUN — Deng et al. 2011</p>
+      <p class="row">taxonomia de privacidade, mesmo DFD — o STRIDE da privacidade</p>
+    </div>
+    <div class="branch node outras-n" style="margin-top:12px">
+      <p class="title" style="font-size:1rem">NIST 800-154 · Manifesto 2020</p>
+      <p class="row">centrada em dados · 4 perguntas, contínuo, do time</p>
+    </div>
+  </div>
+</main>
+
+<script>
+  const root = document.documentElement;
+  let fs = 17;
+  const apply = () => root.style.setProperty("--fs", fs + "px");
+  document.getElementById("in").onclick    = () => { fs = Math.min(26, fs+1); apply(); };
+  document.getElementById("out").onclick   = () => { fs = Math.max(12, fs-1); apply(); };
+  document.getElementById("reset").onclick = () => { fs = 17; apply(); };
+  document.getElementById("full").onclick  = () => {
+    if(!document.fullscreenElement) document.documentElement.requestFullscreen();
+    else document.exitFullscreen();
+  };
+  addEventListener("keydown", e => {
+    if(e.key==="+"||e.key==="=") document.getElementById("in").click();
+    if(e.key==="-") document.getElementById("out").click();
+    if(e.key==="0") document.getElementById("reset").click();
+    if(e.key==="f") document.getElementById("full").click();
+  });
+</script>
+</body>
+</html>
