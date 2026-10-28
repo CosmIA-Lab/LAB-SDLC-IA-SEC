@@ -3,432 +3,366 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Mapa de escrita — Ponto 2</title>
+<title>Árvore de conceitos — Ponto 2</title>
 <style>
   :root{
-    --bg:#0e1116; --surface:#161b22; --line:#30363d;
+    --bg:#0e1116; --surface:#161b22; --line:#3a4350;
     --fg:#e6edf3; --dim:#9aa4b0;
-    --spine:#58a6ff; --base:#8b949e; --etapa:#3fb950; --surf:#d29922; --outras:#bc8cff; --fim:#f778ba;
-    --fs:17px;
+    --root:#58a6ff; --base:#8b949e; --etapa:#3fb950; --surf:#d29922; --outras:#bc8cff; --ex:#f778ba;
+    --p:#79c0ff; --t:#3fb950; --m:#d29922;
+    --fs:16px;
   }
   *{box-sizing:border-box}
   html,body{margin:0}
   body{background:var(--bg); color:var(--fg);
-    font:var(--fs)/1.55 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;}
+    font:var(--fs)/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;}
 
   header{position:sticky; top:0; z-index:5; background:var(--surface);
-    border-bottom:1px solid var(--line); padding:12px 18px;
-    display:flex; align-items:center; gap:14px; flex-wrap:wrap;}
-  header h1{font-size:1.05rem; margin:0; font-weight:700}
-  header .spine{color:var(--dim); font-size:.8rem}
-  header .ctr{margin-left:auto; display:flex; gap:8px; flex-wrap:wrap}
+    border-bottom:1px solid var(--line); padding:10px 16px;
+    display:flex; align-items:center; gap:12px; flex-wrap:wrap;}
+  header h1{font-size:1rem; margin:0; font-weight:700}
+  header .hint{color:var(--dim); font-size:.78rem}
+  header .ctr{margin-left:auto; display:flex; gap:6px; flex-wrap:wrap}
   button{border:1px solid var(--line); background:#21262d; color:var(--fg);
-    border-radius:8px; padding:7px 12px; font-weight:600; cursor:pointer; font-size:.9rem}
-  button:hover{border-color:var(--spine)}
-  button.on{border-color:var(--etapa); color:var(--etapa)}
+    border-radius:8px; padding:6px 10px; font-weight:600; cursor:pointer; font-size:.85rem}
+  button:hover{border-color:var(--root)}
 
-  main{max-width:900px; margin:0 auto; padding:26px 18px 80px;
-    display:flex; flex-direction:column; align-items:stretch;}
+  main{max-width:980px; margin:0 auto; padding:18px 16px 90px}
+  .spine{color:var(--dim); font-size:.88rem; margin:0 0 14px; padding:8px 12px;
+    border:1px dashed var(--line); border-radius:10px}
+  .spine b{color:var(--root)}
 
-  .link{width:3px; height:26px; background:var(--line); align-self:center; border-radius:2px}
+  /* ---------- árvore ---------- */
+  .tree, .tree ul{list-style:none; margin:0; padding:0}
+  .tree ul{margin-left:14px; padding-left:18px; border-left:2px solid var(--line)}
+  .tree li{position:relative; margin:4px 0; padding-left:6px}
+  .tree li::before{content:""; position:absolute; left:-18px; top:.85em; width:16px; height:2px; background:var(--line)}
+  .tree > li::before{display:none}
 
-  .node{border:1px solid var(--line); border-left-width:6px; border-radius:12px;
-    background:var(--surface); padding:14px 18px; position:relative}
-  .node .title{font-weight:800; font-size:1.06rem; margin:0 0 2px; padding-right:64px}
-  .node .pg{position:absolute; top:12px; right:14px; font-size:.8rem; font-weight:800;
-    color:var(--dim); border:1px solid var(--line); border-radius:999px; padding:2px 9px}
-  .node .tese{margin:4px 0 8px; font-weight:600}
-  .node .tese::before{content:"TESE  "; font-size:.75rem; color:var(--dim); letter-spacing:.06em}
-  .node .lab{margin:10px 0 2px; font-size:.75rem; color:var(--dim); letter-spacing:.06em; font-weight:800}
-  .node .row{margin:3px 0}
-  .node .row b{color:var(--fg)}
-  .node ol{margin:2px 0 0 0; padding-left:1.3em}
-  .node ol li{margin:3px 0}
-  .node .ex{margin:4px 0; padding:8px 12px; border-radius:8px; background:#1b2230; font-size:.95rem}
-  .node .src{margin:4px 0; color:var(--dim); font-size:.92rem}
-  .node .out{margin-top:8px; font-weight:600; font-style:italic; color:var(--dim)}
-  .node .out::before{content:"FECHA COM  "; font-size:.75rem; letter-spacing:.06em; font-style:normal}
+  details{margin:0}
+  summary{cursor:pointer; list-style:none; display:inline-block}
+  summary::-webkit-details-marker{display:none}
+  summary::before{content:"▸"; display:inline-block; width:1em; color:var(--dim); transition:transform .15s}
+  details[open] > summary::before{transform:rotate(90deg)}
 
-  .spine-n{border-left-color:var(--spine)} .spine-n .title{color:var(--spine)}
-  .base-n{border-left-color:var(--base)}
-  .etapa-n{border-left-color:var(--etapa)}
-  .surf-n{border-left-color:var(--surf)} .surf-n .title{color:var(--surf)}
-  .outras-n{border-left-color:var(--outras)} .outras-n .title{color:var(--outras)}
-  .fim-n{border-left-color:var(--fim)} .fim-n .title{color:var(--fim)}
+  .n{display:inline-block; padding:3px 9px; border-radius:8px; background:var(--surface);
+    border:1px solid var(--line); border-left-width:4px; font-weight:600}
+  .n small{font-weight:500; color:var(--dim); margin-left:6px; font-size:.8em}
+  .n .w{font-weight:400; color:var(--dim)}
+  .n .w::before{content:" — "}
 
-  .bridge{align-self:center; max-width:640px; text-align:center;
-    color:var(--dim); font-style:italic; font-size:.95rem; padding:10px 14px;}
+  .n.root{border-left-color:var(--root); color:var(--root); font-size:1.15em; font-weight:800}
+  .n.b1{border-left-color:var(--root); font-size:1.05em; font-weight:800}
+  .n.base{border-left-color:var(--base)}
+  .n.etapa{border-left-color:var(--etapa); font-weight:800}
+  .n.surf{border-left-color:var(--surf); color:var(--surf); font-weight:800}
+  .n.outras{border-left-color:var(--outras); color:var(--outras); font-weight:800}
+  .n.ex{border-left-color:var(--ex); color:var(--ex); font-weight:800}
+  .n.leaf{background:transparent; border-color:transparent; padding-left:0; font-weight:500}
+  .n.leaf small{margin-left:4px}
+
+  /* rótulos P / T / M / saída */
+  .k{display:inline-block; min-width:1.5em; text-align:center; font-weight:800; font-size:.78em;
+    border-radius:5px; padding:1px 4px; margin-right:6px; vertical-align:1px}
+  .k.p{background:#1b2a3d; color:var(--p)} .k.t{background:#1f3b2a; color:var(--t)}
+  .k.m{background:#2a2f1f; color:var(--m)} .k.o{background:#2b2231; color:var(--ex)}
+  .k.x{background:#3a2626; color:#ff7b72}
+
+  /* junta (ponte) */
+  li.j{list-style:none}
+  li.j::before{display:none}
+  .bridge{display:inline-block; color:var(--dim); font-style:italic; font-size:.9em; padding:2px 6px}
   .bridge::before{content:"⟪ "} .bridge::after{content:" ⟫"}
 
-  .budget{align-self:stretch; margin:4px 0 18px; border:1px dashed var(--line); border-radius:12px;
-    padding:12px 16px; font-size:.92rem; color:var(--dim)}
-  .budget b{color:var(--spine)}
-  .budget .bar{display:flex; gap:3px; margin-top:8px; height:14px; border-radius:6px; overflow:hidden}
-  .budget .bar span{display:block; height:100%}
-  .budget .leg{display:flex; flex-wrap:wrap; gap:4px 14px; margin-top:6px; font-size:.82rem}
-
-  .grid{display:grid; grid-template-columns:auto repeat(6,1fr); gap:4px; margin:8px 0 4px;
-    font-size:.9rem; text-align:center}
-  .grid div{padding:5px 2px; border-radius:6px; background:#21262d}
+  /* grade STRIDE × elemento */
+  .grid{display:inline-grid; grid-template-columns:auto repeat(6,1.7em); gap:3px; margin:4px 0 2px 1.6em; font-size:.82rem; text-align:center}
+  .grid div{padding:2px 1px; border-radius:4px; background:#21262d}
   .grid .h{font-weight:800; color:var(--dim)}
-  .grid .r{text-align:left; padding-left:8px; font-weight:600}
-  .grid .y{background:#1f3b2a; color:var(--etapa); font-weight:800}
-  .grid .m{background:#2a2f1f; color:var(--surf); font-weight:700; font-size:.8rem}
+  .grid .r{text-align:left; padding:2px 8px 2px 4px; font-weight:600}
+  .grid .y{background:#1f3b2a; color:var(--t); font-weight:800}
+  .grid .mm{background:#2a2f1f; color:var(--m); font-size:.7rem; font-weight:700}
 
-  table.t{width:100%; border-collapse:collapse; font-size:.92rem; margin:6px 0}
-  table.t td{border:1px solid var(--line); padding:4px 8px; vertical-align:top}
-  table.t td:first-child{font-weight:700; white-space:nowrap}
-
-  /* modo espinha: só título, tese e junta */
-  body.espinha .lab, body.espinha ol, body.espinha .ex, body.espinha .src,
-  body.espinha .grid, body.espinha table.t, body.espinha .row{display:none}
-  body.espinha .node{padding:12px 18px}
-
-  @media (max-width:480px){ .grid{font-size:.75rem} .grid .r{padding-left:4px} .node .title{padding-right:0} .node .pg{position:static; display:inline-block; margin-bottom:4px} }
+  @media (max-width:520px){ .tree ul{margin-left:6px; padding-left:12px} .tree li::before{left:-12px; width:10px} .n .w{display:block; margin-top:2px} .n .w::before{content:""} }
 </style>
 </head>
 <body>
 <header>
-  <h1>Mapa de escrita — Ponto 2</h1>
-  <span class="spine">cada card = uma seção do texto: tese → desenvolver → exemplo → fontes → junta</span>
+  <h1>Árvore de conceitos — Ponto 2</h1>
+  <span class="hint">clique num nó para abrir/fechar · <b style="color:var(--p)">P</b> princípio · <b style="color:var(--t)">T</b> técnica · <b style="color:var(--m)">M</b> mecanismo · <b style="color:var(--ex)">→</b> saída</span>
   <div class="ctr">
-    <button id="mode">só espinha</button>
+    <button id="l1">só espinha</button>
+    <button id="l2">até P/T/M</button>
+    <button id="l3">tudo</button>
     <button id="out">A−</button>
     <button id="in">A+</button>
-    <button id="reset">reset</button>
-    <button id="full">⛶ tela cheia</button>
+    <button id="full">⛶</button>
   </div>
 </header>
 
-<main id="tree">
+<main>
+<p class="spine">espinha: <b>o que pode dar errado → ameaça≠vuln≠risco → 4 fundamentos → 4 perguntas (DFD → STRIDE → destinos → prova) → superfície → outras</b></p>
 
-<div class="budget">
-  Orçamento para <b>15 páginas</b> manuscritas (≈ 70 min). Espinha mínima:
-  <b>pergunta da fase de design → ameaça≠vuln≠risco → 4 fundamentos → 4 perguntas → superfície → outras abordagens → conclusão</b>.
-  Regra: nenhuma seção fica em branco; se o tempo apertar, encurte as de 2–3 páginas, nunca pule uma.
-  <div class="bar">
-    <span style="flex:1;background:var(--spine)" title="Introdução 1p"></span>
-    <span style="flex:1;background:var(--spine);opacity:.7" title="Por que modelar 1p"></span>
-    <span style="flex:2;background:var(--base)" title="Fundamentos 2p"></span>
-    <span style="flex:.5;background:var(--etapa);opacity:.5" title="Visão geral ½p"></span>
-    <span style="flex:1.5;background:var(--etapa)" title="Etapa 1 1½p"></span>
-    <span style="flex:3;background:var(--etapa);opacity:.85" title="Etapa 2 3p"></span>
-    <span style="flex:2;background:var(--etapa);opacity:.7" title="Etapa 3 2p"></span>
-    <span style="flex:1;background:var(--etapa);opacity:.55" title="Etapa 4 1p"></span>
-    <span style="flex:2;background:var(--surf)" title="Superfície 2p"></span>
-    <span style="flex:.5;background:var(--outras)" title="Outras ½p"></span>
-    <span style="flex:.5;background:var(--fim)" title="Conclusão ½p"></span>
-  </div>
-  <div class="leg">
-    <span>intro 1</span><span>por que 1</span><span>fundamentos 2</span><span>visão ½</span>
-    <span>etapa 1 · 1½</span><span>etapa 2 · 3</span><span>etapa 3 · 2</span><span>etapa 4 · 1</span>
-    <span>superfície 2</span><span>outras ½</span><span>conclusão ½</span>
-  </div>
-</div>
+<ul class="tree">
+<li>
+<details open data-l="0"><summary><span class="n root">Modelagem de ameaças e superfície de ataque</span></summary>
+<ul>
 
-<!-- ============ INTRODUÇÃO ============ -->
-<div class="node spine-n">
-  <span class="pg">1 pág</span>
-  <p class="title">INTRODUÇÃO — a pergunta que a fase de design precisa responder</p>
-  <p class="tese">O ciclo de vida seguro manda agir antes do código porque a falha de desenho é a mais cara; mas agir cedo exige saber contra o quê — e a modelagem de ameaças é o método que responde "o que pode dar errado" de forma sistemática.</p>
-  <p class="lab">DESENVOLVER</p>
-  <ol>
-    <li>Situar no ciclo: fase de design, antes do código, onde a falha (flaw) nasce e é barata de corrigir (Boehm, 1981; Janca, 2020).</li>
-    <li>Definir em uma frase: identificar, enumerar e decidir sobre as ameaças a um sistema a partir do seu desenho.</li>
-    <li>Distinguir os três termos que o texto vai usar — <b>ameaça</b> (o que pode acontecer), <b>vulnerabilidade</b> (por onde), <b>risco</b> (prob × impacto) — e dizer que a modelagem trabalha no primeiro (NIST SP 800-30 r1, 2012).</li>
-    <li>Anunciar a tese do texto: método vence intuição; e anunciar a estrutura — fundamentos, quatro perguntas, superfície, outras abordagens.</li>
-  </ol>
-  <p class="lab">FONTES</p>
-  <p class="src">Shostack, 2014 (ref. principal) · NIST SP 800-30 r1 · Janca, 2020 · Boehm, 1981</p>
-  <p class="out">o que distingue modelar de simplesmente revisar o desenho?</p>
-</div>
-<div class="link"></div>
+<!-- ========== PERGUNTA ========== -->
+<li><details open data-l="1"><summary><span class="n b1">"O que pode dar errado?"<small>pergunta da fase de design</small></span></summary>
+<ul>
+  <li><span class="n base">antes do código<span class="w">a falha de desenho é a mais cara depois (Boehm 81; Janca 20)</span></span></li>
+  <li><details open data-l="2"><summary><span class="n base">ameaça ≠ vulnerabilidade ≠ risco<small>NIST SP 800-30</small></span></summary>
+    <ul>
+      <li><span class="n leaf">ameaça<span class="w">o que pode acontecer</span></span></li>
+      <li><span class="n leaf">vulnerabilidade<span class="w">por onde</span></span></li>
+      <li><span class="n leaf">risco<span class="w">probabilidade × impacto</span></span></li>
+      <li><span class="n leaf">a modelagem trabalha na ameaça<span class="w">não procura bug, não calcula risco primeiro</span></span></li>
+    </ul></details></li>
+  <li><details open data-l="2"><summary><span class="n base">método, não intuição</span></summary>
+    <ul>
+      <li><span class="n leaf">revisão acha o que o revisor já conhece</span></li>
+      <li><span class="n leaf">"pense como atacante" é conselho, não método<small>Shostack 14, cap. 1</small></span></li>
+      <li><span class="n leaf">estrutura torna a cobertura independente de quem revisa</span></li>
+    </ul></details></li>
+</ul></details></li>
 
-<!-- ============ POR QUE MODELAR ============ -->
-<div class="node spine-n">
-  <span class="pg">1 pág</span>
-  <p class="title">1 · POR QUE MODELAR, E NÃO SÓ REVISAR</p>
-  <p class="tese">Revisão encontra o que o revisor já conhece; a modelagem substitui a intuição por estrutura, de modo que a cobertura não dependa da experiência de quem revisa.</p>
-  <p class="lab">DESENVOLVER</p>
-  <ol>
-    <li>O limite da revisão: lembrança é lista aberta; método é lista fechada e percorrível.</li>
-    <li>"Pense como um atacante" é conselho, não método (Shostack, 2014, cap. 1): quem não é atacante não sabe pensar como um; quem segue um método encontra ameaças sem saber atacar.</li>
-    <li>O que a modelagem entrega além da lista: linguagem comum entre dev, segurança e negócio; decisão documentada; requisito rastreável.</li>
-    <li>Contraste revisão × modelo com o exemplo (abaixo).</li>
-  </ol>
-  <p class="lab">EXEMPLO (use o mesmo sistema o texto inteiro)</p>
-  <p class="ex">Sistema de pagamentos: app do cliente → API → banco; API → gateway do parceiro; tudo em log. <b>Revisado por intuição</b>: SQL injection e senha fraca, dois controles. <b>Modelado</b>: aparecem o repúdio da transferência, a adulteração do valor entre API e gateway e a negação de serviço na consulta de saldo — nenhuma dependia de o revisor lembrar.</p>
-  <p class="lab">FONTES</p>
-  <p class="src">Shostack, 2014, cap. 1 · Threat Modeling Manifesto, 2020 ("fazer modelagem" &gt; "falar de modelagem")</p>
-  <p class="out">modelar é método — mas antes de aplicar qualquer método, o que ele pressupõe?</p>
-</div>
-<div class="link"></div>
+<li class="j"><span class="bridge">antes do método, o que ele pressupõe?</span></li>
 
-<div class="bridge">antes do método, as premissas sem as quais as regras não fazem sentido</div>
-<div class="link"></div>
+<!-- ========== FUNDAMENTOS ========== -->
+<li><details open data-l="1"><summary><span class="n b1">Fundamentos<small>4 premissas</small></span></summary>
+<ul>
+  <li><details open data-l="2"><summary><span class="n base">toda ameaça viola uma propriedade</span></summary>
+    <ul>
+      <li><span class="n leaf">6 propriedades<span class="w">confidencialidade · integridade · disponibilidade · autenticação · autorização · não-repúdio</span></span></li>
+      <li><span class="n leaf">6 propriedades → 6 ameaças → lista finita e completa<small>Shostack 14, Tab. 3-1</small></span></li>
+    </ul></details></li>
+  <li><details open data-l="2"><summary><span class="n base">ameaça não se elimina, decide-se</span></summary>
+    <ul>
+      <li><span class="n leaf">função exposta = ameaça possível</span></li>
+      <li><span class="n leaf">toda ameaça precisa de destino<span class="w">ignorada ≠ aceita</span></span></li>
+    </ul></details></li>
+  <li><details open data-l="2"><summary><span class="n base">ameaça concentra-se na fronteira de confiança</span></summary>
+    <ul>
+      <li><span class="n leaf">fronteira<span class="w">onde o dado muda de nível de confiança: navegador→servidor, serviço→banco, processo→SO</span></span></li>
+      <li><span class="n leaf">ali se reverifica identidade e integridade<span class="w">S, T, E acontecem aqui</span><small>Shostack 14, cap. 2</small></span></li>
+      <li><span class="n leaf">desenhar a fronteira é a 1ª decisão do modelo</span></li>
+    </ul></details></li>
+  <li><details open data-l="2"><summary><span class="n base">o atacante escolhe a porta</span></summary>
+    <ul>
+      <li><span class="n leaf">defensor precisa de todas; atacante, de uma</span></li>
+      <li><span class="n leaf">tamanho da superfície = tamanho da defesa<span class="w">reduzir antes de proteger</span></span></li>
+    </ul></details></li>
+</ul></details></li>
 
-<!-- ============ FUNDAMENTOS ============ -->
-<div class="node base-n">
-  <span class="pg">2 págs</span>
-  <p class="title">2 · FUNDAMENTOS — o que se toma como dado</p>
-  <p class="tese">Quatro premissas sustentam toda a modelagem; não se discutem dentro do método, e cada regra das etapas seguintes deriva de uma delas.</p>
-  <p class="lab">DESENVOLVER — ½ página por premissa: enuncie, explique o que decorre, mostre no exemplo</p>
-  <ol>
-    <li><b>Toda ameaça viola uma propriedade.</b> Ameaça só existe em relação a algo que se quer garantir. CIA (confidencialidade, integridade, disponibilidade) + as três da identidade e da ação: autenticação, autorização, não-repúdio. Seis propriedades → seis ameaças → a lista do que procurar é finita e completa (Shostack, 2014, Tabela 3-1). <i>Decorre:</i> cobrir as seis é cobrir o espaço.</li>
-    <li><b>Ameaça não se elimina, decide-se.</b> Sistema útil expõe função; função exposta é ameaça possível. Objetivo não é zerar, é não deixar nenhuma sem decisão consciente. <i>Decorre:</i> cada ameaça precisa de destino (mitigar, eliminar, transferir, aceitar).</li>
-    <li><b>Ameaça concentra-se na fronteira de confiança.</b> Fronteira = linha onde o dado muda de nível de confiança (navegador→servidor, serviço→banco, processo→SO). Ali identidade e integridade precisam ser reverificadas; ali acontecem spoofing, tampering e elevação (Shostack, 2014, cap. 2). <i>Decorre:</i> desenhar a fronteira é a primeira decisão do modelo.</li>
-    <li><b>O atacante escolhe a porta.</b> Defensor precisa de todos os pontos de entrada; atacante, de um. <i>Decorre:</i> o tamanho da superfície define o tamanho da defesa; reduzir vem antes de proteger.</li>
-  </ol>
-  <p class="lab">EXEMPLO</p>
-  <p class="ex">Fronteiras do sistema de pagamentos: internet → API (app do cliente) e API → terceiro (gateway). As ameaças mais graves do texto vão aparecer exatamente nessas duas linhas.</p>
-  <p class="lab">FONTES</p>
-  <p class="src">Shostack, 2014, cap. 1–3 · NIST SP 800-30 r1 · Microsoft SDL (attack surface reduction)</p>
-  <p class="out">fixadas as premissas, a pergunta é de método: como percorrer o sistema sem deixar ameaça de fora?</p>
-</div>
-<div class="link"></div>
+<li class="j"><span class="bridge">como percorrer o sistema sem deixar ameaça de fora?</span></li>
 
-<div class="bridge">o método são quatro perguntas, em ordem — cada uma depende da anterior</div>
-<div class="link"></div>
+<!-- ========== 4 PERGUNTAS ========== -->
+<li><details open data-l="1"><summary><span class="n b1">4 perguntas<small>Shostack 14</small><span class="w">cada uma depende da anterior; desenho mudou → volta à 1</span></span></summary>
+<ul>
 
-<!-- ============ VISÃO GERAL ============ -->
-<div class="node spine-n">
-  <span class="pg">½ pág</span>
-  <p class="title">3 · AS QUATRO PERGUNTAS — Shostack, 2014</p>
-  <p class="tese">A modelagem é a resposta disciplinada a quatro perguntas: o que estamos construindo, o que pode dar errado, o que fazemos a respeito, fizemos um bom trabalho.</p>
-  <p class="lab">DESENVOLVER</p>
-  <ol>
-    <li>Enumere as quatro e diga que cada uma é uma etapa com objetivo, princípios, técnicas nomeadas, mecanismos e saída.</li>
-    <li>Justifique a ordem: não se enumera sem desenho (2←1), não se decide sem ameaça (3←2), não se valida sem decisão (4←3).</li>
-    <li>A seta de volta: desenho mudou → reabre a pergunta 1. Modelo é documento vivo.</li>
-    <li>Desenhe o fluxo em uma linha: <b>DFD + fronteiras → STRIDE/attack tree → mitigar·eliminar·transferir·aceitar → cobertura + teste</b>.</li>
-  </ol>
-  <p class="out">a primeira pergunta: como desenhar o sistema no nível em que as ameaças aparecem?</p>
-</div>
-<div class="link"></div>
+  <!-- ETAPA 1 -->
+  <li><details open data-l="2"><summary><span class="n etapa">1 · O que estamos construindo?<span class="w">desenho por onde o dado passa</span></span></summary>
+    <ul>
+      <li><details open data-l="3"><summary><span class="n leaf"><span class="k p">P</span>princípios</span></summary><ul>
+        <li><span class="n leaf">fronteira explícita<span class="w">o que não está desenhado não será modelado</span></span></li>
+        <li><span class="n leaf">nível certo de detalhe<span class="w">contexto primeiro; desce só onde a fronteira exige</span></span></li>
+        <li><span class="n leaf">desenho do sistema real<span class="w">não do prometido</span></span></li>
+      </ul></details></li>
+      <li><details open data-l="3"><summary><span class="n leaf"><span class="k t">T</span>DFD<small>DeMarco 79</small> + fronteira de confiança<small>Shostack 14</small></span></summary><ul>
+        <li><span class="n leaf">entidade externa ▭<span class="w">fora do controle: usuário, app, terceiro</span></span></li>
+        <li><span class="n leaf">processo ◯<span class="w">código seu em execução</span></span></li>
+        <li><span class="n leaf">fluxo →<span class="w">dado em trânsito, com protocolo</span></span></li>
+        <li><span class="n leaf">armazenamento ═<span class="w">dado em repouso: banco, fila, cache, log</span></span></li>
+        <li><span class="n leaf">fronteira ╌<span class="w">mudança de confiança</span></span></li>
+      </ul></details></li>
+      <li><span class="n leaf"><span class="k m">M</span>Threat Modeling Tool · Threat Dragon (JSON) · pytm (modelo como código)</span></li>
+      <li><span class="n leaf"><span class="k o">→</span>DFD com fronteiras<span class="w">sem fronteira, não saiu da etapa</span></span></li>
+    </ul></details></li>
 
-<!-- ============ ETAPA 1 ============ -->
-<div class="node etapa-n">
-  <span class="pg">1½ pág</span>
-  <p class="title">4.1 · ETAPA 1 — O QUE ESTAMOS CONSTRUINDO?</p>
-  <p class="tese">O desenho certo não é o diagrama de classes nem o de infraestrutura: é o diagrama do fluxo de dados com as fronteiras de confiança marcadas, porque é nele que as ameaças têm lugar para aparecer.</p>
-  <p class="lab">DESENVOLVER</p>
-  <ol>
-    <li><b>Objetivo</b>: mostrar quem fala com quem, por onde o dado passa, onde repousa, onde muda a confiança.</li>
-    <li><b>Técnica</b>: DFD (DeMarco, 1979) — quatro elementos — mais a fronteira de confiança que a segurança acrescenta (Shostack, 2014, cap. 2). Descreva cada elemento e seu símbolo:</li>
-  </ol>
-  <table class="t">
-    <tr><td>entidade externa</td><td>retângulo — fora do controle do sistema (usuário, app, serviço de terceiro)</td></tr>
-    <tr><td>processo</td><td>círculo — código seu em execução (API, worker, job)</td></tr>
-    <tr><td>fluxo de dados</td><td>seta — dado em trânsito, com o protocolo</td></tr>
-    <tr><td>armazenamento</td><td>duas linhas paralelas — dado em repouso (banco, fila, cache, log)</td></tr>
-    <tr><td>fronteira de confiança</td><td>linha tracejada — mudança de nível de confiança</td></tr>
-  </table>
-  <ol start="3">
-    <li><b>Princípios</b>: fronteira explícita (o que não está desenhado não será modelado) · nível certo de detalhe (contexto primeiro; desce só onde a fronteira exige) · desenho do sistema real, não do prometido.</li>
-    <li><b>Mecanismos</b>: Microsoft Threat Modeling Tool · OWASP Threat Dragon (JSON versionável) · pytm / modelo como código no repositório.</li>
-    <li><b>Saída</b>: DFD com fronteiras. Sem fronteira, não saiu da etapa.</li>
-  </ol>
-  <p class="lab">EXEMPLO</p>
-  <p class="ex">Entidades externas: app do cliente, gateway do parceiro. Processo: API. Armazenamentos: banco de transferências, log. Fluxos: app→API (HTTPS), API→banco, API→gateway (HTTPS), API→log. Fronteiras: app|API e API|gateway.</p>
-  <p class="lab">FONTES</p>
-  <p class="src">DeMarco, 1979 · Shostack, 2014, cap. 2 · OWASP Threat Dragon · Microsoft TMT</p>
-  <p class="out">o desenho diz ONDE procurar; falta O QUE procurar em cada lugar</p>
-</div>
-<div class="link"></div>
+  <li class="j"><span class="bridge">sei ONDE procurar — O QUE procurar em cada lugar?</span></li>
 
-<div class="bridge">a lista fixa de perguntas que torna a enumeração completa — e finita</div>
-<div class="link"></div>
+  <!-- ETAPA 2 -->
+  <li><details open data-l="2"><summary><span class="n etapa">2 · O que pode dar errado?<span class="w">ameaças por elemento</span></span></summary>
+    <ul>
+      <li><details open data-l="3"><summary><span class="n leaf"><span class="k p">P</span>princípios</span></summary><ul>
+        <li><span class="n leaf">estrutura, não intuição</span></li>
+        <li><span class="n leaf">cobertura por elemento<span class="w">elemento sem ameaça = não examinado</span></span></li>
+        <li><span class="n leaf">ameaça ligada ao desenho<span class="w">sem elemento é especulação</span></span></li>
+        <li><span class="n leaf">tudo que cruza a fronteira é hostil do outro lado</span></li>
+      </ul></details></li>
+      <li><details open data-l="3"><summary><span class="n leaf"><span class="k t">T</span>STRIDE<small>Kohnfelder &amp; Garg, Microsoft 99</small><span class="w">6 letras = 6 propriedades negadas</span></span></summary><ul>
+        <li><span class="n leaf"><b>S</b> spoofing → autenticação<span class="w">fingir ser outro</span></span></li>
+        <li><span class="n leaf"><b>T</b> tampering → integridade<span class="w">alterar dado em trânsito ou repouso</span></span></li>
+        <li><span class="n leaf"><b>R</b> repudiation → não-repúdio<span class="w">negar sem que o sistema prove</span></span></li>
+        <li><span class="n leaf"><b>I</b> information disclosure → confidencialidade<span class="w">expor a quem não deve</span></span></li>
+        <li><span class="n leaf"><b>D</b> denial of service → disponibilidade<span class="w">indisponibilizar ou degradar</span></span></li>
+        <li><span class="n leaf"><b>E</b> elevation of privilege → autorização<span class="w">fazer o que não pode</span></span></li>
+      </ul></details></li>
+      <li><details open data-l="3"><summary><span class="n leaf"><span class="k t">T</span>STRIDE por elemento<small>Shostack 14, cap. 3</small><span class="w">torna a enumeração finita</span></span></summary><ul>
+        <li><div class="grid">
+          <div class="h"></div><div class="h">S</div><div class="h">T</div><div class="h">R</div><div class="h">I</div><div class="h">D</div><div class="h">E</div>
+          <div class="r">ent. externa</div><div class="y">✓</div><div></div><div class="y">✓</div><div></div><div></div><div></div>
+          <div class="r">processo</div><div class="y">✓</div><div class="y">✓</div><div class="y">✓</div><div class="y">✓</div><div class="y">✓</div><div class="y">✓</div>
+          <div class="r">fluxo</div><div></div><div class="y">✓</div><div></div><div class="y">✓</div><div class="y">✓</div><div></div>
+          <div class="r">armazenam.</div><div></div><div class="y">✓</div><div class="mm">log</div><div class="y">✓</div><div class="y">✓</div><div></div>
+        </div></li>
+        <li><span class="n leaf">fluxo não sofre S<span class="w">quem finge é a entidade que o origina</span></span></li>
+        <li><span class="n leaf">armazenamento não sofre E<span class="w">quem eleva é o processo que o lê</span></span></li>
+        <li><span class="n leaf">só o processo recebe as 6<span class="w">só ele executa código</span></span></li>
+      </ul></details></li>
+      <li><details open data-l="3"><summary><span class="n leaf"><span class="k t">T</span>attack tree<small>Schneier 99</small><span class="w">como o atacante chega ao que quer</span></span></summary><ul>
+        <li><span class="n leaf">raiz = objetivo · ramos = caminhos (E / OU) · folha = ameaça concreta</span></li>
+        <li><span class="n leaf">complementa o STRIDE<span class="w">organiza as ameaças em caminhos; mostra quais importam</span></span></li>
+      </ul></details></li>
+      <li><span class="n leaf"><span class="k x">✗</span>não é técnica<span class="w">CAPEC · ATT&amp;CK · OWASP Top 10 = bibliotecas de padrão; brainstorming = intuição</span></span></li>
+      <li><span class="n leaf"><span class="k m">M</span>geração por elemento (TMT, Dragon) · jogo Elevation of Privilege<small>Shostack 10</small> · registro id·elemento·categoria</span></li>
+      <li><span class="n leaf"><span class="k o">→</span>lista de ameaças<span class="w">cada uma com elemento e categoria</span></span></li>
+    </ul></details></li>
 
-<!-- ============ ETAPA 2 ============ -->
-<div class="node etapa-n">
-  <span class="pg">3 págs</span>
-  <p class="title">4.2 · ETAPA 2 — O QUE PODE DAR ERRADO?</p>
-  <p class="tese">Enumerar, para cada elemento do desenho, as ameaças que se aplicam a ele — com uma taxonomia fixa para que a lista seja completa, e cruzada com o tipo de elemento para que seja finita.</p>
-  <p class="lab">DESENVOLVER — é a seção mais longa; três blocos de ~1 página</p>
-  <ol>
-    <li><b>Bloco A — STRIDE</b> (Kohnfelder e Garg, Microsoft, 1999). Apresente as seis categorias e, para cada uma, a propriedade que nega (Shostack, 2014, Tabela 3-1). Escreva uma linha de definição e uma de exemplo por letra:</li>
-  </ol>
-  <table class="t">
-    <tr><td>S · Spoofing</td><td>nega <b>autenticação</b> — fingir ser outra pessoa, processo ou sistema. Ex.: credencial vazada usada no app.</td></tr>
-    <tr><td>T · Tampering</td><td>nega <b>integridade</b> — alterar dado em trânsito ou em repouso. Ex.: valor da transferência alterado entre app e API.</td></tr>
-    <tr><td>R · Repudiation</td><td>nega <b>não-repúdio</b> — negar ter feito, sem que o sistema prove o contrário. Ex.: cliente nega a transferência.</td></tr>
-    <tr><td>I · Information disclosure</td><td>nega <b>confidencialidade</b> — expor dado a quem não deveria. Ex.: canal com o parceiro cai para texto claro.</td></tr>
-    <tr><td>D · Denial of service</td><td>nega <b>disponibilidade</b> — indisponibilizar ou degradar. Ex.: rajada de consultas de saldo.</td></tr>
-    <tr><td>E · Elevation of privilege</td><td>nega <b>autorização</b> — fazer o que não pode. Ex.: cliente troca o id da conta e opera a de outro.</td></tr>
-  </table>
-  <ol start="2">
-    <li><b>Bloco B — STRIDE por elemento</b> (Shostack, 2014, cap. 3). O que impede a enumeração de explodir: nem toda categoria faz sentido para todo elemento. Explique o porquê de cada linha — fluxo não sofre spoofing (quem finge é a entidade que o origina); armazenamento não eleva privilégio (quem o faz é o processo que o lê); só o processo recebe as seis, porque só ele executa código.</li>
-  </ol>
-  <div class="grid">
-    <div class="h"></div><div class="h">S</div><div class="h">T</div><div class="h">R</div><div class="h">I</div><div class="h">D</div><div class="h">E</div>
-    <div class="r">ent. externa</div><div class="y">✓</div><div></div><div class="y">✓</div><div></div><div></div><div></div>
-    <div class="r">processo</div><div class="y">✓</div><div class="y">✓</div><div class="y">✓</div><div class="y">✓</div><div class="y">✓</div><div class="y">✓</div>
-    <div class="r">fluxo</div><div></div><div class="y">✓</div><div></div><div class="y">✓</div><div class="y">✓</div><div></div>
-    <div class="r">armazenam.</div><div></div><div class="y">✓</div><div class="m">se log</div><div class="y">✓</div><div class="y">✓</div><div></div>
-  </div>
-  <ol start="3">
-    <li><b>Bloco C — Attack tree</b> (Schneier, 1999). STRIDE responde "o que pode acontecer a este elemento"; a árvore responde "como o atacante chega ao que quer". Raiz = objetivo; ramos = caminhos com nós E/OU; folha = ameaça concreta. As duas se complementam: a árvore organiza as ameaças do STRIDE em caminhos e mostra quais importam para o objetivo.</li>
-    <li><b>Princípios</b> (uma frase cada): estrutura, não intuição · cobertura por elemento (elemento sem ameaça = elemento não examinado) · ameaça ligada ao desenho (sem elemento é especulação) · tudo que cruza a fronteira é hostil do outro lado.</li>
-    <li><b>O que não é técnica</b>: CAPEC, ATT&amp;CK e OWASP Top 10 são bibliotecas de padrões de ataque, usadas para dar nome e detalhe ao que o STRIDE apontou; brainstorming é a intuição que a seção 1 descartou.</li>
-    <li><b>Mecanismos</b>: geração automática por elemento (TMT, Threat Dragon) · jogo de cartas Elevation of Privilege (Shostack, Microsoft, 2010) · template de registro (id, elemento, categoria, propriedade, descrição).</li>
-    <li><b>Saída</b>: lista de ameaças, cada uma com elemento e categoria.</li>
-  </ol>
-  <p class="lab">EXEMPLO — tabela elemento × categoria × ameaça</p>
-  <p class="ex">app S credencial vazada · app R nega a transferência · fluxo app→API T valor alterado · API E troca de id de conta · API D rajada de saldo · fluxo API→gateway I canal em claro · banco T operador altera a tabela · log R sem integridade não prova. <b>Árvore</b>: raiz "transferir dinheiro de outro cliente" = spoofing do app OU elevação na API OU tampering no fluxo.</p>
-  <p class="lab">FONTES</p>
-  <p class="src">Kohnfelder e Garg, 1999 · Shostack, 2014, cap. 3 (Tabela 3-1 e STRIDE-per-element) · Schneier, 1999 · MITRE CAPEC/ATT&amp;CK (bibliotecas)</p>
-  <p class="out">uma enumeração honesta produz dezenas de ameaças, e a maioria não merece controle — o que fazer com cada uma, e qual atacar primeiro?</p>
-</div>
-<div class="link"></div>
+  <li class="j"><span class="bridge">dezenas de ameaças — o que fazer com cada uma, e qual primeiro?</span></li>
 
-<div class="bridge">da lista à decisão: destino, mitigação, prioridade, requisito</div>
-<div class="link"></div>
+  <!-- ETAPA 3 -->
+  <li><details open data-l="2"><summary><span class="n etapa">3 · O que fazemos a respeito?<span class="w">cada ameaça com destino</span></span></summary>
+    <ul>
+      <li><details open data-l="3"><summary><span class="n leaf"><span class="k p">P</span>princípios</span></summary><ul>
+        <li><span class="n leaf">nenhuma ameaça sem decisão<span class="w">aceitar é decisão; esquecer não é</span></span></li>
+        <li><span class="n leaf">mitigação é requisito, não anotação</span></li>
+        <li><span class="n leaf">risco ordena, não elimina</span></li>
+        <li><span class="n leaf">aceitar exige dono<span class="w">quem, por quê, até quando</span></span></li>
+      </ul></details></li>
+      <li><details open data-l="3"><summary><span class="n leaf"><span class="k t">T</span>4 destinos<small>Shostack 14, cap. 1</small></span></summary><ul>
+        <li><span class="n leaf">mitigar<span class="w">reduzir probabilidade ou impacto</span></span></li>
+        <li><span class="n leaf">eliminar<span class="w">remover a função ou o fluxo</span></span></li>
+        <li><span class="n leaf">transferir<span class="w">contrato, seguro, terceiro</span></span></li>
+        <li><span class="n leaf">aceitar<span class="w">registrar e conviver</span></span></li>
+      </ul></details></li>
+      <li><details open data-l="3"><summary><span class="n leaf"><span class="k t">T</span>mitigação por categoria<small>Shostack 14, cap. 8</small><span class="w">1ª linha; depois ajusta ao elemento</span></span></summary><ul>
+        <li><span class="n leaf"><b>S</b> → autenticação<span class="w">hash de senha · MFA · certificado · assinatura de mensagem</span></span></li>
+        <li><span class="n leaf"><b>T</b> → integridade<span class="w">hash · MAC · assinatura digital · TLS · escrita mínima</span></span></li>
+        <li><span class="n leaf"><b>R</b> → não-repúdio<span class="w">log íntegro com timestamp · assinatura · auditoria</span></span></li>
+        <li><span class="n leaf"><b>I</b> → confidencialidade<span class="w">cripto em trânsito e repouso · authz · minimização</span></span></li>
+        <li><span class="n leaf"><b>D</b> → disponibilidade<span class="w">rate limit · cota · redundância · limite de tamanho</span></span></li>
+        <li><span class="n leaf"><b>E</b> → autorização<span class="w">checar permissão em toda operação · least privilege · sandbox</span></span></li>
+        <li><span class="n leaf">T em fluxo pede TLS; T em armazenamento pede permissão + hash</span></li>
+      </ul></details></li>
+      <li><details open data-l="3"><summary><span class="n leaf"><span class="k t">T</span>priorizar: risco = prob × impacto<small>NIST SP 800-30</small></span></summary><ul>
+        <li><span class="n leaf">DREAD<small>Howard &amp; LeBlanc 03</small><span class="w">dano · reprodutibilidade · explorabilidade · afetados · descoberta — abandonado por inconsistência (Shostack 14, cap. 9)</span></span></li>
+        <li><span class="n leaf">bug bar<span class="w">limiar definido antes; decide o que bloqueia release</span></span></li>
+        <li><span class="n leaf">CVSS<span class="w">só quando virou vulnerabilidade conhecida, em produção</span></span></li>
+      </ul></details></li>
+      <li><span class="n leaf"><span class="k m">M</span>registro com destino e dono · backlog ligado ao modelo · registro de risco aceito</span></li>
+      <li><span class="n leaf"><span class="k o">→</span>mitigação vira requisito com critério de aceite<span class="w">"transferência acima de X exige 2º fator"</span></span></li>
+    </ul></details></li>
 
-<!-- ============ ETAPA 3 ============ -->
-<div class="node etapa-n">
-  <span class="pg">2 págs</span>
-  <p class="title">4.3 · ETAPA 3 — O QUE FAZEMOS A RESPEITO?</p>
-  <p class="tese">Dar um destino a cada ameaça e transformar os destinos escolhidos em requisitos que o resto do ciclo possa implementar e provar — porque mitigação que não virou requisito não existe para quem desenvolve.</p>
-  <p class="lab">DESENVOLVER</p>
-  <ol>
-    <li><b>Quatro destinos</b> (Shostack, 2014, cap. 1): <b>mitigar</b> (reduzir probabilidade ou impacto) · <b>eliminar</b> (remover a função ou o fluxo) · <b>transferir</b> (contrato, seguro, terceiro) · <b>aceitar</b> (registrar e conviver). Aceitar é decisão; esquecer não é. Aceitar exige dono, justificativa e data de revisão.</li>
-    <li><b>Mitigação padrão por categoria</b> (Shostack, 2014, cap. 8) — a resposta de primeira linha, depois ajustada ao elemento e à fronteira:</li>
-  </ol>
-  <table class="t">
-    <tr><td>S → autenticação</td><td>hash de senha, MFA, certificado, assinatura de mensagem</td></tr>
-    <tr><td>T → integridade</td><td>hash, MAC, assinatura digital, TLS, permissão de escrita mínima</td></tr>
-    <tr><td>R → não-repúdio</td><td>log com integridade e timestamp, assinatura, trilha de auditoria</td></tr>
-    <tr><td>I → confidencialidade</td><td>criptografia em trânsito e em repouso, autorização, minimização</td></tr>
-    <tr><td>D → disponibilidade</td><td>rate limit, cota, redundância, validação de tamanho</td></tr>
-    <tr><td>E → autorização</td><td>verificação de permissão em toda operação, least privilege, sandbox</td></tr>
-  </table>
-  <ol start="3">
-    <li>Mostre que a mitigação depende do elemento: tampering em fluxo pede TLS; em armazenamento pede permissão de escrita e hash.</li>
-    <li><b>Priorização</b>: risco = probabilidade × impacto (NIST SP 800-30 r1). DREAD (Howard e LeBlanc, 2003) — dano, reprodutibilidade, explorabilidade, usuários afetados, descoberta — foi a escala da Microsoft e foi abandonada por inconsistência entre avaliadores (Shostack, 2014, cap. 9); o que sobrevive é a ideia de pontuar para ordenar. Na prática: <b>bug bar</b> (limiar definido antes) decide o que bloqueia a release; CVSS entra só quando a ameaça virou vulnerabilidade conhecida, em produção.</li>
-    <li><b>Princípios</b>: nenhuma ameaça sem decisão · mitigação é requisito, não anotação · risco ordena, não elimina · aceitar exige dono.</li>
-    <li><b>Mecanismos</b>: registro de ameaças com campo "destino" e dono · backlog ligado ao modelo (cada item rastreável até a ameaça) · registro de risco aceito.</li>
-    <li><b>Saída</b>: toda ameaça com destino; toda mitigação escrita como requisito com critério de aceite ("transferência acima de X exige segundo fator").</li>
-  </ol>
-  <p class="lab">EXEMPLO</p>
-  <p class="ex">Spoofing → MFA na transferência. Repúdio → ordem assinada + log íntegro. Tampering no fluxo → TLS obrigatório + assinatura do corpo. Elevação → verificação de dono do recurso em toda operação. DoS → rate limit por cliente. Canal do parceiro → mTLS; a parte do lado do parceiro, <b>transferida</b> por contrato. Tampering no banco → escrita só pela API + auditoria.</p>
-  <p class="lab">FONTES</p>
-  <p class="src">Shostack, 2014, cap. 1, 8 e 9 · NIST SP 800-30 r1 · Howard e LeBlanc, 2003 (DREAD) · Microsoft SDL (bug bar)</p>
-  <p class="out">decidir não é provar — como saber se o modelo cobriu o sistema e se as mitigações realmente entraram?</p>
-</div>
-<div class="link"></div>
+  <li class="j"><span class="bridge">decidir não é provar — como saber que cobriu e que entrou?</span></li>
 
-<div class="bridge">a pergunta que fecha o ciclo e liga a modelagem ao teste</div>
-<div class="link"></div>
+  <!-- ETAPA 4 -->
+  <li><details open data-l="2"><summary><span class="n etapa">4 · Fizemos um bom trabalho?<span class="w">modelo validado e vivo</span></span></summary>
+    <ul>
+      <li><details open data-l="3"><summary><span class="n leaf"><span class="k p">P</span>princípios</span></summary><ul>
+        <li><span class="n leaf">cobertura verificável<span class="w">tabela elemento × categoria preenchida</span></span></li>
+        <li><span class="n leaf">mitigação prova-se no teste<span class="w">antes disso é intenção</span></span></li>
+        <li><span class="n leaf">modelo acompanha desenho<span class="w">versão do modelo = versão da arquitetura</span></span></li>
+        <li><span class="n leaf">modelo pertence ao time<span class="w">segurança facilita e revisa</span></span></li>
+      </ul></details></li>
+      <li><details open data-l="3"><summary><span class="n leaf"><span class="k t">T</span>checklist<small>Shostack 14</small> · teste como prova<small>NIST SP 800-115</small></span></summary><ul>
+        <li><span class="n leaf">diagrama confere? cobertura confere? destino confere? teste confere?</span></li>
+        <li><span class="n leaf">requisito negativo nascido da ameaça vira caso de teste</span></li>
+      </ul></details></li>
+      <li><span class="n leaf"><span class="k m">M</span>modelo versionado com o código · revisão obrigatória no pipeline ao mudar fronteira · id ameaça → teste</span></li>
+      <li><span class="n leaf"><span class="k o">→</span>rastreabilidade<span class="w">ameaça → requisito → controle → teste</span></span></li>
+      <li><span class="n leaf">regra de ouro<span class="w">modelo arquivado é modelo de um sistema que não existe mais</span></span></li>
+    </ul></details></li>
 
-<!-- ============ ETAPA 4 ============ -->
-<div class="node etapa-n">
-  <span class="pg">1 pág</span>
-  <p class="title">4.4 · ETAPA 4 — FIZEMOS UM BOM TRABALHO?</p>
-  <p class="tese">Validar três coisas — o diagrama corresponde ao sistema, todo elemento foi interrogado, toda mitigação tem como ser provada — e manter o modelo vivo quando o desenho mudar.</p>
-  <p class="lab">DESENVOLVER</p>
-  <ol>
-    <li><b>Checklist</b> (Shostack, 2014, cap. 1 e 7): diagrama confere? cobertura confere (tabela elemento × categoria preenchida)? destino confere? teste confere?</li>
-    <li><b>Teste como prova</b> (NIST SP 800-115, 2008): o requisito negativo que nasceu da ameaça vira caso de teste; o teste fecha a rastreabilidade <b>ameaça → requisito → controle → teste</b>. É aqui que a modelagem entrega ao teste de segurança o que ele precisa provar.</li>
-    <li><b>Princípios</b>: cobertura verificável · mitigação prova-se no teste (antes disso é intenção) · modelo acompanha desenho (versão do modelo = versão da arquitetura) · modelo pertence ao time (segurança facilita e revisa).</li>
-    <li><b>Mecanismos</b>: modelo versionado junto com o código (muda no mesmo pull request) · revisão de modelo obrigatória no pipeline quando muda componente de fronteira · id da ameaça referenciado no requisito e no caso de teste.</li>
-    <li>Regra de ouro para fechar: modelo feito uma vez e arquivado é modelo de um sistema que não existe mais.</li>
-  </ol>
-  <p class="lab">EXEMPLO</p>
-  <p class="ex">"Requisição com conta de outro cliente retorna 403" é o teste da elevação de privilégio. Adicionar um webhook do parceiro (novo canal) reabre a etapa 1.</p>
-  <p class="lab">FONTES</p>
-  <p class="src">Shostack, 2014, cap. 1 e 7 · NIST SP 800-115 · Threat Modeling Manifesto, 2020 (contínuo, do time)</p>
-  <p class="out">as quatro etapas assumem o contorno do sistema como dado; mas o contorno é decisão de projeto — quantas portas o sistema expõe?</p>
-</div>
-<div class="link"></div>
+</ul></details></li>
 
-<div class="bridge">medir e reduzir o contorno antes de enumerar o que entra por ele</div>
-<div class="link"></div>
+<li class="j"><span class="bridge">as 4 etapas assumem o contorno; o contorno é decisão → quantas portas?</span></li>
 
-<!-- ============ SUPERFÍCIE ============ -->
-<div class="node surf-n">
-  <span class="pg">2 págs</span>
-  <p class="title">5 · ANÁLISE DE SUPERFÍCIE DE ATAQUE</p>
-  <p class="tese">Superfície de ataque é o conjunto de pontos por onde um atacante entra ou extrai dado; cada ponto a mais é uma porta a mais para defender e para falhar — por isso reduzir vem antes de proteger.</p>
-  <p class="lab">DESENVOLVER</p>
-  <ol>
-    <li><b>Definição formal</b> (Manadhata e Wing, 2011): três dimensões — <b>métodos</b> (pontos de entrada e saída: endpoints, funções exportadas, handlers), <b>canais</b> (portas, sockets, pipes), <b>itens de dado</b> (parâmetros, arquivos, campos). Quanto mais, maior a superfície.</li>
-    <li><b>Relação com o DFD</b>: os pontos de entrada são os fluxos que cruzam a fronteira externa. Superfície = olhar o diagrama de fora para dentro; modelagem = de dentro para fora. O mesmo desenho serve às duas.</li>
-    <li><b>Atividades</b>: enumerar entradas (endpoints, formulários, uploads, filas, portas, integrações, dependências) · enumerar saídas (respostas, logs, exportações, webhooks, erros) · classificar por exposição (anônimo &gt; autenticado &gt; interno &gt; admin) · medir · reduzir (desligar, restringir, agrupar, autenticar antes).</li>
-    <li><b>Técnicas</b>: métrica de superfície (Manadhata e Wing, 2011) — ponderada por dano potencial e esforço de acesso, compara versões · RASQ, superfície relativa (Howard, Pincus e Wing, 2003) — lista de vetores com peso, compara configurações · redução de superfície (Howard, 2003; Microsoft SDL) — desligar por padrão, reduzir privilégio do que fica, reduzir quem alcança.</li>
-    <li><b>Princípios</b>: redução antes de proteção · exposição define prioridade · padrão fechado (off by default) · superfície inclui o que você não escreveu (dependência, plugin, terceiro).</li>
-    <li><b>Mecanismos</b>: inventário de endpoints gerado do OpenAPI · nmap (canais abertos esquecidos) · SCA (código de terceiro na superfície) · feature flag off · API gateway com rota explícita.</li>
-    <li><b>O que não é técnica</b>: OWASP Attack Surface Analysis Cheat Sheet é checklist; varredura é mecanismo.</li>
-    <li>Regra de ouro: a feature que ninguém usa continua atacável — superfície morta é viva para o atacante.</li>
-  </ol>
-  <p class="lab">EXEMPLO</p>
-  <p class="ex">Entradas: dois endpoints públicos (saldo, transferência), um canal com o parceiro, o SDK do gateway como dependência. <b>Redução</b>: o endpoint de exportação de extrato, previsto e sem cliente, não entra na release.</p>
-  <p class="lab">FONTES</p>
-  <p class="src">Manadhata e Wing, IEEE TSE 2011 · Howard, Pincus e Wing, 2003 · Howard, MSDN 2003 · Microsoft SDL · OWASP ASA Cheat Sheet</p>
-  <p class="out">o método de Shostack e o STRIDE são a via principal, mas não a única — e saber onde cada alternativa cabe é parte de dominar o tema</p>
-</div>
-<div class="link"></div>
+<!-- ========== SUPERFÍCIE ========== -->
+<li><details open data-l="1"><summary><span class="n surf">Superfície de ataque<span class="w">medir e reduzir por onde a ameaça entra</span></span></summary>
+<ul>
+  <li><details open data-l="2"><summary><span class="n leaf">definição<small>Manadhata &amp; Wing 11</small><span class="w">3 dimensões</span></span></summary><ul>
+    <li><span class="n leaf">métodos<span class="w">pontos de entrada e saída: endpoints, handlers, funções exportadas</span></span></li>
+    <li><span class="n leaf">canais<span class="w">portas, sockets, pipes</span></span></li>
+    <li><span class="n leaf">itens de dado<span class="w">parâmetros, arquivos, campos</span></span></li>
+  </ul></details></li>
+  <li><span class="n leaf">relação com o DFD<span class="w">entradas = fluxos que cruzam a fronteira externa; superfície olha de fora para dentro</span></span></li>
+  <li><details open data-l="2"><summary><span class="n leaf"><span class="k p">P</span>princípios</span></summary><ul>
+    <li><span class="n leaf">redução antes de proteção<span class="w">remover vence defender</span></span></li>
+    <li><span class="n leaf">exposição define prioridade<span class="w">anônimo &gt; autenticado &gt; interno &gt; admin</span></span></li>
+    <li><span class="n leaf">padrão fechado<span class="w">off by default</span></span></li>
+    <li><span class="n leaf">inclui o que você não escreveu<span class="w">dependência, plugin, terceiro</span></span></li>
+  </ul></details></li>
+  <li><details open data-l="2"><summary><span class="n leaf"><span class="k t">T</span>técnicas</span></summary><ul>
+    <li><span class="n leaf">métrica de superfície<small>Manadhata &amp; Wing 11</small><span class="w">ponderada por dano e esforço; compara versões</span></span></li>
+    <li><span class="n leaf">RASQ — superfície relativa<small>Howard, Pincus &amp; Wing 03</small><span class="w">vetores com peso; compara configurações</span></span></li>
+    <li><span class="n leaf">redução de superfície<small>Howard 03 · Microsoft SDL</small><span class="w">desligar por padrão · reduzir privilégio · reduzir quem alcança</span></span></li>
+  </ul></details></li>
+  <li><span class="n leaf"><span class="k x">✗</span>não é técnica<span class="w">OWASP ASA Cheat Sheet = checklist · varredura = mecanismo</span></span></li>
+  <li><span class="n leaf"><span class="k m">M</span>inventário por OpenAPI · nmap · SCA · feature flag off · API gateway com rota explícita</span></li>
+  <li><span class="n leaf"><span class="k o">→</span>inventário por exposição + lista do que foi removido</span></li>
+  <li><span class="n leaf">regra de ouro<span class="w">feature que ninguém usa continua atacável</span></span></li>
+</ul></details></li>
 
-<div class="bridge">partir do negócio, da privacidade ou do dado</div>
-<div class="link"></div>
+<li class="j"><span class="bridge">STRIDE é a via principal, não a única</span></li>
 
-<!-- ============ OUTRAS ============ -->
-<div class="node outras-n">
-  <span class="pg">½ pág</span>
-  <p class="title">6 · OUTRAS ABORDAGENS — e quando cada uma cabe</p>
-  <p class="tese">STRIDE é taxonomia de ameaça, PASTA é processo, LINDDUN é taxonomia de outra propriedade; nenhum substitui o DFD nem as quatro perguntas — todos precisam de um desenho e terminam em decisão.</p>
-  <p class="lab">DESENVOLVER — um parágrafo curto por linha</p>
-  <table class="t">
-    <tr><td>PASTA</td><td>UcedaVélez e Morana, 2015 — Process for Attack Simulation and Threat Analysis; sete estágios do objetivo de negócio ao risco (objetivos, escopo técnico, decomposição, análise de ameaças, análise de vulnerabilidades, modelagem de ataque, risco e impacto). Quando a prioridade é alinhar segurança ao impacto no negócio.</td></tr>
-    <tr><td>LINDDUN</td><td>Deng, Wuyts, Scandariato, Preneel e Joosen, 2011 — linkability, identifiability, non-repudiation, detectability, disclosure, unawareness, non-compliance. O STRIDE da privacidade; usa o mesmo DFD. Quando o ativo central é dado pessoal.</td></tr>
-    <tr><td>Centrada em dados</td><td>NIST SP 800-154 (rascunho, 2016) — parte do dado a proteger e de onde ele vive. Quando o escopo é um dado atravessando vários sistemas.</td></tr>
-    <tr><td>Manifesto</td><td>Threat Modeling Manifesto, 2020 — o que atravessa todas: as quatro perguntas como estrutura mínima, modelagem contínua e do time.</td></tr>
-  </table>
-  <p class="lab">FONTES</p>
-  <p class="src">UcedaVélez e Morana, 2015 · Deng et al., 2011 · NIST SP 800-154 · threatmodelingmanifesto.org</p>
-  <p class="out">o que fica quando se tira o nome das técnicas?</p>
-</div>
-<div class="link"></div>
+<!-- ========== OUTRAS ========== -->
+<li><details open data-l="1"><summary><span class="n outras">Outras abordagens<span class="w">todas precisam de desenho e terminam em decisão</span></span></summary>
+<ul>
+  <li><details open data-l="2"><summary><span class="n leaf">PASTA<small>UcedaVélez &amp; Morana 15</small><span class="w">processo, 7 estágios, parte do negócio</span></span></summary><ul>
+    <li><span class="n leaf">objetivos → escopo técnico → decomposição → análise de ameaças → análise de vulnerabilidades → modelagem de ataque → risco e impacto</span></li>
+  </ul></details></li>
+  <li><details open data-l="2"><summary><span class="n leaf">LINDDUN<small>Deng et al. 11</small><span class="w">o STRIDE da privacidade; mesmo DFD</span></span></summary><ul>
+    <li><span class="n leaf">Linkability · Identifiability · Non-repudiation · Detectability · Disclosure · Unawareness · Non-compliance</span></li>
+  </ul></details></li>
+  <li><span class="n leaf">centrada em dados<small>NIST SP 800-154</small><span class="w">parte do dado e de onde ele vive</span></span></li>
+  <li><span class="n leaf">Threat Modeling Manifesto<small>2020</small><span class="w">4 perguntas · contínuo · do time</span></span></li>
+  <li><span class="n leaf">taxonomia × processo<span class="w">STRIDE e LINDDUN são taxonomias; PASTA é processo</span></span></li>
+</ul></details></li>
 
-<!-- ============ CONCLUSÃO ============ -->
-<div class="node fim-n">
-  <span class="pg">½ pág</span>
-  <p class="title">CONCLUSÃO — a cadeia inteira em uma linha</p>
-  <p class="tese">Modelagem de ameaças é o ponto do ciclo onde a ameaça nasce com nome, lugar no desenho e destino; a superfície de ataque decide quantas ameaças haverá para nascer.</p>
-  <p class="lab">DESENVOLVER</p>
-  <ol>
-    <li>Retome a tese: método vence intuição porque a cobertura deixa de depender de quem revisa.</li>
-    <li>Recite a cadeia: <b>ameaça (etapa 2) → requisito (etapa 3) → controle → teste (etapa 4)</b> — é a rastreabilidade do ciclo vista do ponto onde a ameaça nasce.</li>
-    <li>Feche com a consequência de engenharia: a falha de desenho que a modelagem encontra é a que patch nenhum corrige depois; e o modelo só vale enquanto acompanha o desenho.</li>
-  </ol>
-  <p class="lab">FONTES PARA CITAR DE CABEÇA (ordem de importância)</p>
-  <p class="src">Shostack 2014 · Kohnfelder e Garg 1999 · Schneier 1999 · DeMarco 1979 · Manadhata e Wing 2011 · NIST SP 800-30 · NIST SP 800-154 · NIST SP 800-115 · Howard, Pincus e Wing 2003 · Howard e LeBlanc 2003 · UcedaVélez e Morana 2015 · Deng et al. 2011 · Manifesto 2020</p>
-</div>
+<!-- ========== EXEMPLO ========== -->
+<li><details open data-l="1"><summary><span class="n ex">Exemplo-fio: API de pagamentos<span class="w">use o mesmo o texto inteiro</span></span></summary>
+<ul>
+  <li><span class="n leaf">DFD<span class="w">app → API → banco · API → gateway do parceiro · API → log · fronteiras: app|API e API|gateway</span></span></li>
+  <li><details open data-l="2"><summary><span class="n leaf">ameaças por elemento</span></summary><ul>
+    <li><span class="n leaf">app <b>S</b> credencial vazada · app <b>R</b> nega a transferência</span></li>
+    <li><span class="n leaf">fluxo app→API <b>T</b> valor alterado · fluxo API→gateway <b>I</b> canal em claro</span></li>
+    <li><span class="n leaf">API <b>E</b> troca id da conta · API <b>D</b> rajada de saldo</span></li>
+    <li><span class="n leaf">banco <b>T</b> operador altera tabela · log <b>R</b> sem integridade</span></li>
+  </ul></details></li>
+  <li><span class="n leaf">árvore<span class="w">"transferir de outro cliente" = S app OU E API OU T fluxo</span></span></li>
+  <li><span class="n leaf">destinos<span class="w">MFA · ordem assinada + log íntegro · TLS + assinatura · dono do recurso · rate limit · mTLS (parte transferida por contrato) · escrita só pela API</span></span></li>
+  <li><span class="n leaf">prova<span class="w">"conta de outro cliente → 403" · webhook novo reabre a etapa 1</span></span></li>
+  <li><span class="n leaf">superfície<span class="w">2 endpoints públicos + canal do parceiro + SDK; exportação sem cliente não entra</span></span></li>
+</ul></details></li>
 
+</ul></details>
+</li>
+</ul>
 </main>
 
 <script>
   const root = document.documentElement;
-  let fs = 17;
+  let fs = 16;
   const apply = () => root.style.setProperty("--fs", fs + "px");
-  document.getElementById("in").onclick    = () => { fs = Math.min(26, fs+1); apply(); };
-  document.getElementById("out").onclick   = () => { fs = Math.max(12, fs-1); apply(); };
-  document.getElementById("reset").onclick = () => { fs = 17; apply(); };
-  document.getElementById("full").onclick  = () => {
+  document.getElementById("in").onclick  = () => { fs = Math.min(24, fs+1); apply(); };
+  document.getElementById("out").onclick = () => { fs = Math.max(11, fs-1); apply(); };
+  document.getElementById("full").onclick = () => {
     if(!document.fullscreenElement) document.documentElement.requestFullscreen();
     else document.exitFullscreen();
   };
-  const mode = document.getElementById("mode");
-  mode.onclick = () => {
-    const on = document.body.classList.toggle("espinha");
-    mode.classList.toggle("on", on);
-    mode.textContent = on ? "mapa completo" : "só espinha";
-  };
+  // níveis: 1 = só espinha (ramos de 1º nível fechados), 2 = até P/T/M, 3 = tudo
+  const setLevel = max => document.querySelectorAll("details").forEach(d => {
+    const l = +d.dataset.l; d.open = l < max;
+  });
+  document.getElementById("l1").onclick = () => setLevel(1);
+  document.getElementById("l2").onclick = () => setLevel(3);
+  document.getElementById("l3").onclick = () => setLevel(9);
   addEventListener("keydown", e => {
     if(e.key==="+"||e.key==="=") document.getElementById("in").click();
     if(e.key==="-") document.getElementById("out").click();
-    if(e.key==="0") document.getElementById("reset").click();
     if(e.key==="f") document.getElementById("full").click();
-    if(e.key==="e") mode.click();
+    if(e.key==="1") setLevel(1); if(e.key==="2") setLevel(3); if(e.key==="3") setLevel(9);
   });
 </script>
 </body>
