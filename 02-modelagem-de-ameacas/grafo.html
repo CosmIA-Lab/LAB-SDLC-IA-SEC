@@ -182,6 +182,7 @@ N.forEach(([id,label]) => BASE[id]=label);
 const depth = id => DEPTH[id] ??= (PARENT[id] ? depth(PARENT[id])+1 : 0);
 N.forEach(([id]) => depth(id));
 
+const LEVEL = 140, ROW = 68, IND = 34, GAP = 70;
 const elements = [
   ...N.map(([id,label,type,src,desc]) => ({data:{id,label,type,src,desc}})),
   ...TREE.map(([s,t,l],i) => ({data:{id:"t"+i,source:s,target:t,label:l,kind:"tree"}})),
@@ -213,8 +214,14 @@ const cy = cytoscape({
       "curve-style":"bezier","arrow-scale":.9,
       "label":"data(label)","font-size":9,"color":"#9aa4b0","text-wrap":"wrap","text-max-width":90,
       "text-background-color":"#0e1116","text-background-opacity":.85,"text-background-padding":2,"text-rotation":"autorotate"}},
-    {selector:"edge[kind='tree']", style:{"curve-style":"taxi","taxi-direction":"downward","taxi-turn":"-20px","taxi-turn-min-distance":"10px","target-arrow-shape":"none","line-color":"#2b323c"}},
-    {selector:"edge[kind='x']", style:{"curve-style":"unbundled-bezier","control-point-distances":[45],"control-point-weights":[.5],"line-color":"#5a6676","target-arrow-color":"#5a6676","color":"#c9d1d9","font-size":10,"z-index":5}},
+    {selector:"edge[kind='tree']", style:{"curve-style":"taxi","taxi-direction":"downward","taxi-turn":"50%","target-arrow-shape":"none","line-color":"#3a4350","width":1.4}},
+    // ramos de coluna: linha desce pela margem esquerda do pai e entra pela lateral do filho (como tree-view)
+    {selector:"edge[kind='tree'][source != 'p2']", style:{
+      "taxi-turn":"-1px","taxi-turn-min-distance":"0px",
+      "source-endpoint": e => `${-e.source().width()/2 + IND/2}px ${e.source().height()/2}px`,
+      "target-endpoint": e => `${-e.target().width()/2}px 0px`,
+      "font-size":8.5,"text-margin-x":-7,"text-rotation":"autorotate"}},
+    {selector:"edge[kind='x']", style:{"curve-style":"unbundled-bezier","control-point-distances":[-70],"control-point-weights":[.5],"line-color":"#5a6676","target-arrow-color":"#5a6676","color":"#c9d1d9","font-size":10,"z-index":5,"text-rotation":"none","text-background-opacity":1,"text-background-padding":3,"text-border-opacity":1,"text-border-width":1,"text-border-color":"#30363d"}},
     {selector:"edge[label='nega']", style:{"line-color":"#ff7b72","target-arrow-color":"#ff7b72","line-style":"dashed"}},
     {selector:"edge[label='restaura']", style:{"line-color":"#3fb950","target-arrow-color":"#3fb950","line-style":"dotted"}},
     {selector:"edge[label='fundamenta']", style:{"line-color":"#8b949e","target-arrow-color":"#8b949e","width":2.2}},
@@ -231,7 +238,6 @@ const cy = cytoscape({
 const open = new Set(["p2"]);
 const visible = id => !PARENT[id] || (open.has(PARENT[id]) && visible(PARENT[id]));
 const W = id => { const w = Math.max(...BASE[id].split("\n").map(l => l.length)); return Math.max(120, w*7.4+34); };
-const LEVEL = 140, ROW = 68, IND = 34, GAP = 70;
 
 // raiz no topo; cada filho da raiz é uma coluna; descendentes descem em lista indentada (outline)
 function layout(){
