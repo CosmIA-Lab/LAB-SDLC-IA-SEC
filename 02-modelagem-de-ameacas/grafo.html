@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ponto 2 — Grafo de conceitos</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.28.1/cytoscape.min.js"></script>
+<style>
+  :root{--bg:#0e1116; --surface:#161b22; --line:#30363d; --fg:#e6edf3; --dim:#9aa4b0;
+    --root:#58a6ff; --fund:#8b949e; --prop:#79c0ff; --etapa:#3fb950; --princ:#56d4dd; --tec:#3fb950;
+    --mec:#d29922; --saida:#f778ba; --ameaca:#ff7b72; --surf:#d29922; --outra:#bc8cff; --cat:#6e7681}
+  *{box-sizing:border-box} html,body{margin:0;height:100%}
+  body{background:var(--bg); color:var(--fg); font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif; display:flex; flex-direction:column}
+  header{background:var(--surface); border-bottom:1px solid var(--line); padding:8px 14px; display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+  header h1{font-size:.95rem; margin:0}
+  header .ctr{margin-left:auto; display:flex; gap:6px; flex-wrap:wrap}
+  button,select,input{border:1px solid var(--line); background:#21262d; color:var(--fg); border-radius:8px; padding:5px 9px; font-weight:600; font-size:.82rem}
+  button{cursor:pointer} button:hover{border-color:var(--root)} button.on{border-color:var(--etapa); color:var(--etapa)}
+  input{font-weight:500; width:150px}
+  #wrap{flex:1; display:flex; min-height:0}
+  #cy{flex:1; min-width:0}
+  aside{width:340px; max-width:45vw; border-left:1px solid var(--line); background:var(--surface); padding:14px 16px; overflow:auto}
+  aside h2{margin:0 0 4px; font-size:1.05rem}
+  aside .type{font-size:.75rem; letter-spacing:.06em; font-weight:800; text-transform:uppercase; margin-bottom:8px}
+  aside .src{color:var(--dim); font-size:.85rem; margin:6px 0}
+  aside p{margin:6px 0}
+  aside ul{margin:6px 0 0; padding-left:1.1em; font-size:.9rem} aside li{margin:3px 0} aside li b{color:var(--dim); font-weight:600}
+  .legend{display:flex; flex-wrap:wrap; gap:6px 12px; font-size:.78rem; color:var(--dim); padding:6px 14px; border-bottom:1px solid var(--line); background:var(--surface)}
+  .legend span::before{content:"●"; margin-right:4px}
+  @media (max-width:760px){ #wrap{flex-direction:column} aside{width:auto; max-width:none; border-left:0; border-top:1px solid var(--line); max-height:42vh} }
+</style>
+</head>
+<body>
+<header>
+  <h1>Ponto 2 — Modelagem de ameaças e análise de superfície de ataque · grafo</h1>
+  <div class="ctr">
+    <input id="q" placeholder="buscar nó…">
+    <select id="filtro">
+      <option value="">todas as camadas</option>
+      <option value="fundamento">fundamentos</option>
+      <option value="principio">princípios</option>
+      <option value="tecnica">técnicas</option>
+      <option value="mecanismo">mecanismos</option>
+      <option value="saida">saídas</option>
+    </select>
+    <button id="lay">layout: hierárquico</button>
+    <button id="fit">ajustar</button>
+    <button id="full">⛶</button>
+  </div>
+</header>
+<div class="legend">
+  <span style="color:var(--root)">raiz / etapa</span><span style="color:var(--fund)">fundamento</span><span style="color:var(--prop)">propriedade</span>
+  <span style="color:var(--ameaca)">ameaça STRIDE</span><span style="color:var(--princ)">princípio</span><span style="color:var(--tec)">técnica (fonte)</span>
+  <span style="color:var(--mec)">mecanismo</span><span style="color:var(--saida)">saída</span><span style="color:var(--surf)">superfície</span><span style="color:var(--outra)">outra abordagem</span><span style="color:var(--cat)">catálogo, não técnica</span>
+</div>
+<div id="wrap">
+  <div id="cy"></div>
+  <aside id="panel">
+    <h2>Como usar</h2>
+    <p>Clique num nó: ele e os vizinhos acendem, o resto apaga, e a explicação aparece aqui. Arraste para mover, role para zoom. Clique no fundo para limpar.</p>
+    <p>Setas são relações nomeadas: <i>nega</i>, <i>fundamenta</i>, <i>alimenta</i>, <i>vira</i>, <i>prova</i>. Leia um caminho inteiro em voz alta — é o parágrafo pronto.</p>
+    <p class="src">Teclas: <b>f</b> tela cheia · <b>l</b> troca layout · <b>0</b> ajustar</p>
+  </aside>
+</div>
+
+<script>
+// ---------- dados ----------
+// tipos: root, etapa, fundamento, propriedade, ameaca, principio, tecnica, mecanismo, saida, surf, outra, catalogo, termo
+const N = [
+ ["p2","Modelagem de ameaças\ne superfície de ataque","root","","Responder 'o que pode dar errado' na fase de design e decidir por onde a ameaça entra. Referência principal: Shostack, 2014."],
+ ["q0","O que pode dar errado?","etapa","","A pergunta que a fase de design precisa responder. A falha de desenho é a mais cara de corrigir depois do código (Boehm, 1981; Janca, 2020)."],
+ ["ameaca","ameaça","termo","NIST SP 800-30","Evento ou agente com potencial de dano. Responde: o que pode acontecer? A modelagem trabalha aqui."],
+ ["vuln","vulnerabilidade","termo","NIST SP 800-30","A fraqueza que permite à ameaça se concretizar. Responde: por onde?"],
+ ["risco","risco","termo","NIST SP 800-30","Probabilidade × impacto. Responde: quanto importa? Ordena, não elimina."],
+ ["metodo","método, não intuição","principio","Shostack 2014, cap. 1","'Pense como um atacante' é conselho, não método. Estrutura torna a cobertura independente de quem revisa."],
+
+ ["f1","toda ameaça viola\numa propriedade","fundamento","Shostack 2014, Tab. 3-1","Ameaça só existe em relação a algo que se quer garantir. Seis propriedades → seis ameaças → lista finita e completa."],
+ ["f2","ameaça não se elimina,\ndecide-se","fundamento","Shostack 2014","Função exposta é ameaça possível. Objetivo não é zerar, é não deixar nenhuma sem decisão."],
+ ["f3","ameaça concentra-se na\nfronteira de confiança","fundamento","Shostack 2014, cap. 2","Onde o dado muda de nível de confiança é onde identidade e integridade precisam ser reverificadas."],
+ ["f4","o atacante escolhe\na porta","fundamento","Microsoft SDL","Defensor precisa de todos os pontos de entrada; atacante, de um. Tamanho da superfície = tamanho da defesa."],
+
+ ["pC","confidencialidade","propriedade","","Só quem deve acessa. Mitigação típica: criptografia, autorização, minimização."],
+ ["pI","integridade","propriedade","","O dado é o que deveria ser. Mitigação: hash, MAC, assinatura, TLS, escrita mínima."],
+ ["pD","disponibilidade","propriedade","","Está lá quando é preciso. Mitigação: rate limit, cota, redundância, limite de tamanho."],
+ ["pAn","autenticação","propriedade","","Quem é. Mitigação: hash de senha, MFA, certificado, assinatura de mensagem."],
+ ["pAz","autorização","propriedade","","O que pode. Mitigação: checar permissão em toda operação, least privilege, sandbox."],
+ ["pNr","não-repúdio","propriedade","","Não pode negar que fez. Mitigação: log íntegro com timestamp, assinatura, auditoria."],
+
+ ["q1","1 · O que estamos\nconstruindo?","etapa","Shostack 2014","Desenho por onde o dado passa e onde muda a confiança. Saída: DFD com fronteiras."],
+ ["q2","2 · O que pode\ndar errado?","etapa","Shostack 2014","Ameaças por elemento, ligadas ao diagrama. Saída: lista de ameaças com elemento e categoria."],
+ ["q3","3 · O que fazemos\na respeito?","etapa","Shostack 2014","Cada ameaça com destino; mitigação vira requisito. Saída: requisito com critério de aceite."],
+ ["q4","4 · Fizemos um\nbom trabalho?","etapa","Shostack 2014","Diagrama confere, cobertura confere, destino confere, teste confere. Modelo acompanha o desenho."],
+
+ ["dfd","DFD","tecnica","DeMarco, 1979","Diagrama de fluxo de dados: entidade externa ▭, processo ◯, fluxo →, armazenamento ═. A segurança acrescenta a fronteira ╌."],
+ ["front","fronteira de confiança","tecnica","Shostack 2014, cap. 2","Linha onde o nível de confiança muda. Sem fronteira desenhada não há onde procurar."],
+ ["elem","elementos: entidade externa ·\nprocesso · fluxo · armazenamento","termo","DeMarco 1979","Entidade externa S R · processo STRIDE · fluxo T I D · armazenamento T I D (R se log)."],
+ ["pr1","fronteira explícita ·\nnível certo de detalhe","principio","","O que não está desenhado não será modelado. Contexto primeiro; desce só onde a fronteira exige. Desenho do sistema real."],
+ ["m1","Threat Modeling Tool ·\nThreat Dragon · pytm","mecanismo","","Desenham o DFD com fronteiras e geram ameaças por elemento. Dragon em JSON versionável; pytm como código no repositório."],
+ ["s1","DFD com fronteiras","saida","","Sem fronteira, o desenho não saiu da etapa."],
+
+ ["stride","STRIDE","tecnica","Kohnfelder e Garg, Microsoft, 1999","Taxonomia de seis categorias, uma por propriedade negada. É o que torna a enumeração completa."],
+ ["S","S · spoofing","ameaca","","Fingir ser outra pessoa, processo ou sistema. Ex.: credencial vazada usada no app."],
+ ["T","T · tampering","ameaca","","Alterar dado em trânsito ou repouso. Ex.: valor da transferência alterado entre app e API."],
+ ["R","R · repudiation","ameaca","","Negar ter feito, sem que o sistema prove o contrário. Ex.: cliente nega a transferência."],
+ ["I","I · information\ndisclosure","ameaca","","Expor dado a quem não deveria. Ex.: canal com o parceiro cai para texto claro."],
+ ["D","D · denial of service","ameaca","","Indisponibilizar ou degradar. Ex.: rajada de consultas de saldo."],
+ ["E","E · elevation\nof privilege","ameaca","","Fazer o que não se pode. Ex.: cliente troca o id da conta e opera a de outro."],
+ ["spe","STRIDE por elemento","tecnica","Shostack 2014, cap. 3","Cruza taxonomia com tipo de elemento; torna a enumeração finita. Só o processo recebe as seis, porque só ele executa código."],
+ ["atree","attack tree","tecnica","Schneier, 1999","Raiz = objetivo do atacante; ramos = caminhos (E/OU); folha = ameaça concreta. Organiza as ameaças do STRIDE em caminhos."],
+ ["pr2","cobertura por elemento ·\nameaça ligada ao desenho","principio","","Elemento sem ameaça = não examinado. Ameaça sem elemento = especulação. Tudo que cruza a fronteira é hostil do outro lado."],
+ ["cat","CAPEC · ATT&CK ·\nOWASP Top 10","catalogo","MITRE / OWASP","Bibliotecas de padrões de ataque: dão nome e detalhe ao que o STRIDE apontou. Não são técnica de enumeração."],
+ ["eop","jogo Elevation\nof Privilege","mecanismo","Shostack, Microsoft, 2010","Cada carta é uma ameaça STRIDE; o time percorre o diagrama jogando as que se aplicam."],
+ ["s2","lista de ameaças","saida","","Cada ameaça com elemento do DFD e categoria. Sem elemento não é ameaça do sistema; sem categoria não se sabe o que protege."],
+
+ ["dest","4 destinos: mitigar ·\neliminar · transferir · aceitar","tecnica","Shostack 2014, cap. 1","Mitigar reduz; eliminar remove a função ou o fluxo; transferir passa por contrato ou terceiro; aceitar registra e convive. Aceitar exige dono."],
+ ["mitcat","mitigação por categoria","tecnica","Shostack 2014, cap. 8","Para cada letra, a família de controle que a responde (a propriedade negada é a que se restaura). Depois ajusta ao elemento: T em fluxo pede TLS, em armazenamento pede permissão e hash."],
+ ["prior","priorizar por risco","tecnica","NIST SP 800-30","Risco = probabilidade × impacto ordena as ameaças. Bug bar decide o que bloqueia a release."],
+ ["dread","DREAD","catalogo","Howard e LeBlanc, 2003","Dano, reprodutibilidade, explorabilidade, afetados, descoberta. Abandonado pela Microsoft por inconsistência entre avaliadores (Shostack 2014, cap. 9)."],
+ ["cvss","CVSS","catalogo","FIRST","Entra só quando a ameaça virou vulnerabilidade conhecida, em produção — gestão de vulnerabilidades."],
+ ["pr3","nenhuma ameaça sem decisão ·\nmitigação é requisito","principio","","Aceitar é decisão; esquecer não é. Mitigação que não virou requisito não existe para quem desenvolve."],
+ ["m3","registro com destino e dono ·\nbacklog ligado ao modelo","mecanismo","","Cada item do backlog rastreável até a ameaça. Registro de risco aceito: quem, por quê, até quando."],
+ ["req","requisito com\ncritério de aceite","saida","","'Transferência acima de X exige segundo fator.' É o que a fase de requisitos escreve e a de testes prova."],
+
+ ["check","checklist de validação","tecnica","Shostack 2014, cap. 1 e 7","Diagrama confere? Cobertura confere (tabela elemento × categoria)? Destino confere? Teste confere?"],
+ ["teste","teste como prova","tecnica","NIST SP 800-115","O requisito negativo nascido da ameaça vira caso de teste. Fecha a rastreabilidade."],
+ ["pr4","modelo acompanha desenho ·\nmodelo pertence ao time","principio","","Versão do modelo = versão da arquitetura. Segurança facilita e revisa; o time que constrói modela."],
+ ["m4","modelo versionado ·\nrevisão no pipeline","mecanismo","","O arquivo do modelo muda no mesmo pull request que muda a arquitetura. Mudar componente de fronteira exige revisão do modelo."],
+ ["controle","controle","saida","","A mitigação implementada."],
+ ["s4","teste","saida","","A prova de que o controle existe. Volta ao ativo: fecha o circuito."],
+
+ ["surf","superfície de ataque","surf","Manadhata e Wing, 2011","Conjunto de pontos por onde se entra ou se extrai dado: métodos (entradas/saídas), canais (portas, sockets), itens de dado (parâmetros, campos)."],
+ ["metr","métrica de superfície","tecnica","Manadhata e Wing, 2011","Três dimensões ponderadas por dano potencial e esforço de acesso; compara versões do mesmo sistema."],
+ ["rasq","RASQ","tecnica","Howard, Pincus e Wing, 2003","Superfície relativa: lista de vetores de ataque com peso; compara configurações."],
+ ["red","redução de superfície","tecnica","Howard, 2003; Microsoft SDL","Desligar por padrão, reduzir privilégio do que fica, reduzir quem alcança."],
+ ["prS","redução antes de proteção ·\npadrão fechado","principio","","Remover vence defender. Exposição define prioridade (anônimo > autenticado > interno). Inclui o que você não escreveu."],
+ ["mS","OpenAPI · nmap · SCA ·\nfeature flag · API gateway","mecanismo","","Inventário vem do contrato; nmap acha canais esquecidos; SCA enumera terceiros; gateway só passa rota declarada."],
+ ["sS","inventário por exposição\n+ o que foi removido","saida","","Para o que ficou, a entrada correspondente no DFD."],
+
+ ["pasta","PASTA","outra","UcedaVélez e Morana, 2015","Processo em sete estágios, do objetivo de negócio ao risco. É processo, não taxonomia."],
+ ["linddun","LINDDUN","outra","Deng et al., 2011","Taxonomia de privacidade: linkability, identifiability, non-repudiation, detectability, disclosure, unawareness, non-compliance. Usa o mesmo DFD."],
+ ["n154","NIST SP 800-154","outra","NIST, 2016 (rascunho)","Modelagem centrada em dados: parte do dado e de onde ele vive."],
+ ["manif","Threat Modeling\nManifesto","outra","2020","Quatro perguntas como estrutura mínima; modelagem contínua e do time."],
+];
+
+const E = [
+ ["p2","q0","abre com"],["p2","surf","e também"],
+ ["q0","ameaca","enumera"],["ameaca","vuln","explora"],["ameaca","risco","prob × impacto"],["vuln","risco",""],
+ ["q0","metodo","exige"],["metodo","stride","justifica"],
+ ["q0","f1","pressupõe"],["q0","f2","pressupõe"],["q0","f3","pressupõe"],["q0","f4","pressupõe"],
+ ["f1","stride","fundamenta"],["f1","pC",""],["f1","pI",""],["f1","pD",""],["f1","pAn",""],["f1","pAz",""],["f1","pNr",""],
+ ["f2","dest","fundamenta"],["f3","front","fundamenta"],["f4","surf","fundamenta"],
+ ["q0","q1","método"],["q1","q2","depois"],["q2","q3","depois"],["q3","q4","depois"],["q4","q1","desenho mudou"],
+ ["q1","dfd","T"],["dfd","elem","tem"],["dfd","front","+"],["q1","pr1","P"],["q1","m1","M"],["q1","s1","→"],
+ ["q2","stride","T"],["stride","S",""],["stride","T",""],["stride","R",""],["stride","I",""],["stride","D",""],["stride","E",""],
+ ["S","pAn","nega"],["T","pI","nega"],["R","pNr","nega"],["I","pC","nega"],["D","pD","nega"],["E","pAz","nega"],
+ ["q2","spe","T"],["spe","stride","cruza"],["spe","elem","com"],
+ ["q2","atree","T"],["atree","stride","organiza"],["q2","pr2","P"],["q2","cat","consulta"],["q2","eop","M"],["q2","s2","→"],
+ ["s1","q2","alimenta"],["s2","q3","alimenta"],
+ ["q3","dest","T"],["q3","mitcat","T"],["mitcat","pAn","restaura"],["mitcat","pI","restaura"],["mitcat","pNr","restaura"],["mitcat","pC","restaura"],["mitcat","pD","restaura"],["mitcat","pAz","restaura"],
+ ["q3","prior","T"],["prior","risco","usa"],["prior","dread","abandonado"],["prior","cvss","só em produção"],
+ ["q3","pr3","P"],["q3","m3","M"],["q3","req","→"],
+ ["req","q4","alimenta"],["q4","check","T"],["q4","teste","T"],["q4","pr4","P"],["q4","m4","M"],
+ ["ameaca","req","vira"],["req","controle","vira"],["controle","s4","provado por"],["teste","s4",""],
+ ["surf","front","= fluxos que cruzam a\nfronteira externa"],["surf","metr","T"],["surf","rasq","T"],["surf","red","T"],["surf","prS","P"],["surf","mS","M"],["surf","sS","→"],["sS","q1","entra no"],
+ ["p2","pasta","alternativa"],["p2","linddun","alternativa"],["p2","n154","alternativa"],["p2","manif","atravessa"],
+ ["linddun","dfd","usa"],["pasta","risco","parte do negócio ao"],
+];
+
+const COLORS = {root:"#58a6ff",etapa:"#58a6ff",fundamento:"#8b949e",propriedade:"#79c0ff",ameaca:"#ff7b72",principio:"#56d4dd",
+  tecnica:"#3fb950",mecanismo:"#d29922",saida:"#f778ba",surf:"#d29922",outra:"#bc8cff",catalogo:"#6e7681",termo:"#9aa4b0"};
+const TYPE_PT = {root:"raiz",etapa:"etapa",fundamento:"fundamento",propriedade:"propriedade",ameaca:"ameaça STRIDE",principio:"princípio",
+  tecnica:"técnica",mecanismo:"mecanismo",saida:"saída",surf:"superfície",outra:"outra abordagem",catalogo:"catálogo — não é técnica",termo:"termo"};
+
+const elements = [
+  ...N.map(([id,label,type,src,desc]) => ({data:{id,label,type,src,desc}})),
+  ...E.map(([s,t,l],i) => ({data:{id:"e"+i,source:s,target:t,label:l}}))
+];
+
+const cy = cytoscape({
+  container: document.getElementById("cy"),
+  elements,
+  wheelSensitivity: .25,
+  style: [
+    {selector:"node", style:{
+      "label":"data(label)","text-wrap":"wrap","text-max-width":170,"text-valign":"center","text-halign":"center",
+      "font-size":12,"color":"#e6edf3","background-color":"#161b22","border-width":3,
+      "border-color": e => COLORS[e.data("type")]||"#9aa4b0",
+      "shape":"round-rectangle","width":"label","height":"label","padding":"10px"}},
+    {selector:"node[type='root']", style:{"font-size":15,"font-weight":800,"background-color":"#1b2a3d","color":"#58a6ff"}},
+    {selector:"node[type='etapa']", style:{"font-weight":800,"font-size":13,"background-color":"#13201a"}},
+    {selector:"node[type='fundamento']", style:{"shape":"hexagon","padding":"14px","background-color":"#1a1f26"}},
+    {selector:"node[type='propriedade']", style:{"shape":"ellipse","padding":"6px","background-color":"#141d2b"}},
+    {selector:"node[type='ameaca']", style:{"background-color":"#2a1a1a","font-weight":700}},
+    {selector:"node[type='saida']", style:{"shape":"tag","padding":"8px"}},
+    {selector:"node[type='catalogo']", style:{"border-style":"dashed","color":"#9aa4b0"}},
+    {selector:"node[type='termo']", style:{"border-style":"dotted"}},
+    {selector:"edge", style:{
+      "width":1.6,"line-color":"#3a4350","target-arrow-color":"#3a4350","target-arrow-shape":"triangle",
+      "curve-style":"bezier","arrow-scale":.9,
+      "label":"data(label)","font-size":9,"color":"#9aa4b0","text-wrap":"wrap","text-max-width":90,
+      "text-background-color":"#0e1116","text-background-opacity":.85,"text-background-padding":2,"text-rotation":"autorotate"}},
+    {selector:"edge[label='nega']", style:{"line-color":"#ff7b72","target-arrow-color":"#ff7b72","line-style":"dashed"}},
+    {selector:"edge[label='restaura']", style:{"line-color":"#3fb950","target-arrow-color":"#3fb950","line-style":"dotted"}},
+    {selector:"edge[label='fundamenta']", style:{"line-color":"#8b949e","target-arrow-color":"#8b949e","width":2.2}},
+    {selector:"edge[label='vira'],edge[label='provado por'],edge[label='alimenta']", style:{"line-color":"#f778ba","target-arrow-color":"#f778ba","width":2.2}},
+    {selector:".dim", style:{"opacity":.12}},
+    {selector:".hi", style:{"opacity":1,"border-width":5}},
+    {selector:"edge.hi", style:{"width":3,"font-size":11,"color":"#e6edf3"}},
+  ]
+});
+
+const LAYOUTS = {
+  hier: {name:"breadthfirst", directed:true, roots:"#p2", spacingFactor:1.05, padding:30, avoidOverlap:true, nodeDimensionsIncludeLabels:true},
+  forca:{name:"cose", animate:false, randomize:false, idealEdgeLength:120, nodeRepulsion:()=>60000, nodeOverlap:30, gravity:.25, numIter:1500, padding:30, nodeDimensionsIncludeLabels:true}
+};
+let current = "hier";
+const run = () => cy.layout(LAYOUTS[current]).run();
+run();
+
+const panel = document.getElementById("panel");
+const show = n => {
+  const d = n.data();
+  const col = COLORS[d.type];
+  const neigh = n.connectedEdges().map(e => {
+    const other = e.source().id()===n.id() ? e.target() : e.source();
+    const dir = e.source().id()===n.id() ? "→" : "←";
+    return `<li><b>${dir} ${e.data("label")||""}</b> ${other.data("label").replace(/\n/g," ")}</li>`;
+  }).join("");
+  panel.innerHTML = `<h2>${d.label.replace(/\n/g," ")}</h2>
+    <div class="type" style="color:${col}">${TYPE_PT[d.type]}</div>
+    ${d.src?`<div class="src">${d.src}</div>`:""}
+    <p>${d.desc}</p>
+    <ul>${neigh}</ul>`;
+};
+cy.on("tap","node", ev => {
+  const n = ev.target, hood = n.closedNeighborhood();
+  cy.elements().addClass("dim").removeClass("hi");
+  hood.removeClass("dim").addClass("hi");
+  show(n);
+});
+cy.on("tap", ev => { if(ev.target===cy) cy.elements().removeClass("dim hi"); });
+
+document.getElementById("lay").onclick = e => {
+  current = current==="hier" ? "forca" : "hier";
+  e.target.textContent = "layout: " + (current==="hier" ? "hierárquico" : "força");
+  run();
+};
+document.getElementById("fit").onclick = () => cy.fit(undefined, 30);
+document.getElementById("full").onclick = () => {
+  if(!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen();
+};
+document.getElementById("filtro").onchange = e => {
+  const t = e.target.value;
+  cy.elements().removeClass("dim hi");
+  if(!t) return;
+  const keep = cy.nodes(`[type='${t}'], [type='root'], [type='etapa']`);
+  cy.elements().not(keep).not(keep.edgesWith(keep)).addClass("dim");
+};
+document.getElementById("q").oninput = e => {
+  const q = e.target.value.trim().toLowerCase();
+  cy.elements().removeClass("dim hi");
+  if(!q) return;
+  const hit = cy.nodes().filter(n => n.data("label").toLowerCase().includes(q) || (n.data("desc")||"").toLowerCase().includes(q));
+  cy.elements().not(hit).addClass("dim"); hit.addClass("hi");
+  if(hit.length===1){ show(hit[0]); cy.animate({center:{eles:hit}, zoom:1.2}, {duration:250}); }
+};
+addEventListener("keydown", ev => {
+  if(ev.target.tagName==="INPUT") return;
+  if(ev.key==="f") document.getElementById("full").click();
+  if(ev.key==="l") document.getElementById("lay").click();
+  if(ev.key==="0") document.getElementById("fit").click();
+});
+addEventListener("resize", () => cy.resize());
+</script>
+</body>
+</html>
