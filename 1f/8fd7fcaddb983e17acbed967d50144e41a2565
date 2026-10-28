@@ -1,0 +1,19 @@
+02-modelagem-de-ameacas/arvore.html
+  s_7cc7673de0adc8::t_28cbad335d051c 6,11,24,28,30,36-42,44-50,52,55-57,59,63-68,70,77-87,92-93,95,104-120,122-125,127,129-145,147-267,269-406,420-425,431
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "1f8fd7fcaddb983e17acbed967d50144e41a2565",
+  "prompts": {},
+  "sessions": {
+    "s_7cc7673de0adc8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9ffe1f51-e813-456c-ad90-77b82c1de23c",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "alan <nascimentoalankst@gmail.com>"
+    }
+  }
+}
