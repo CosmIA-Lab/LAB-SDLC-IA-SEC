@@ -59,7 +59,7 @@ Um sistema útil expõe função, e função exposta é ameaça possível. O obj
 
 ### Ameaça concentra-se na fronteira de confiança
 
-Fronteira de confiança é a linha onde o dado passa de um domínio para outro com nível de confiança diferente: do navegador para o servidor, do serviço para o banco, do processo para o sistema operacional. É nela que spoofing, tampering e elevação de privilégio acontecem, porque é onde a identidade e a integridade precisam ser reverificadas. Desenhar a fronteira é, portanto, a primeira decisão do modelo: onde ela está, está o trabalho (Shostack, 2014, cap. 2).
+Nível de confiança é o quanto o sistema assume sobre quem está do outro lado e sobre o dado que vem de lá: quem controla aquele componente, com que privilégio ele executa e o que já foi verificado (identidade, autorização, validação). Swiderski e Snyder (2004) enumeram os níveis como uma lista ordenada de privilégios — usuário anônimo, usuário autenticado, administrador, processo do sistema — e atribuem um nível a cada ponto de entrada. Fronteira de confiança é a linha onde esse nível muda: do navegador (controlado pelo usuário, e portanto pelo atacante) para o servidor (controlado por nós), do serviço para o banco, do processo para o sistema operacional, do nosso serviço para o parceiro externo. O critério é controle e privilégio, não rede: dois serviços na mesma VPC sob donos diferentes têm fronteira entre si; dois módulos do mesmo processo não têm. É nela que spoofing, tampering e elevação de privilégio acontecem, porque tudo que vem do lado de menor confiança precisa ter identidade e integridade reverificadas antes de ser aceito. Desenhar a fronteira é, portanto, a primeira decisão do modelo: onde ela está, está o trabalho (Shostack, 2014, cap. 2).
 
 ### O atacante escolhe a porta
 
@@ -475,6 +475,7 @@ A cadeia inteira em uma linha: ameaça (etapa 2) → requisito (etapa 3) → con
 ## Referências
 
 - **Shostack, Adam. *Threat Modeling: Designing for Security*. Wiley, 2014** — referência principal. Cap. 1 (quatro perguntas, quatro destinos), cap. 2 (DFD e fronteiras de confiança), cap. 3 (STRIDE e STRIDE por elemento, Tabela 3-1), cap. 8 (mitigações por categoria), cap. 9 (crítica ao DREAD)
+- **Swiderski, Frank; Snyder, Window. *Threat Modeling*. Microsoft Press, 2004** — níveis de confiança como lista ordenada de privilégios atribuída a cada ponto de entrada e ativo; base do conceito de fronteira usado por Shostack
 - Kohnfelder, Loren; Garg, Praerit. *The threats to our products*. Microsoft, 1999 — origem do STRIDE
 - Schneier, Bruce. "Attack Trees". *Dr. Dobb's Journal*, 1999
 - DeMarco, Tom. *Structured Analysis and System Specification*. Yourdon Press, 1979 — DFD
