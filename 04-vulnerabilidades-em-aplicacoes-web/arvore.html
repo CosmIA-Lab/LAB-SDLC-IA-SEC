@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ponto 4 — Vulnerabilidades em aplicações web</title>
+<style>
+  :root{
+    --bg:#0e1116; --surface:#161b22; --line:#3a4350;
+    --fg:#e6edf3; --dim:#9aa4b0;
+    --root:#58a6ff; --base:#8b949e; --etapa:#3fb950; --surf:#d29922; --outras:#bc8cff; --ex:#f778ba;
+    --p:#79c0ff; --t:#3fb950; --m:#d29922;
+    --fs:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--bg); color:var(--fg);
+    font:var(--fs)/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;}
+
+  header{position:sticky; top:0; z-index:5; background:var(--surface);
+    border-bottom:1px solid var(--line); padding:10px 16px;
+    display:flex; align-items:center; gap:12px; flex-wrap:wrap;}
+  header h1{font-size:1rem; margin:0; font-weight:700}
+  header .hint{color:var(--dim); font-size:.78rem}
+  header .ctr{margin-left:auto; display:flex; gap:6px; flex-wrap:wrap}
+  button{border:1px solid var(--line); background:#21262d; color:var(--fg);
+    border-radius:8px; padding:6px 10px; font-weight:600; cursor:pointer; font-size:.85rem}
+  button:hover{border-color:var(--root)}
+
+  main{max-width:980px; margin:0 auto; padding:18px 16px 90px}
+  .spine{color:var(--dim); font-size:.88rem; margin:0 0 14px; padding:8px 12px;
+    border:1px dashed var(--line); border-radius:10px}
+  .spine b{color:var(--root)}
+
+  /* ---------- árvore ---------- */
+  .tree, .tree ul{list-style:none; margin:0; padding:0}
+  .tree ul{margin-left:14px; padding-left:18px; border-left:2px solid var(--line)}
+  .tree li{position:relative; margin:4px 0; padding-left:6px}
+  .tree li::before{content:""; position:absolute; left:-18px; top:.85em; width:16px; height:2px; background:var(--line)}
+  .tree > li::before{display:none}
+
+  details{margin:0}
+  summary{cursor:pointer; list-style:none; display:inline-block}
+  summary::-webkit-details-marker{display:none}
+  summary::before{content:"▸"; display:inline-block; width:1em; color:var(--dim); transition:transform .15s}
+  details[open] > summary::before{transform:rotate(90deg)}
+
+  .n{display:inline-block; padding:3px 9px; border-radius:8px; background:var(--surface);
+    border:1px solid var(--line); border-left-width:4px; font-weight:600}
+  .n small{font-weight:500; color:var(--dim); margin-left:6px; font-size:.8em}
+  .n .w{font-weight:400; color:var(--dim)}
+  .n .w::before{content:" — "}
+
+  .n.root{border-left-color:var(--root); color:var(--root); font-size:1.15em; font-weight:800}
+  .n.b1{border-left-color:var(--root); font-size:1.05em; font-weight:800}
+  .n.base{border-left-color:var(--base)}
+  .n.etapa{border-left-color:var(--etapa); font-weight:800}
+  .n.surf{border-left-color:var(--surf); color:var(--surf); font-weight:800}
+  .n.outras{border-left-color:var(--outras); color:var(--outras); font-weight:800}
+  .n.ex{border-left-color:var(--ex); color:var(--ex); font-weight:800}
+  .n.leaf{background:transparent; border-color:transparent; padding-left:0; font-weight:500}
+  .n.leaf small{margin-left:4px}
+
+  /* rótulos P / T / M / saída */
+  .k{display:inline-block; min-width:1.5em; text-align:center; font-weight:800; font-size:.78em;
+    border-radius:5px; padding:1px 4px; margin-right:6px; vertical-align:1px}
+  .k.p{background:#1b2a3d; color:var(--p)} .k.t{background:#1f3b2a; color:var(--t)}
+  .k.m{background:#2a2f1f; color:var(--m)} .k.o{background:#2b2231; color:var(--ex)}
+  .k.x{background:#3a2626; color:#ff7b72}
+
+  /* junta (ponte) */
+  li.j{list-style:none}
+  li.j::before{display:none}
+  .bridge{display:inline-block; color:var(--dim); font-style:italic; font-size:.9em; padding:2px 6px}
+  .bridge::before{content:"⟪ "} .bridge::after{content:" ⟫"}
+
+  /* grade STRIDE × elemento */
+  .grid{display:inline-grid; grid-template-columns:auto repeat(6,1.7em); gap:3px; margin:4px 0 2px 1.6em; font-size:.82rem; text-align:center}
+  .grid div{padding:2px 1px; border-radius:4px; background:#21262d}
+  .grid .h{font-weight:800; color:var(--dim)}
+  .grid .r{text-align:left; padding:2px 8px 2px 4px; font-weight:600}
+  .grid .y{background:#1f3b2a; color:var(--t); font-weight:800}
+  .grid .mm{background:#2a2f1f; color:var(--m); font-size:.7rem; font-weight:700}
+
+  @media (max-width:520px){ .tree ul{margin-left:6px; padding-left:12px} .tree li::before{left:-12px; width:10px} .n .w{display:block; margin-top:2px} .n .w::before{content:""} }
+</style>
+</head>
+<body>
+<header>
+  <h1>Ponto 4 — Vulnerabilidades em aplicações web <span class="hint">· árvore de conceitos</span></h1>
+  <span class="hint">clique num nó para abrir/fechar · <b style="color:var(--p)">P</b> princípio · <b style="color:var(--t)">T</b> técnica · <b style="color:var(--m)">M</b> mecanismo · <b style="color:var(--ex)">→</b> saída</span>
+  <div class="ctr">
+    <button id="l1">só espinha</button>
+    <button id="l2">até P/T/M</button>
+    <button id="l3">tudo</button>
+    <button id="out">A−</button>
+    <button id="in">A+</button>
+    <button id="full">⛶</button>
+  </div>
+</header>
+
+<main>
+<p class="spine">espinha: <b>4 fatos do modelo → caminho da requisição → taxonomias → classes por estação → plataforma → exemplo → erros</b></p>
+
+<ul class="tree">
+<li>
+<details open data-l="0"><summary><span class="n root">Vulnerabilidades em aplicações web<span class="w">consequências previsíveis do modelo de execução, não lista de nomes</span></span></summary>
+<ul>
+
+<!-- ========== FUNDAMENTOS ========== -->
+<li><details open data-l="1"><summary><span class="n b1">Fundamentos<small>4 fatos do modelo</small><span class="w">um programa dividido por uma fronteira que o atacante controla</span></span></summary>
+<ul>
+  <li><details open data-l="2"><summary><span class="n base">1 · toda entrada é hostil</span></summary><ul>
+    <li><span class="n leaf">o navegador é opcional<span class="w">campo oculto, cabeçalho, cookie, Referer, nome de arquivo, método: tudo é escolha do cliente</span></span></li>
+    <li><span class="n leaf">validar no servidor, por lista de permissão<span class="w">validação no cliente é conveniência, nunca controle</span></span></li>
+  </ul></details></li>
+  <li><details open data-l="2"><summary><span class="n base">2 · dado e instrução compartilham o canal</span></summary><ul>
+    <li><span class="n leaf">SQL, HTML, shell, URL são texto<span class="w">o interpretador não sabe onde o dado termina</span></span></li>
+    <li><span class="n leaf">defesa = separar por construção<span class="w">parametrizar, codificar por contexto; nunca filtrar caracteres</span><small>IEEE CSD 14 #4</small></span></li>
+  </ul></details></li>
+  <li><details open data-l="2"><summary><span class="n base">3 · a identidade é um token que viaja</span></summary><ul>
+    <li><span class="n leaf">HTTP sem estado<span class="w">cada requisição chega sozinha; o cookie diz quem é</span></span></li>
+    <li><span class="n leaf">token = senha temporária<span class="w">confidencialidade · integridade · escopo · expiração</span></span></li>
+  </ul></details></li>
+  <li><details open data-l="2"><summary><span class="n base">4 · a web é composição sob a política de mesma origem</span></summary><ul>
+    <li><span class="n leaf">origem = esquema + host + porta<small>Netscape 95; Barth RFC 6454 11</small></span></li>
+    <li><span class="n leaf">isola LEITURA, não ENVIO<span class="w">por isso CSRF existe; CORS relaxa; cookies vão por host</span></span></li>
+    <li><span class="n leaf">toda vuln "entre sites" = política contornada, relaxada ou ausente</span></li>
+  </ul></details></li>
+</ul></details></li>
+
+<li class="j"><span class="bridge">dezenas de nomes; onde cada um vive? no caminho da requisição</span></li>
+
+<!-- ========== CAMINHO ========== -->
+<li><details open data-l="1"><summary><span class="n b1">Caminho da requisição<span class="w">cada classe é a falha de uma estação</span></span></summary>
+<ul>
+  <li><span class="n leaf">parse/validação<span class="w">validação ausente · upload · XXE · desserialização · smuggling</span></span></li>
+  <li><span class="n leaf">autenticação<span class="w">credential stuffing · sessão fraca · fixação</span></span></li>
+  <li><span class="n leaf">autorização<span class="w">IDOR/BOLA · função sem checagem · traversal · CSRF</span></span></li>
+  <li><span class="n leaf">dados e serviços<span class="w">injeção SQL/comando/LDAP · SSRF</span></span></li>
+  <li><span class="n leaf">resposta<span class="w">XSS · cabeçalhos ausentes · dado exposto · redirect aberto</span></span></li>
+</ul></details></li>
+
+<li class="j"><span class="bridge">as listas dizem o que é frequente, não o que fazer</span></li>
+
+<!-- ========== TAXONOMIAS ========== -->
+<li><details open data-l="1"><summary><span class="n b1 surf">Taxonomias<span class="w">consciência ≠ padrão</span></span></summary>
+<ul>
+  <li><details open data-l="2"><summary><span class="n base">OWASP Top 10<small>2021 · 2025 RC</small></span></summary><ul>
+    <li><span class="n leaf">2021<span class="w">A01 acesso · A02 cripto · A03 injeção (+XSS) · A04 design · A05 config · A06 componentes · A07 authn · A08 integridade · A09 log · A10 SSRF</span></span></li>
+    <li><span class="n leaf">2025<span class="w">config → A02 · cadeia de suprimentos → A03 · SSRF dentro de A01 · nova: condições excepcionais (fail-open)</span></span></li>
+    <li><span class="n leaf"><span class="k x">✗</span>não é padrão de requisitos<span class="w">a própria OWASP aponta o ASVS</span></span></li>
+  </ul></details></li>
+  <li><span class="n leaf">CWE Top 25<small>MITRE 2024</small><span class="w">1 XSS-79 · 3 SQLi-89 · 4 CSRF-352 · 5 traversal-22 — vocabulário formal + evidência</span></span></li>
+  <li><span class="n leaf">ASVS<small>4.0.3; 5.0 em 2025</small><span class="w">~280 requisitos · 14 capítulos · L1/L2/L3 — o padrão verificável; WSTG 4.2 = como testar</span></span></li>
+</ul></details></li>
+
+<li class="j"><span class="bridge">cada classe: o que é → como acontece → princípio violado → técnica (fonte) → mecanismo → prova</span></li>
+
+<!-- ========== CLASSES ========== -->
+<li><details open data-l="1"><summary><span class="n b1">Classes<small>ordem do caminho</small></span></summary>
+<ul>
+  <li><details open data-l="2"><summary><span class="n etapa">validação ausente<span class="w">traversal-22 · XXE · desserialização-502</span></span></summary><ul>
+    <li><span class="n leaf">como<span class="w">../ no caminho · ENTITY SYSTEM file:// · objeto nativo do cliente vira gadget chain</span><small>Frohoff/Lawrence 15</small></span></li>
+    <li><span class="n leaf"><span class="k t">T</span>lista de permissão na borda<small>ASVS V5</small> · entidades externas off · JSON com esquema, não formato nativo</span></li>
+    <li><span class="n leaf"><span class="k m">M</span>esquema declarativo · limites de tamanho · parser configurado · nome de arquivo gerado · canonicalizar antes de checar prefixo</span></li>
+  </ul></details></li>
+  <li><details open data-l="2"><summary><span class="n etapa">injeção<span class="w">SQLi-89 · comando-78 · LDAP · template</span></span></summary><ul>
+    <li><span class="n leaf">como<span class="w">tautologia · union · piggy-backed · cega por tempo/erro</span><small>Halfond/Viegas/Orso 06</small></span></li>
+    <li><span class="n leaf"><span class="k p">P</span>separar dado de instrução</span></li>
+    <li><span class="n leaf"><span class="k t">T</span>parametrizar (dado vinculado, nunca no texto) · execve com argumentos · menor privilégio no banco</span></li>
+    <li><span class="n leaf"><span class="k m">M</span>prepared statements · ORM sem interpolação · conta só-leitura · WAF só como profundidade</span></li>
+    <li><span class="n leaf"><span class="k x">✗</span>escapar aspas ≠ parametrizar<span class="w">falha em numérico, LIKE, charset</span></span></li>
+  </ul></details></li>
+  <li><details open data-l="2"><summary><span class="n etapa">XSS<small>CWE-79, #1 em 2024</small><span class="w">refletido · armazenado · DOM</span></span></summary><ul>
+    <li><span class="n leaf">DOM<span class="w">servidor não participa: location.hash → innerHTML</span><small>Klein 05</small></span></li>
+    <li><span class="n leaf"><span class="k p">P</span>o navegador executa o que recebe; é defeito de SAÍDA</span></li>
+    <li><span class="n leaf"><span class="k t">T</span>codificação de saída por contexto<small>OWASP</small><span class="w">corpo · atributo · JS · URL · CSS; alguns contextos: dado não pode ir</span></span></li>
+    <li><span class="n leaf"><span class="k t">T</span>CSP<small>Stamm/Sterne/Markham 10</small><span class="w">origens de script, sem inline; segunda camada</span></span></li>
+    <li><span class="n leaf"><span class="k m">M</span>template com escape automático (cuidado com raw/dangerouslySetInnerHTML) · CSP nonce · HttpOnly · textContent · Trusted Types · DOMPurify só se HTML é requisito</span></li>
+  </ul></details></li>
+  <li><details open data-l="2"><summary><span class="n etapa">CSRF<small>CWE-352</small><span class="w">navegador anexa cookie a toda requisição</span></span></summary><ul>
+    <li><span class="n leaf">mesma origem bloqueia ler, não enviar<span class="w">form em outra origem + cookie = transferência autenticada</span></span></li>
+    <li><span class="n leaf"><span class="k t">T</span>token sincronizador + Origin<small>Barth/Jackson/Mitchell 08</small> · SameSite<small>rfc6265bis; Lax padrão Chrome 20</small></span></li>
+    <li><span class="n leaf"><span class="k m">M</span>token do framework em todo POST · SameSite=Lax/Strict · Origin na API · token em Authorization não sofre CSRF</span></li>
+    <li><span class="n leaf"><span class="k x">✗</span>SameSite não acabou com CSRF<span class="w">Lax envia em GET de navegação; subdomínio é mesmo site</span></span></li>
+  </ul></details></li>
+  <li><details open data-l="2"><summary><span class="n etapa">controle de acesso quebrado<small>A01 em 21 e 25</small><span class="w">IDOR/BOLA-639 · função-862 · elevação · traversal · CORS *</span></span></summary><ul>
+    <li><span class="n leaf"><span class="k p">P</span>mediação completa · autorizar depois de autenticar<small>IEEE CSD #3</small></span></li>
+    <li><span class="n leaf"><span class="k t">T</span>checar por objeto e por função no servidor, negar por padrão<small>ASVS V4</small> · Check Point (ponto 3)</span></li>
+    <li><span class="n leaf"><span class="k m">M</span>middleware authz(sujeito, ação, recurso) · filtro por dono na query · OPA/Cedar · UUID como extra · CORS por lista</span></li>
+    <li><span class="n leaf">prova<span class="w">matriz papel × recurso do outro → 403/404; trocar id em todo endpoint</span></span></li>
+  </ul></details></li>
+  <li><details open data-l="2"><summary><span class="n etapa">autenticação e sessão<small>A07</small><span class="w">stuffing · brute force · fixação-384 · sequestro · sem expiração-613</span></span></summary><ul>
+    <li><span class="n leaf"><span class="k t">T</span>NIST 800-63B<span class="w">lista de vazadas, sem composição nem troca periódica, limite de tentativas, MFA</span></span></li>
+    <li><span class="n leaf"><span class="k t">T</span>rotacionar id de sessão no login (mata fixação) · derivação lenta e salgada</span></li>
+    <li><span class="n leaf"><span class="k m">M</span>Argon2id · limitador por conta e IP · Secure+HttpOnly+SameSite · expiração absoluta e por inatividade · logout invalida no servidor · passkey</span></li>
+    <li><span class="n leaf">ponto 6 aprofunda OAuth 2.0 / OIDC</span></li>
+  </ul></details></li>
+  <li><details open data-l="2"><summary><span class="n etapa">SSRF<small>CWE-918; A10 em 21</small><span class="w">servidor busca URL do usuário</span></span></summary><ul>
+    <li><span class="n leaf">alvo<span class="w">rede interna · localhost · 169.254.169.254 (Capital One 19)</span></span></li>
+    <li><span class="n leaf"><span class="k t">T</span>lista de destinos pós-DNS, sem redirect · egress restrito · IMDSv2</span></li>
+    <li><span class="n leaf"><span class="k m">M</span>cliente HTTP configurado · regras de saída · proxy dedicado</span></li>
+  </ul></details></li>
+  <li><details open data-l="2"><summary><span class="n etapa">configuração e cabeçalhos<small>A05 → A02 em 25</small></span></summary><ul>
+    <li><span class="n leaf">como<span class="w">credencial padrão · stack trace · debug em prod · TLS fraco · cabeçalho ausente</span></span></li>
+    <li><span class="n leaf"><span class="k p">P</span>seguro por padrão<small>Howard/Lipner 06</small></span></li>
+    <li><span class="n leaf"><span class="k m">M</span>IaC revisada · HSTS<small>RFC 6797</small> · CSP · nosniff · frame-ancestors (clickjacking) · Referrer-Policy · TLS 1.2+</span></li>
+  </ul></details></li>
+  <li><details open data-l="2"><summary><span class="n etapa">criptografia e dado sensível<small>A02</small></span></summary><ul>
+    <li><span class="n leaf">como<span class="w">senha em claro/MD5 · cartão inteiro · chave no repo · cripto própria · dado em URL/log/erro</span></span></li>
+    <li><span class="n leaf"><span class="k t">T</span>classificar o dado → controle · primitivas padrão · nada sensível em URL/log</span></li>
+    <li><span class="n leaf"><span class="k m">M</span>KMS com rotação · Argon2id · tokenização · mascaramento · Cache-Control: no-store</span></li>
+  </ul></details></li>
+  <li><details open data-l="2"><summary><span class="n etapa">integridade e componentes<small>A06/A08 → cadeia A03 em 25</small></span></summary><ul>
+    <li><span class="n leaf">script de terceiro comprometido = XSS com convite</span></li>
+    <li><span class="n leaf"><span class="k t">T</span>SCA + SBOM · SRI · assinatura<small>ponto 8</small></span></li>
+    <li><span class="n leaf"><span class="k m">M</span>lockfile · integrity em script · CSP de script · verificação de assinatura</span></li>
+  </ul></details></li>
+  <li><details open data-l="2"><summary><span class="n etapa">registro e monitoramento<small>A09</small></span></summary><ul>
+    <li><span class="n leaf">= registro de comprometimento ausente<small>S&amp;S 75; R do STRIDE</small></span></li>
+    <li><span class="n leaf"><span class="k m">M</span>eventos de segurança com sujeito e tempo, sem dado sensível · log central só-anexa · alertas<small>ponto 10</small></span></li>
+  </ul></details></li>
+</ul></details></li>
+
+<li class="j"><span class="bridge">há defesas que não são de classe nenhuma: a plataforma</span></li>
+
+<!-- ========== PLATAFORMA ========== -->
+<li><details open data-l="1"><summary><span class="n b1 outras">Plataforma do navegador<span class="w">o navegador oferece, a aplicação declara</span></span></summary>
+<ul>
+  <li><span class="n leaf">mesma origem<span class="w">isola leitura</span> · CORS<span class="w">relaxa</span> · CSP<span class="w">origens por tipo de recurso</span></span></li>
+  <li><span class="n leaf">cookies<span class="w">Secure · HttpOnly · SameSite</span> · HSTS<span class="w">só TLS</span> · nosniff<span class="w">não adivinha tipo</span></span></li>
+  <li><span class="n leaf">X-Frame-Options / frame-ancestors<span class="w">clickjacking</span> · SRI<span class="w">hash de script externo</span> · Trusted Types<span class="w">XSS de DOM</span></span></li>
+  <li><span class="n leaf"><span class="k x">✗</span>sem declarar, a plataforma roda em modo aberto<span class="w">padrões à prova de falha invertidos</span></span></li>
+</ul></details></li>
+
+<li class="j"><span class="bridge">tudo na mesma API de pagamentos</span></li>
+
+<!-- ========== EXEMPLO ========== -->
+<li><details data-l="1"><summary><span class="n b1 ex">exemplo-fio<small>API de pagamentos</small><span class="w">classe onde vive → defesa nomeada → teste</span></span></summary>
+<ul>
+  <li><span class="n leaf">busca → SQLi → parâmetro vinculado + conta só-leitura → ' OR '1'='1 devolve vazio</span></li>
+  <li><span class="n leaf">nome do beneficiário → XSS → escape por contexto + CSP nonce + HttpOnly → &lt;img onerror&gt; vira texto</span></li>
+  <li><span class="n leaf">transferência → CSRF → token + SameSite=Lax + Origin → form de outra origem = 403</span></li>
+  <li><span class="n leaf">/contas/{id} → IDOR → middleware do ponto 3 + filtro por dono + UUID → conta do outro = 404</span></li>
+  <li><span class="n leaf">login → 800-63B + rotação + Argon2id + limite + MFA → fixação falha, 100 tentativas bloqueiam</span></li>
+  <li><span class="n leaf">webhook → SSRF → host público pós-DNS, sem redirect, egress fechado → 169.254… rejeitado</span></li>
+  <li><span class="n leaf">upload → tipo pelo conteúdo, nome gerado, fora da raiz, nosniff + attachment</span></li>
+  <li><span class="n leaf">cabeçalhos → HSTS · CSP · nosniff · frame-ancestors 'none' · cookies Secure · TLS 1.2+</span></li>
+  <li><span class="n leaf">terceiros → SRI + CSP + SCA · log → sujeito, tempo, sem cartão, alerta de 403</span></li>
+  <li><span class="n leaf">camadas se somam<span class="w">HttpOnly limita XSS; CSP limita o resto; token + SameSite limitam CSRF</span></span></li>
+</ul></details></li>
+
+<!-- ========== ERROS ========== -->
+<li><details data-l="1"><summary><span class="n b1"><span class="k x">✗</span>erros a não cometer</span></summary>
+<ul>
+  <li><span class="n leaf">Top 10 ≠ padrão (ASVS é) · validar entrada ≠ resolver XSS · escapar ≠ parametrizar</span></li>
+  <li><span class="n leaf">WAF ≠ correção · SameSite ≠ fim do CSRF · HTTPS ≠ anti-injeção</span></li>
+  <li><span class="n leaf">mesma origem não impede CSRF · esconder URL ≠ authz · sanitizar ≠ escapar</span></li>
+</ul></details></li>
+
+</ul></details>
+</li>
+</ul>
+</main>
+
+<script>
+  const root = document.documentElement;
+  let fs = 16;
+  const apply = () => root.style.setProperty("--fs", fs + "px");
+  document.getElementById("in").onclick  = () => { fs = Math.min(24, fs+1); apply(); };
+  document.getElementById("out").onclick = () => { fs = Math.max(11, fs-1); apply(); };
+  document.getElementById("full").onclick = () => {
+    if(!document.fullscreenElement) document.documentElement.requestFullscreen();
+    else document.exitFullscreen();
+  };
+  // níveis: 1 = só espinha (ramos de 1º nível fechados), 2 = até P/T/M, 3 = tudo
+  const setLevel = max => document.querySelectorAll("details").forEach(d => {
+    const l = +d.dataset.l; d.open = l < max;
+  });
+  document.getElementById("l1").onclick = () => setLevel(1);
+  document.getElementById("l2").onclick = () => setLevel(3);
+  document.getElementById("l3").onclick = () => setLevel(9);
+  addEventListener("keydown", e => {
+    if(e.key==="+"||e.key==="=") document.getElementById("in").click();
+    if(e.key==="-") document.getElementById("out").click();
+    if(e.key==="f") document.getElementById("full").click();
+    if(e.key==="1") setLevel(1); if(e.key==="2") setLevel(3); if(e.key==="3") setLevel(9);
+  });
+</script>
+</body>
+</html>
