@@ -1,0 +1,25 @@
+00-mapa-de-estudo.md
+  s_7cc7673de0adc8::t_d9d1790bcf553b 68
+03-principios-de-arquitetura-segura/README.md
+  s_7cc7673de0adc8::t_a67e60826f5edd 3,5-407
+03-principios-de-arquitetura-segura/arvore.html
+  s_7cc7673de0adc8::t_56b19d4cb9c0ef 1-315
+03-principios-de-arquitetura-segura/arvore-memoria.md
+  s_7cc7673de0adc8::t_bc5e798e0fe272 1-88
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f1a99e7ef4b34405531c4fc7bb8cac9ea176f6fa",
+  "prompts": {},
+  "sessions": {
+    "s_7cc7673de0adc8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9ffe1f51-e813-456c-ad90-77b82c1de23c",
+        "model": "unknown"
+      },
+      "human_author": "alan <nascimentoalankst@gmail.com>"
+    }
+  }
+}
