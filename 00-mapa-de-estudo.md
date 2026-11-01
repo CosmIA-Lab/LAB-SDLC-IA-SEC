@@ -65,7 +65,7 @@ Para cada ponto, o par que mais cai: a âncora nomeada (com fonte) e o mecanismo
 |---|---|---|
 | 1. SDLC seguro | *estratégia*: pushing left (Boehm, 1981; Janca, 2020); NIST SSDF | pipeline CI/CD com gates por fase |
 | 2. Modelagem de ameaças | quatro perguntas (Shostack, 2014) com STRIDE (Kohnfelder e Garg, 1999); attack tree (Schneier, 1999); superfície (Manadhata e Wing, 2011) | DFD com fronteiras + Threat Dragon / Threat Modeling Tool |
-| 3. Arquitetura segura | Saltzer & Schroeder, 1975 (8 princípios) | trust boundary, segmentação, sandbox |
+| 3. Arquitetura segura | Saltzer e Schroeder, 1975 (8 princípios); monitor de referência (Anderson, 1972); arquitetura zero trust (NIST SP 800-207, 2020); revisão contra 10 flaws (IEEE CSD, 2014) | PDP/PEP no gateway, compartimentação (contêiner sem root), mTLS, ADR de arquitetura |
 | 4. Vulns web | OWASP Top 10; OWASP ASVS | query parametrizada, output encoding, CSP |
 | 5. Codificação + memória | CWE Top 25; SEI CERT | type-safe lang, bounds checking, ASLR/DEP |
 | 6. AuthN/AuthZ/sessão | OAuth 2.0; OIDC; RBAC/ABAC | token assinado, cookie HttpOnly+Secure, MFA |

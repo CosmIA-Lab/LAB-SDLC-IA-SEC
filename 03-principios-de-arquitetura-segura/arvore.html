@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ponto 3 — Princípios de arquitetura e projeto seguros</title>
+<style>
+  :root{
+    --bg:#0e1116; --surface:#161b22; --line:#3a4350;
+    --fg:#e6edf3; --dim:#9aa4b0;
+    --root:#58a6ff; --base:#8b949e; --etapa:#3fb950; --surf:#d29922; --outras:#bc8cff; --ex:#f778ba;
+    --p:#79c0ff; --t:#3fb950; --m:#d29922;
+    --fs:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--bg); color:var(--fg);
+    font:var(--fs)/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;}
+
+  header{position:sticky; top:0; z-index:5; background:var(--surface);
+    border-bottom:1px solid var(--line); padding:10px 16px;
+    display:flex; align-items:center; gap:12px; flex-wrap:wrap;}
+  header h1{font-size:1rem; margin:0; font-weight:700}
+  header .hint{color:var(--dim); font-size:.78rem}
+  header .ctr{margin-left:auto; display:flex; gap:6px; flex-wrap:wrap}
+  button{border:1px solid var(--line); background:#21262d; color:var(--fg);
+    border-radius:8px; padding:6px 10px; font-weight:600; cursor:pointer; font-size:.85rem}
+  button:hover{border-color:var(--root)}
+
+  main{max-width:980px; margin:0 auto; padding:18px 16px 90px}
+  .spine{color:var(--dim); font-size:.88rem; margin:0 0 14px; padding:8px 12px;
+    border:1px dashed var(--line); border-radius:10px}
+  .spine b{color:var(--root)}
+
+  /* ---------- árvore ---------- */
+  .tree, .tree ul{list-style:none; margin:0; padding:0}
+  .tree ul{margin-left:14px; padding-left:18px; border-left:2px solid var(--line)}
+  .tree li{position:relative; margin:4px 0; padding-left:6px}
+  .tree li::before{content:""; position:absolute; left:-18px; top:.85em; width:16px; height:2px; background:var(--line)}
+  .tree > li::before{display:none}
+
+  details{margin:0}
+  summary{cursor:pointer; list-style:none; display:inline-block}
+  summary::-webkit-details-marker{display:none}
+  summary::before{content:"▸"; display:inline-block; width:1em; color:var(--dim); transition:transform .15s}
+  details[open] > summary::before{transform:rotate(90deg)}
+
+  .n{display:inline-block; padding:3px 9px; border-radius:8px; background:var(--surface);
+    border:1px solid var(--line); border-left-width:4px; font-weight:600}
+  .n small{font-weight:500; color:var(--dim); margin-left:6px; font-size:.8em}
+  .n .w{font-weight:400; color:var(--dim)}
+  .n .w::before{content:" — "}
+
+  .n.root{border-left-color:var(--root); color:var(--root); font-size:1.15em; font-weight:800}
+  .n.b1{border-left-color:var(--root); font-size:1.05em; font-weight:800}
+  .n.base{border-left-color:var(--base)}
+  .n.etapa{border-left-color:var(--etapa); font-weight:800}
+  .n.surf{border-left-color:var(--surf); color:var(--surf); font-weight:800}
+  .n.outras{border-left-color:var(--outras); color:var(--outras); font-weight:800}
+  .n.ex{border-left-color:var(--ex); color:var(--ex); font-weight:800}
+  .n.leaf{background:transparent; border-color:transparent; padding-left:0; font-weight:500}
+  .n.leaf small{margin-left:4px}
+
+  /* rótulos P / T / M / saída */
+  .k{display:inline-block; min-width:1.5em; text-align:center; font-weight:800; font-size:.78em;
+    border-radius:5px; padding:1px 4px; margin-right:6px; vertical-align:1px}
+  .k.p{background:#1b2a3d; color:var(--p)} .k.t{background:#1f3b2a; color:var(--t)}
+  .k.m{background:#2a2f1f; color:var(--m)} .k.o{background:#2b2231; color:var(--ex)}
+  .k.x{background:#3a2626; color:#ff7b72}
+
+  /* junta (ponte) */
+  li.j{list-style:none}
+  li.j::before{display:none}
+  .bridge{display:inline-block; color:var(--dim); font-style:italic; font-size:.9em; padding:2px 6px}
+  .bridge::before{content:"⟪ "} .bridge::after{content:" ⟫"}
+
+  /* grade STRIDE × elemento */
+  .grid{display:inline-grid; grid-template-columns:auto repeat(6,1.7em); gap:3px; margin:4px 0 2px 1.6em; font-size:.82rem; text-align:center}
+  .grid div{padding:2px 1px; border-radius:4px; background:#21262d}
+  .grid .h{font-weight:800; color:var(--dim)}
+  .grid .r{text-align:left; padding:2px 8px 2px 4px; font-weight:600}
+  .grid .y{background:#1f3b2a; color:var(--t); font-weight:800}
+  .grid .mm{background:#2a2f1f; color:var(--m); font-size:.7rem; font-weight:700}
+
+  @media (max-width:520px){ .tree ul{margin-left:6px; padding-left:12px} .tree li::before{left:-12px; width:10px} .n .w{display:block; margin-top:2px} .n .w::before{content:""} }
+</style>
+</head>
+<body>
+<header>
+  <h1>Ponto 3 — Princípios de arquitetura e projeto seguros <span class="hint">· árvore de conceitos</span></h1>
+  <span class="hint">clique num nó para abrir/fechar · <b style="color:var(--p)">P</b> princípio · <b style="color:var(--t)">T</b> técnica · <b style="color:var(--m)">M</b> mecanismo · <b style="color:var(--ex)">→</b> saída</span>
+  <div class="ctr">
+    <button id="l1">só espinha</button>
+    <button id="l2">até P/T/M</button>
+    <button id="l3">tudo</button>
+    <button id="out">A−</button>
+    <button id="in">A+</button>
+    <button id="full">⛶</button>
+  </div>
+</header>
+
+<main>
+<p class="spine">espinha: <b>flaw ≠ bug → 4 fundamentos → 8 princípios (1975) → releituras → 6 técnicas → exemplo → erros</b></p>
+
+<ul class="tree">
+<li>
+<details open data-l="0"><summary><span class="n root">Princípios de arquitetura e projeto seguros<span class="w">decidir, antes do código, como o sistema resiste quando algo falha</span></span></summary>
+<ul>
+
+<!-- ========== FLAW ========== -->
+<li><details open data-l="1"><summary><span class="n b1">Falha de design ≠ bug<small>McGraw 06</small></span></summary>
+<ul>
+  <li><span class="n leaf">bug<span class="w">código não faz o que o projeto mandou</span></span></li>
+  <li><span class="n leaf">flaw<span class="w">código faz o que o projeto mandou; o projeto estava errado (~metade dos defeitos)</span></span></li>
+  <li><span class="n leaf">corrige-se redesenhando<span class="w">custo cresce por fase (Boehm 81) → revisão de arquitetura antes do código</span></span></li>
+  <li><details open data-l="2"><summary><span class="n base">princípio, não checklist</span></summary>
+    <ul>
+      <li><span class="n leaf">checklist enumera o que já aconteceu</span></li>
+      <li><span class="n leaf">princípio é regra sobre a forma<span class="w">vale para falha ainda não catalogada</span></span></li>
+      <li><span class="n leaf">IEEE CSD 14 chegou ao mesmo lugar<span class="w">cada flaw = violação de um princípio de 1975</span></span></li>
+    </ul></details></li>
+  <li><details open data-l="2"><summary><span class="n base">taxonomia do lab</span></summary>
+    <ul>
+      <li><span class="n leaf">fundamento = premissa · princípio = regra · técnica = método com fonte · mecanismo = implementação</span></li>
+      <li><span class="n leaf"><span class="k x">✗</span>RBAC não é princípio<span class="w">é mecanismo de menor privilégio</span></span></li>
+    </ul></details></li>
+  <li><span class="n leaf">exemplo<span class="w">GET /contas/{id}/saldo sem checar dono: zero bugs, um flaw (mediação completa)</span></span></li>
+</ul></details></li>
+
+<li class="j"><span class="bridge">antes das regras, o que elas pressupõem?</span></li>
+
+<!-- ========== FUNDAMENTOS ========== -->
+<li><details open data-l="1"><summary><span class="n b1">Fundamentos<small>4 premissas</small></span></summary>
+<ul>
+  <li><details open data-l="2"><summary><span class="n base">confiança é decisão explícita, não estado padrão</span></summary>
+    <ul>
+      <li><span class="n leaf">"centro mole"<span class="w">perímetro duro, interior sem verificação</span><small>Kindervag 10</small></span></li>
+      <li><span class="n leaf">nada é confiável por estar "dentro"<span class="w">concede-se, verifica-se, expira</span><small>NIST 800-207</small></span></li>
+    </ul></details></li>
+  <li><details open data-l="2"><summary><span class="n base">a violação vai acontecer em algum lugar</span></summary>
+    <ul>
+      <li><span class="n leaf">assume breach<span class="w">"quando entrarem por aqui, até onde chegam?"</span></span></li>
+      <li><span class="n leaf">raio de explosão<span class="w">a grandeza que o desenho minimiza</span></span></li>
+    </ul></details></li>
+  <li><details open data-l="2"><summary><span class="n base">segurança = mecanismo pequeno e sempre invocado</span></summary>
+    <ul>
+      <li><span class="n leaf">monitor de referência<span class="w">sempre invocado · inviolável · verificável</span><small>Anderson 72</small></span></li>
+      <li><span class="n leaf">TCB<span class="w">base computacional confiável: quanto menor, melhor</span></span></li>
+    </ul></details></li>
+  <li><details open data-l="2"><summary><span class="n base">quem opera o sistema é parte dele</span></summary>
+    <ul>
+      <li><span class="n leaf">controle inusável é controle desligado<small>Adams/Sasse 99</small></span></li>
+      <li><span class="n leaf">usuário, dev e operador são componentes com comportamento previsível</span></li>
+    </ul></details></li>
+</ul></details></li>
+
+<li class="j"><span class="bridge">que regras decorrem disso? as de 1975, ainda</span></li>
+
+<!-- ========== 8 PRINCÍPIOS ========== -->
+<li><details open data-l="1"><summary><span class="n b1">8 princípios<small>Saltzer &amp; Schroeder 75</small><span class="w">molde: regra → o que viola → técnica → mecanismo → exemplo</span></span></summary>
+<ul>
+  <li><details open data-l="2"><summary><span class="n etapa">1 · Economia de mecanismo<span class="w">pequeno e inspecionável</span></span></summary><ul>
+    <li><span class="n leaf">viola<span class="w">authz espalhada; cripto própria</span></span></li>
+    <li><span class="n leaf"><span class="k t">T</span>TCB mínima<small>Anderson 72</small> · Check Point<small>Yoder/Barcalow 97</small></span></li>
+    <li><span class="n leaf"><span class="k m">M</span>middleware único · biblioteca cripto padrão · serviço de identidade</span></li>
+  </ul></details></li>
+  <li><details open data-l="2"><summary><span class="n etapa">2 · Padrões à prova de falha<span class="w">permissão, não exclusão</span></span></summary><ul>
+    <li><span class="n leaf">viola<span class="w">lista de bloqueio; exceção que deixa passar</span></span></li>
+    <li><span class="n leaf"><span class="k t">T</span>default deny · seguro por padrão<small>Howard/Lipner 06; CISA 23</small></span></li>
+    <li><span class="n leaf"><span class="k m">M</span>rede nega tudo · flag off · IAM vazio · erro → 403</span></li>
+    <li><span class="n leaf"><span class="k x">✗</span>fail-safe (física: destranca) ≠ fail secure (software: nega)</span></li>
+  </ul></details></li>
+  <li><details open data-l="2"><summary><span class="n etapa">3 · Mediação completa<span class="w">todo acesso a todo objeto verificado</span></span></summary><ul>
+    <li><span class="n leaf">viola<span class="w">checar só na listagem; authz só no front; cache de decisão; TOCTOU</span></span></li>
+    <li><span class="n leaf"><span class="k t">T</span>monitor de referência<small>Anderson 72</small> · PDP/PEP<small>NIST 800-207</small></span></li>
+    <li><span class="n leaf"><span class="k m">M</span>gateway como PEP · OPA/Cedar como PDP · reavaliar por requisição · token curto</span></li>
+  </ul></details></li>
+  <li><details open data-l="2"><summary><span class="n etapa">4 · Desenho aberto<span class="w">não depende do segredo do desenho</span></span></summary><ul>
+    <li><span class="n leaf">Kerckhoffs 1883 · Shannon 49 "o inimigo conhece o sistema"</span></li>
+    <li><span class="n leaf"><span class="k t">T</span>primitivas e protocolos públicos · revisão externa</span></li>
+    <li><span class="n leaf"><span class="k m">M</span>cripto padrão · cofre com rotação · API documentada</span></li>
+    <li><span class="n leaf"><span class="k x">✗</span>aberto ≠ publicar tudo<span class="w">obscuridade pode ser camada extra, nunca a única</span></span></li>
+  </ul></details></li>
+  <li><details open data-l="2"><summary><span class="n etapa">5 · Separação de privilégios<span class="w">duas chaves &gt; uma</span></span></summary><ul>
+    <li><span class="n leaf"><span class="k t">T</span>separação de deveres<small>Clark/Wilson 87</small> · MFA · revisão obrigatória</span></li>
+    <li><span class="n leaf"><span class="k m">M</span>aprovação em dupla · branch protegida · conta admin separada</span></li>
+  </ul></details></li>
+  <li><details open data-l="2"><summary><span class="n etapa">6 · Menor privilégio<span class="w">mínimo necessário</span></span></summary><ul>
+    <li><span class="n leaf">viola<span class="w">serviço como root; token com todos os escopos; banco compartilhado</span></span></li>
+    <li><span class="n leaf"><span class="k t">T</span>privsep do OpenSSH<small>Provos/Friedl/Honeyman 03</small> · IAM por função</span></li>
+    <li><span class="n leaf"><span class="k m">M</span>usuário por serviço · capabilities · escopos OAuth · seccomp · conta só-leitura</span></li>
+    <li><span class="n leaf">exemplo<span class="w">saldo comprometido lê saldos; não transfere</span></span></li>
+  </ul></details></li>
+  <li><details open data-l="2"><summary><span class="n etapa">7 · Menor mecanismo comum<span class="w">pouco compartilhado</span></span></summary><ul>
+    <li><span class="n leaf">viola<span class="w">cache sem chave de tenant; filtro por tenant em cada query</span></span></li>
+    <li><span class="n leaf"><span class="k t">T</span>isolamento por domínio de segurança · Spectre 19 como aviso</span></li>
+    <li><span class="n leaf"><span class="k m">M</span>chave prefixada por tenant · row-level security · banco por tenant · sandbox</span></li>
+  </ul></details></li>
+  <li><details open data-l="2"><summary><span class="n etapa">8 · Aceitabilidade psicológica<span class="w">uso correto é o fácil</span></span></summary><ul>
+    <li><span class="n leaf">viola<span class="w">troca mensal de senha → post-it; alerta que ninguém lê</span></span></li>
+    <li><span class="n leaf"><span class="k t">T</span>segurança usável<small>Adams/Sasse 99; NIST 800-63B 17</small></span></li>
+    <li><span class="n leaf"><span class="k m">M</span>SSO · passkeys · gerenciador de senhas · erro que diz o que fazer</span></li>
+  </ul></details></li>
+  <li><details open data-l="2"><summary><span class="n base">+2 imperfeitos</span></summary><ul>
+    <li><span class="n leaf">fator de trabalho<span class="w">custo de burlar × recursos do atacante: bcrypt/Argon2, rate limit</span></span></li>
+    <li><span class="n leaf">registro de comprometimento<span class="w">log íntegro, timestamp, só-anexa — o R do STRIDE</span></span></li>
+  </ul></details></li>
+</ul></details></li>
+
+<li class="j"><span class="bridge">o que mudou com rede, nuvem, terceiros? só o vocabulário</span></li>
+
+<!-- ========== RELEITURAS ========== -->
+<li><details open data-l="1"><summary><span class="n b1 surf">Releituras contemporâneas<small>linhagem</small><span class="w">cada uma = fundamento + princípios de 1975</span></span></summary>
+<ul>
+  <li><span class="n leaf">defesa em profundidade<span class="w">camadas INDEPENDENTES = violação acontece + 6 + 3</span><small>NSA IATF 00; Viega/McGraw 01</small></span></li>
+  <li><span class="n leaf">assume breach<span class="w">até onde chega daqui? = violação acontece + 6 + 7 + registro</span><small>Microsoft 2010s</small></span></li>
+  <li><details open data-l="2"><summary><span class="n base">zero trust<span class="w">acesso por identidade e sessão, não por rede = confiança explícita + 3 + 6 + 2</span></span></summary><ul>
+    <li><span class="n leaf">Kindervag 10 → BeyondCorp 14 (proxy ciente de identidade, sem VPN) → NIST 800-207 20</span></li>
+    <li><span class="n leaf">7 tenets<span class="w">tudo é recurso · comunicação protegida · acesso por sessão · política dinâmica · monitorar ativos · authn/authz antes de cada acesso · coletar para melhorar</span></span></li>
+    <li><span class="n leaf"><span class="k x">✗</span>não é produto, nem "desligar a VPN"</span></li>
+  </ul></details></li>
+  <li><span class="n leaf">seguro por padrão / por design<span class="w">fábrica segura; decidido no projeto = 2 + 8 + 1</span><small>Howard/Lipner 06 SD3+C; CISA 23</small></span></li>
+  <li><span class="n leaf">separação de deveres<span class="w">executa ≠ confere = 5</span><small>Clark/Wilson 87</small></span></li>
+  <li><span class="n leaf">elo mais fraco · não confiar no cliente<span class="w">= confiança explícita + 3</span><small>Viega/McGraw 01; IEEE CSD 14 #1</small></span></li>
+</ul></details></li>
+
+<li class="j"><span class="bridge">regra diz o que não violar; falta o método repetível</span></li>
+
+<!-- ========== TÉCNICAS ========== -->
+<li><details open data-l="1"><summary><span class="n b1 outras">6 técnicas<span class="w">nome + fonte → mecanismos → saída</span></span></summary>
+<ul>
+  <li><details open data-l="2"><summary><span class="n base"><span class="k t">T</span>monitor de referência / Check Point<small>Anderson 72; Yoder/Barcalow 97</small></span></summary><ul>
+    <li><span class="n leaf"><span class="k m">M</span>gateway · OPA/Cedar · policy as code</span></li>
+    <li><span class="n leaf"><span class="k o">→</span>toda seta de acesso passa por um nó nomeado + teste de que não há desvio</span></li>
+  </ul></details></li>
+  <li><details open data-l="2"><summary><span class="n base"><span class="k t">T</span>padrões de segurança<small>Yoder/Barcalow 97; Schumacher 06</small></span></summary><ul>
+    <li><span class="n leaf">Single Access Point · Check Point · Roles · Session · Full View with Errors · Limited View · Secure Access Layer</span></li>
+    <li><span class="n leaf"><span class="k o">→</span>vocabulário de revisão: "falta Check Point no serviço X"</span></li>
+  </ul></details></li>
+  <li><details open data-l="2"><summary><span class="n base"><span class="k t">T</span>separação de privilégios / compartimentação<small>Provos/Friedl/Honeyman 03</small></span></summary><ul>
+    <li><span class="n leaf"><span class="k m">M</span>processos com IPC estreito · contêiner sem root + seccomp · conta por ambiente · VPC por camada</span></li>
+    <li><span class="n leaf"><span class="k o">→</span>mapa de compartimentos: o que um comprometido alcança</span></li>
+  </ul></details></li>
+  <li><details open data-l="2"><summary><span class="n base"><span class="k t">T</span>arquitetura zero trust<small>NIST 800-207</small></span></summary><ul>
+    <li><span class="n leaf">policy engine + policy administrator = PDP · PEP no caminho do acesso</span></li>
+    <li><span class="n leaf">3 variantes<span class="w">identidade aprimorada · microssegmentação · SDP</span></span></li>
+    <li><span class="n leaf"><span class="k m">M</span>mTLS · proxy ciente de identidade · token curto · postura do dispositivo · SPIFFE</span></li>
+    <li><span class="n leaf"><span class="k o">→</span>nenhuma seta "confiável por estar na rede interna"</span></li>
+  </ul></details></li>
+  <li><details open data-l="2"><summary><span class="n base"><span class="k t">T</span>revisão contra as 10 falhas<small>IEEE CSD 14</small></span></summary><ul>
+    <li><span class="n leaf">1 confiança · 2 authn inviolável · 3 authz após authn · 4 dado ≠ controle · 5 validação explícita</span></li>
+    <li><span class="n leaf">6 cripto correta · 7 dado sensível · 8 usuários · 9 terceiros mudam a superfície · 10 mudança futura</span></li>
+    <li><span class="n leaf"><span class="k m">M</span>revisão antes do código · ADR por item · gate no ciclo (ponto 1)</span></li>
+  </ul></details></li>
+  <li><details open data-l="2"><summary><span class="n base"><span class="k t">T</span>requisitos verificáveis<small>OWASP ASVS V1; NIST 800-160</small></span></summary><ul>
+    <li><span class="n leaf">ASVS V1<span class="w">componentes identificados · authn centralizada · comunicação autenticada; 3 níveis</span></span></li>
+    <li><span class="n leaf">800-160<span class="w">segurança como propriedade emergente do sistema projetado</span></span></li>
+    <li><span class="n leaf"><span class="k o">→</span>ativo → requisito → controle → teste</span></li>
+  </ul></details></li>
+</ul></details></li>
+
+<li class="j"><span class="bridge">aplicar tudo num caso: a API de pagamentos do ponto 2</span></li>
+
+<!-- ========== EXEMPLO ========== -->
+<li><details data-l="1"><summary><span class="n b1 ex">exemplo-fio<small>API de pagamentos</small><span class="w">ameaça → princípio → técnica → mecanismo → teste</span></span></summary>
+<ul>
+  <li><span class="n leaf">troca de id → mediação completa → Check Point → middleware único → 403 em todo endpoint</span></li>
+  <li><span class="n leaf">dependência vulnerável → menor privilégio → compartimentação → credencial só-leitura → lê, não move</span></li>
+  <li><span class="n leaf">credencial interna → confiança explícita → zero trust → mTLS + PDP/PEP + token curto</span></li>
+  <li><span class="n leaf">operador interno → separação de privilégios/deveres → 2º fator + 2º operador + log assinado</span></li>
+  <li><span class="n leaf">canal do parceiro → desenho aberto + profundidade → TLS + assinatura + minimizar; falha → nega</span></li>
+  <li><span class="n leaf">rajada → fator de trabalho → rate limit · saldo e transferência separados (7)</span></li>
+  <li><span class="n leaf">config → seguro por padrão → flag off · MFA on · caminho seguro é o fácil</span></li>
+  <li><span class="n leaf">revisão → IEEE CSD item a item em ADR → requisitos ASVS no backlog → gate do ponto 1</span></li>
+</ul></details></li>
+
+<!-- ========== ERROS ========== -->
+<li><details data-l="1"><summary><span class="n b1"><span class="k x">✗</span>erros a não cometer</span></summary>
+<ul>
+  <li><span class="n leaf">RBAC não é princípio · zero trust não é produto · dois antivírus ≠ profundidade</span></li>
+  <li><span class="n leaf">fail-safe ≠ fail secure · aberto ≠ publicar tudo · SAST acha bug, não flaw</span></li>
+  <li><span class="n leaf">princípios não são independentes: mostrar a linhagem</span></li>
+</ul></details></li>
+
+</ul></details>
+</li>
+</ul>
+</main>
+
+<script>
+  const root = document.documentElement;
+  let fs = 16;
+  const apply = () => root.style.setProperty("--fs", fs + "px");
+  document.getElementById("in").onclick  = () => { fs = Math.min(24, fs+1); apply(); };
+  document.getElementById("out").onclick = () => { fs = Math.max(11, fs-1); apply(); };
+  document.getElementById("full").onclick = () => {
+    if(!document.fullscreenElement) document.documentElement.requestFullscreen();
+    else document.exitFullscreen();
+  };
+  // níveis: 1 = só espinha (ramos de 1º nível fechados), 2 = até P/T/M, 3 = tudo
+  const setLevel = max => document.querySelectorAll("details").forEach(d => {
+    const l = +d.dataset.l; d.open = l < max;
+  });
+  document.getElementById("l1").onclick = () => setLevel(1);
+  document.getElementById("l2").onclick = () => setLevel(3);
+  document.getElementById("l3").onclick = () => setLevel(9);
+  addEventListener("keydown", e => {
+    if(e.key==="+"||e.key==="=") document.getElementById("in").click();
+    if(e.key==="-") document.getElementById("out").click();
+    if(e.key==="f") document.getElementById("full").click();
+    if(e.key==="1") setLevel(1); if(e.key==="2") setLevel(3); if(e.key==="3") setLevel(9);
+  });
+</script>
+</body>
+</html>
