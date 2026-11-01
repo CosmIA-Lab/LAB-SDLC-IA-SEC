@@ -1,0 +1,25 @@
+04-vulnerabilidades-em-aplicacoes-web/README.md
+  s_7cc7673de0adc8::t_9fedcaf70047aa 3,5-381
+04-vulnerabilidades-em-aplicacoes-web/arvore-memoria.md
+  s_7cc7673de0adc8::t_b63f05909d8bf8 1-100
+04-vulnerabilidades-em-aplicacoes-web/arvore.html
+  s_7cc7673de0adc8::t_b63f05909d8bf8 1-292
+00-mapa-de-estudo.md
+  s_7cc7673de0adc8::t_002c9da74ebb0f 69
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "413548db9015b00c1e16618695e93a7ce7edebd8",
+  "prompts": {},
+  "sessions": {
+    "s_7cc7673de0adc8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9ffe1f51-e813-456c-ad90-77b82c1de23c",
+        "model": "unknown"
+      },
+      "human_author": "alan <nascimentoalankst@gmail.com>"
+    }
+  }
+}
