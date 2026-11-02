@@ -2,6 +2,16 @@
 
 > Texto corrido, no registro de uma dissertação, com cerca de dez páginas à mão. Três fontes nomeadas, um caso real, um exemplo que atravessa o texto. **[+]** marca onde alongar; **[−]** marca o que cortar primeiro.
 
+
+## Esqueleto — o que você anota em 5 minutos antes de escrever
+
+- **Seções, na ordem:** Introdução → Quatro fatos do modelo → Taxonomias → Injeção → Cross-site scripting → Falsificação de requisição entre sítios → Controle de acesso quebrado → As demais classes → O que a plataforma oferece → Exemplo → Um caso real → O que não confundir → Conclusão
+- **Figura 1:** O caminho da requisição e onde cada classe de vulnerabilidade vive.
+- **Caso:** British Airways e o Magecart, 2018.
+- **Três fontes:** OWASP Top 10 (2021; 2025) e OWASP ASVS — consciência e padrão; Barth, Jackson e Mitchell, *Robust Defenses for Cross-Site Request Forgery* (2008).
+- **Exemplo:** a API de pagamentos (aplicativo, gateway, contas, transferências, banco, fila, parceiro).
+- **Desfecho começa com:** "Em síntese, as vulnerabilidades em aplicações web não são uma lista de nomes, e sim consequências de uma cadeia."
+
 ## 1. Introdução — um programa dividido ao meio
 
 Uma aplicação web é um programa dividido ao meio por uma fronteira que o atacante controla. Metade roda no servidor, sob nosso controle; metade roda no navegador, sob o controle de quem quer que esteja do outro lado — e tudo que atravessa essa fronteira, nos dois sentidos, pode ser forjado, alterado ou interpretado de um jeito que ninguém previu. As vulnerabilidades de aplicações web não são uma coleção de truques a decorar; são consequências previsíveis de alguns fatos do modelo de execução, e quem entende os fatos reconhece a vulnerabilidade nova quando ela aparece.

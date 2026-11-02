@@ -2,6 +2,16 @@
 
 > Texto corrido, no registro de uma dissertação, com cerca de dez páginas à mão. Três fontes nomeadas, um caso real, um exemplo que atravessa o texto. **[+]** marca onde alongar; **[−]** marca o que cortar primeiro.
 
+
+## Esqueleto — o que você anota em 5 minutos antes de escrever
+
+- **Seções, na ordem:** Introdução → O que se toma como dado → Análise estática → Análise dinâmica → Análise de composição → Fuzzing → Os testes que o time escreve → Exemplo → Um caso real → O que não confundir → Conclusão
+- **Figura 1:** As janelas das técnicas de teste e onde cada uma roda no pipeline.
+- **Caso:** Log4Shell, 2021.
+- **Três fontes:** NIST SP 800-115, *Technical Guide to Information Security Testing and Assessment* (2008), com o OWASP Web Security Testing Guide como roteiro; Chess e West, *Secure Programming with Static Analysis* (2007), e Livshits e Lam (2005) — análise de fluxo de dados; Miller, Fredriksen e So (1990) e Zalewski, AFL (2013) — fuzzing.
+- **Exemplo:** a API de pagamentos (aplicativo, gateway, contas, transferências, banco, fila, parceiro).
+- **Desfecho começa com:** "Em síntese, os testes de segurança não são uma lista de ferramentas, e sim uma cadeia."
+
 ## 1. Introdução — o que um teste prova
 
 Edsger Dijkstra escreveu, em 1970, que o teste pode mostrar a presença de defeitos, nunca a ausência. Em segurança a frase é mais dura ainda: o atacante procura exatamente o caso que o teste não cobriu. Um programa de testes de segurança, portanto, não "garante que o sistema é seguro". Ele produz evidência de que classes específicas de falha foram procuradas, com técnicas específicas, até um grau de cobertura conhecido — e a honestidade sobre o que não foi coberto é parte do resultado.

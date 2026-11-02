@@ -2,6 +2,16 @@
 
 > Texto corrido, no registro de uma dissertação, com cerca de dez páginas à mão. Três fontes nomeadas, um caso real, um exemplo que atravessa o texto. **[+]** marca onde alongar; **[−]** marca o que cortar primeiro.
 
+
+## Esqueleto — o que você anota em 5 minutos antes de escrever
+
+- **Seções, na ordem:** Introdução → Confiar sem verificar → O que se toma como dado → Os elos → Os princípios → Os arcabouços e técnicas com nome → Exemplo → Dois casos reais → O que não confundir → Conclusão
+- **Figura 1:** A cadeia de suprimentos com as ameaças A–H do SLSA e um incidente por letra.
+- **Caso:** SolarWinds, 2020, e xz-utils, 2024.
+- **Três fontes:** SLSA — *Supply-chain Levels for Software Artifacts*, v1.0 (OpenSSF, 2023) — ameaças e níveis; Thompson, *Reflections on Trusting Trust* (1984) — a premissa; Newman et al., *Sigstore* (2022), e Torres-Arias et al., *in-toto* (2019) — assinatura e atestações.
+- **Exemplo:** a API de pagamentos (aplicativo, gateway, contas, transferências, banco, fila, parceiro).
+- **Desfecho começa com:** "Em síntese, a segurança da cadeia de suprimentos de software não é uma lista de boas práticas, e sim uma cadeia — literalmente."
+
 ## 1. Introdução — o código que você não escreveu
 
 Uma aplicação moderna é, em volume, trabalho alheio. Estudos da indústria colocam entre setenta e noventa por cento a fração de código aberto de terceiros em um sistema típico; um aplicativo web carrega centenas de pacotes, a maioria escolhida por ninguém do time — vieram como dependências de dependências. A isso se somam o compilador, o gerenciador de pacotes, o serviço de integração contínua, o registro de imagens, a imagem base do sistema operacional, os complementos do pipeline. O artefato que vai para produção é majoritariamente de outros, e o time o assina como se fosse seu.

@@ -2,6 +2,16 @@
 
 > Texto corrido, no registro de uma dissertação, com cerca de dez páginas à mão. Três fontes nomeadas, um caso real, um exemplo que atravessa o texto. As marcas **[+]** indicam onde dá para alongar com um parágrafo próprio se sobrar tempo; as marcas **[−]** indicam o que cortar primeiro se faltar. Os títulos das seções podem ir para o papel como estão.
 
+
+## Esqueleto — o que você anota em 5 minutos antes de escrever
+
+- **Seções, na ordem:** Introdução → Três palavras que não são sinônimos → O que a modelagem toma como dado → Primeira pergunta → Segunda pergunta → Terceira pergunta → Quarta pergunta → A análise de superfície de ataque → Exemplo → Um caso real → O que não confundir → Conclusão
+- **Figura 1:** O diagrama de fluxo de dados da API de pagamentos com fronteiras de confiança e STRIDE por elemento.
+- **Caso:** Capital One, 2019.
+- **Três fontes:** Shostack, *Threat Modeling: Designing for Security* (2014) — quatro perguntas, STRIDE por elemento, quatro destinos; Kohnfelder e Garg (Microsoft, 1999) — STRIDE; Manadhata e Wing (2011) — superfície de ataque.
+- **Exemplo:** a API de pagamentos (aplicativo, gateway, contas, transferências, banco, fila, parceiro).
+- **Desfecho começa com:** "Em síntese, a modelagem de ameaças não é uma lista de boas práticas, e sim uma cadeia."
+
 ## 1. Introdução — a pergunta da fase de design
 
 Todo sistema de software é construído a partir de uma lista de coisas que ele deve fazer. Quase nenhum é construído a partir de uma lista de coisas que ele não pode deixar acontecer. A modelagem de ameaças é a atividade que escreve essa segunda lista, e a escreve no momento em que ainda é barato agir sobre ela: na fase de design, antes de existir código, quando mudar uma decisão custa uma conversa e não uma reescrita.

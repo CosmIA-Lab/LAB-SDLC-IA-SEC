@@ -2,6 +2,16 @@
 
 > Texto corrido, no registro de uma dissertação, com cerca de dez páginas à mão. Três fontes nomeadas, um caso real, um exemplo que atravessa o texto. **[+]** marca onde alongar; **[−]** marca o que cortar primeiro.
 
+
+## Esqueleto — o que você anota em 5 minutos antes de escrever
+
+- **Seções, na ordem:** Introdução → Princípio, técnica e mecanismo → O que se toma como dado → Os oito princípios de Saltzer e Schroeder → As releituras contemporâneas → As técnicas → Exemplo → Um caso real → O que não confundir → Conclusão
+- **Figura 1:** Anéis de defesa em profundidade com o princípio que cada anel aplica.
+- **Caso:** Operação Aurora e o BeyondCorp.
+- **Três fontes:** Saltzer e Schroeder, *The Protection of Information in Computer Systems* (1975) — os oito princípios; Anderson (1972) — monitor de referência; NIST SP 800-207, *Zero Trust Architecture* (2020).
+- **Exemplo:** a API de pagamentos (aplicativo, gateway, contas, transferências, banco, fila, parceiro).
+- **Desfecho começa com:** "Em síntese, os princípios de arquitetura e projeto seguros não são uma lista de boas práticas, e sim uma cadeia."
+
 ## 1. Introdução — a falha que não é bug
 
 Há dois tipos de defeito de segurança, e eles se corrigem de modos diferentes. O primeiro é o bug: o projeto estava certo e o código não o seguiu — a consulta que deveria ser parametrizada e não foi. O segundo é a falha de design: o código faz exatamente o que o projeto mandou, e o projeto estava errado — o sistema que confia no identificador de conta enviado pelo cliente para decidir que saldo mostrar não tem nenhuma linha errada; o desenho é que entregou ao atacante a decisão de autorização. Gary McGraw, em *Software Security: Building Security In* (2006), estimou que cerca de metade dos defeitos de segurança são do segundo tipo, e que nenhuma ferramenta de análise de código os encontra, porque não há linha para apontar.

@@ -2,6 +2,16 @@
 
 > Texto corrido, no registro de uma dissertação, com cerca de dez páginas à mão. Três fontes nomeadas, um caso real, um exemplo que atravessa o texto. **[+]** marca onde alongar; **[−]** marca o que cortar primeiro.
 
+
+## Esqueleto — o que você anota em 5 minutos antes de escrever
+
+- **Seções, na ordem:** Introdução → O que mudou → O vocabulário → O ciclo → Divulgação coordenada → Quando é explorada → Exemplo → Dois casos reais → O que não confundir → Conclusão
+- **Figura 1:** A janela de exposição e o ciclo que a encurta.
+- **Caso:** Equifax e WannaCry, 2017.
+- **Três fontes:** NIST SP 800-40 rev. 4, *Guide to Enterprise Patch Management Planning* (2022) — o ciclo como gestão de risco; FIRST, CVSS e EPSS, e CISA, catálogo KEV (2021) e SSVC — o vocabulário de priorização; ISO/IEC 29147 e 30111 com o guia de divulgação coordenada do CERT/CC (2017).
+- **Exemplo:** a API de pagamentos (aplicativo, gateway, contas, transferências, banco, fila, parceiro).
+- **Desfecho começa com:** "Em síntese, a gestão de vulnerabilidades não é uma lista de boas práticas, e sim uma cadeia."
+
 ## 1. Introdução — a janela que a organização controla
 
 Todos os temas anteriores da engenharia de software seguro tentam impedir que a vulnerabilidade chegue a produção. A gestão de vulnerabilidades parte do fato de que ela chega — na dependência que ganhou uma falha pública ontem, no componente que ninguém revisou, no sistema operacional do servidor — e organiza o que se faz a partir daí: saber que existe, decidir qual importa, corrigir no prazo, provar que corrigiu, e aprender.

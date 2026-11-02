@@ -2,6 +2,16 @@
 
 > Texto corrido, no registro de uma dissertação, com cerca de dez páginas à mão. Três fontes nomeadas, um caso real, um exemplo que atravessa o texto. **[+]** marca onde alongar; **[−]** marca o que cortar primeiro.
 
+
+## Esqueleto — o que você anota em 5 minutos antes de escrever
+
+- **Seções, na ordem:** Introdução → O que se toma como dado → Autenticação → Sessão → Autorização → Protocolos → Exemplo → Um caso real → O que não confundir → Conclusão
+- **Figura 1:** O fluxo OAuth 2.0 com código de autorização e PKCE, e onde a autorização por objeto acontece.
+- **Caso:** Uber, 2022.
+- **Três fontes:** NIST SP 800-63B, *Digital Identity Guidelines* (2017) — níveis de garantia, senhas, segundo fator, recuperação; RFC 6749, *The OAuth 2.0 Authorization Framework* (2012), com PKCE (RFC 7636) e a prática corrente de segurança (RFC 9700, 2025); Ferraiolo e Kuhn, *Role-Based Access Controls* (1992).
+- **Exemplo:** a API de pagamentos (aplicativo, gateway, contas, transferências, banco, fila, parceiro).
+- **Desfecho começa com:** "Em síntese, autenticação, autorização e sessão não são uma lista de boas práticas, e sim uma cadeia."
+
 ## 1. Introdução — três perguntas que o código confunde
 
 Toda aplicação com usuários responde a três perguntas, e as confunde com frequência. **Quem é?** — a autenticação: o sujeito apresenta uma evidência e o sistema a verifica contra o que conhece, produzindo uma afirmação de identidade com um grau de confiança. **O que pode fazer, com este recurso, agora?** — a autorização: uma decisão tomada a cada acesso, depois da autenticação e com base nela, mas separada dela. **Como o sistema lembra, na próxima requisição, que a autenticação aconteceu?** — a sessão: um segredo portátil que vale como a prova pelo tempo em que dura.

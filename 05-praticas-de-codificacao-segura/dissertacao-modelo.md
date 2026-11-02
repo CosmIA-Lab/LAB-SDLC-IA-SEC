@@ -2,6 +2,16 @@
 
 > Texto corrido, no registro de uma dissertação, com cerca de dez páginas à mão. Três fontes nomeadas, um caso real, um exemplo que atravessa o texto. **[+]** marca onde alongar; **[−]** marca o que cortar primeiro.
 
+
+## Esqueleto — o que você anota em 5 minutos antes de escrever
+
+- **Seções, na ordem:** Introdução → Bug de segurança não é bug comum → O que se toma como dado → Os erros de memória → As regras que valem em qualquer linguagem → As técnicas → Exemplo → Um caso real → O que não confundir → Conclusão
+- **Figura 1:** A pilha durante um estouro de buffer e onde cada mitigação age.
+- **Caso:** Heartbleed, 2014.
+- **Três fontes:** SEI CERT C Coding Standard (2016) e Seacord, *Secure Coding in C and C++* (2013) — regras com identificador; Aleph One, *Smashing the Stack for Fun and Profit* (1996) — o estouro de pilha; CISA e NSA, *The Case for Memory Safe Roadmaps* (2023) — a migração de linguagem.
+- **Exemplo:** a API de pagamentos (aplicativo, gateway, contas, transferências, banco, fila, parceiro).
+- **Desfecho começa com:** "Em síntese, a codificação segura não é uma lista de boas práticas, e sim uma cadeia."
+
 ## 1. Introdução — quando o código trai o projeto
 
 A arquitetura decide a forma do sistema; o código é quem a executa — e pode traí-la. Codificação segura é a disciplina que impede essa traição: um conjunto de regras sobre o que o código faz com entrada que ninguém legítimo enviaria, cobradas por ferramentas e não só pela atenção de quem escreve. A sua classe definidora é o erro de memória. Em linguagens como C e C++, o programador é a única barreira entre a entrada hostil e a memória do processo, e quando essa barreira falha o atacante não altera uma consulta ou uma página: toma o fluxo de execução do programa.

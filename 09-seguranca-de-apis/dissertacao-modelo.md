@@ -2,6 +2,16 @@
 
 > Texto corrido, no registro de uma dissertação, com cerca de dez páginas à mão. Três fontes nomeadas, um caso real, um exemplo que atravessa o texto. **[+]** marca onde alongar; **[−]** marca o que cortar primeiro.
 
+
+## Esqueleto — o que você anota em 5 minutos antes de escrever
+
+- **Seções, na ordem:** Introdução → O que se toma como dado → Três anéis → APIs → Microsserviços → Contêineres e orquestração → Exemplo → Dois casos reais → O que não confundir → Conclusão
+- **Figura 1:** Os três anéis — borda, malha e pod — com o que cada um faz e o que nenhum faz.
+- **Caso:** Tesla, 2018, e o escape do runc, 2019.
+- **Três fontes:** OWASP API Security Top 10 (2023) — as dez categorias; NIST SP 800-204, *Security Strategies for Microservices-based Application Systems* (2019), e SP 800-190, *Application Container Security Guide* (2017); NSA e CISA, *Kubernetes Hardening Guide* (2022).
+- **Exemplo:** a API de pagamentos (aplicativo, gateway, contas, transferências, banco, fila, parceiro).
+- **Desfecho começa com:** "Em síntese, a segurança de APIs, microsserviços e contêineres não é uma lista de boas práticas, e sim a mesma cadeia aplicada em três anéis."
+
 ## 1. Introdução — quando o sistema vira muitos
 
 No monólito, a fronteira de confiança principal era uma: o navegador de um lado, o servidor do outro. A chamada entre o módulo de contas e o de transferências não atravessava rede, não precisava de autenticação e não podia ser interceptada. Quando o sistema se decompõe em serviços que conversam por rede, cada uma dessas chamadas vira uma requisição entre processos, possivelmente entre máquinas — e tudo que valia para a fronteira externa passa a valer para ela. Quando a interface vira um contrato de API, cada operação é um ponto de entrada enumerável, exposto sem a tela que limitava o que se pedia. E quando o serviço roda em um contêiner, roda como um processo com visão restrita do sistema, compartilhando o núcleo com todos os vizinhos.
