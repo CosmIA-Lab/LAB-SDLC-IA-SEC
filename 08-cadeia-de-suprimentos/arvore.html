@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ponto 8 — Segurança da cadeia de suprimentos de software</title>
+<style>
+  :root{
+    --bg:#0e1116; --surface:#161b22; --line:#3a4350;
+    --fg:#e6edf3; --dim:#9aa4b0;
+    --root:#58a6ff; --base:#8b949e; --etapa:#3fb950; --surf:#d29922; --outras:#bc8cff; --ex:#f778ba;
+    --p:#79c0ff; --t:#3fb950; --m:#d29922;
+    --fs:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--bg); color:var(--fg);
+    font:var(--fs)/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;}
+
+  header{position:sticky; top:0; z-index:5; background:var(--surface);
+    border-bottom:1px solid var(--line); padding:10px 16px;
+    display:flex; align-items:center; gap:12px; flex-wrap:wrap;}
+  header h1{font-size:1rem; margin:0; font-weight:700}
+  header .hint{color:var(--dim); font-size:.78rem}
+  header .ctr{margin-left:auto; display:flex; gap:6px; flex-wrap:wrap}
+  button{border:1px solid var(--line); background:#21262d; color:var(--fg);
+    border-radius:8px; padding:6px 10px; font-weight:600; cursor:pointer; font-size:.85rem}
+  button:hover{border-color:var(--root)}
+
+  main{max-width:980px; margin:0 auto; padding:18px 16px 90px}
+  .spine{color:var(--dim); font-size:.88rem; margin:0 0 14px; padding:8px 12px;
+    border:1px dashed var(--line); border-radius:10px}
+  .spine b{color:var(--root)}
+
+  /* ---------- árvore ---------- */
+  .tree, .tree ul{list-style:none; margin:0; padding:0}
+  .tree ul{margin-left:14px; padding-left:18px; border-left:2px solid var(--line)}
+  .tree li{position:relative; margin:4px 0; padding-left:6px}
+  .tree li::before{content:""; position:absolute; left:-18px; top:.85em; width:16px; height:2px; background:var(--line)}
+  .tree > li::before{display:none}
+
+  details{margin:0}
+  summary{cursor:pointer; list-style:none; display:inline-block}
+  summary::-webkit-details-marker{display:none}
+  summary::before{content:"▸"; display:inline-block; width:1em; color:var(--dim); transition:transform .15s}
+  details[open] > summary::before{transform:rotate(90deg)}
+
+  .n{display:inline-block; padding:3px 9px; border-radius:8px; background:var(--surface);
+    border:1px solid var(--line); border-left-width:4px; font-weight:600}
+  .n small{font-weight:500; color:var(--dim); margin-left:6px; font-size:.8em}
+  .n .w{font-weight:400; color:var(--dim)}
+  .n .w::before{content:" — "}
+
+  .n.root{border-left-color:var(--root); color:var(--root); font-size:1.15em; font-weight:800}
+  .n.b1{border-left-color:var(--root); font-size:1.05em; font-weight:800}
+  .n.base{border-left-color:var(--base)}
+  .n.etapa{border-left-color:var(--etapa); font-weight:800}
+  .n.surf{border-left-color:var(--surf); color:var(--surf); font-weight:800}
+  .n.outras{border-left-color:var(--outras); color:var(--outras); font-weight:800}
+  .n.ex{border-left-color:var(--ex); color:var(--ex); font-weight:800}
+  .n.leaf{background:transparent; border-color:transparent; padding-left:0; font-weight:500}
+  .n.leaf small{margin-left:4px}
+
+  /* rótulos P / T / M / saída */
+  .k{display:inline-block; min-width:1.5em; text-align:center; font-weight:800; font-size:.78em;
+    border-radius:5px; padding:1px 4px; margin-right:6px; vertical-align:1px}
+  .k.p{background:#1b2a3d; color:var(--p)} .k.t{background:#1f3b2a; color:var(--t)}
+  .k.m{background:#2a2f1f; color:var(--m)} .k.o{background:#2b2231; color:var(--ex)}
+  .k.x{background:#3a2626; color:#ff7b72}
+
+  /* junta (ponte) */
+  li.j{list-style:none}
+  li.j::before{display:none}
+  .bridge{display:inline-block; color:var(--dim); font-style:italic; font-size:.9em; padding:2px 6px}
+  .bridge::before{content:"⟪ "} .bridge::after{content:" ⟫"}
+
+  /* grade STRIDE × elemento */
+  .grid{display:inline-grid; grid-template-columns:auto repeat(6,1.7em); gap:3px; margin:4px 0 2px 1.6em; font-size:.82rem; text-align:center}
+  .grid div{padding:2px 1px; border-radius:4px; background:#21262d}
+  .grid .h{font-weight:800; color:var(--dim)}
+  .grid .r{text-align:left; padding:2px 8px 2px 4px; font-weight:600}
+  .grid .y{background:#1f3b2a; color:var(--t); font-weight:800}
+  .grid .mm{background:#2a2f1f; color:var(--m); font-size:.7rem; font-weight:700}
+
+  @media (max-width:520px){ .tree ul{margin-left:6px; padding-left:12px} .tree li::before{left:-12px; width:10px} .n .w{display:block; margin-top:2px} .n .w::before{content:""} }
+</style>
+</head>
+<body>
+<header>
+  <h1>Ponto 8 — Segurança da cadeia de suprimentos de software <span class="hint">· árvore de conceitos</span></h1>
+  <span class="hint">clique num nó para abrir/fechar · <b style="color:var(--p)">P</b> princípio · <b style="color:var(--t)">T</b> técnica · <b style="color:var(--m)">M</b> mecanismo · <b style="color:var(--ex)">→</b> saída</span>
+  <div class="ctr">
+    <button id="l1">só espinha</button>
+    <button id="l2">até P/T/M</button>
+    <button id="l3">tudo</button>
+    <button id="out">A−</button>
+    <button id="in">A+</button>
+    <button id="full">⛶</button>
+  </div>
+</header>
+
+<main>
+<p class="spine">espinha: <b>código que não é seu → 4 fundamentos → cadeia e ameaças A–H → por elo → princípios → arcabouços → exemplo → erros</b></p>
+
+<ul class="tree">
+<li>
+<details open data-l="0"><summary><span class="n root">Segurança da cadeia de suprimentos de software<span class="w">tudo que entra no artefato sem ter sido escrito pelo time, e como cada elo é atacado</span></span></summary>
+<ul>
+
+<li><details open data-l="1"><summary><span class="n b1">Código que você não escreveu</span></summary>
+<ul>
+  <li><span class="n leaf">70–90% do artefato é de terceiros<small>OSSRA</small><span class="w">+ compilador, CI, registro, imagem base, actions</span></span></li>
+  <li><span class="n leaf">Thompson 84 "Trusting Trust"<span class="w">não dá para confiar no que não se escreveu → tornar a confiança verificável</span></span></li>
+  <li><span class="n leaf">por que agora<span class="w">SolarWinds 20 · Codecov 21 · Log4Shell 21 · xz 24 → EO 14028 → SSDF, SLSA, SBOM</span></span></li>
+  <li><span class="n leaf">exemplo<span class="w">1.400 pacotes npm, 180 gems, 12 actions, imagem ruby:3.3: o pipeline percebe a troca? o binário veio do commit revisado?</span></span></li>
+</ul></details></li>
+
+<li class="j"><span class="bridge">antes das técnicas, o que elas pressupõem</span></li>
+
+<li><details open data-l="1"><summary><span class="n b1">Fundamentos<small>4 premissas</small></span></summary>
+<ul>
+  <li><span class="n base">código alheio é seu risco<span class="w">inventário legível por máquina; "não sabia que usava" não é defesa</span></span></li>
+  <li><span class="n base">confiança verificável, não assumida<span class="w">proveniência assinada · verificação · reconstrução</span></span></li>
+  <li><span class="n base">muitos elos; o atacante escolhe o mais fraco<span class="w">controle por elo</span></span></li>
+  <li><span class="n base">integridade = prova criptográfica + política<span class="w">hash sem quem assinou = nada; assinatura sem exigência = decoração</span></span></li>
+</ul></details></li>
+
+<li class="j"><span class="bridge">o mapa da cadeia</span></li>
+
+<li><details open data-l="1"><summary><span class="n b1">A cadeia e as ameaças<small>SLSA v1.0, A–H</small></span></summary>
+<ul>
+  <li><span class="n leaf">dev →A→ fonte →B→ build →C,D→ artefato →F→ registro →G→ consumidor →H→ produção · E = dependências (a mesma cadeia, alheia)</span></li>
+  <li><span class="n leaf">SolarWinds = D · Codecov = D + exfiltração · xz = A + E · typosquatting/confusion = H · <span class="k x">✗</span>Log4Shell = E sem intenção (SCA, ponto 7)</span></li>
+</ul></details></li>
+
+<li><details open data-l="1"><summary><span class="n b1">Por elo<span class="w">ameaça (incidente) → controle</span></span></summary>
+<ul>
+  <li><details open data-l="2"><summary><span class="n etapa">fonte</span></summary><ul>
+    <li><span class="n leaf">ameaças<span class="w">commit sem 2FA · sem revisão · mantenedor malicioso (xz 24; event-stream 18)</span></span></li>
+    <li><span class="n leaf"><span class="k m">M</span>2FA FIDO2 · branch protection · commits assinados (gitsign) · dois mantenedores · Scorecard</span></li>
+  </ul></details></li>
+  <li><details open data-l="2"><summary><span class="n etapa">dependências</span></summary><ul>
+    <li><span class="n leaf">ameaças<span class="w">typosquatting · dependency confusion (Birsan 21) · mantenedor comprometido (ua-parser-js 21; colors 22) · postinstall · cadeia profunda</span></span></li>
+    <li><span class="n leaf"><span class="k m">M</span>lockfile com hash (npm ci, --require-hashes) · registro privado + escopos reservados · revisão de dep nova · ignore-scripts · Renovate com quarentena · SCA · minimizar</span></li>
+  </ul></details></li>
+  <li><details open data-l="2"><summary><span class="n etapa">build</span></summary><ul>
+    <li><span class="n leaf">ameaças<span class="w">CI comprometido (Codecov 21) · fonte substituída no build (SolarWinds 20, SUNSPOT) · action por tag móvel · segredo fixo · não hermético</span></span></li>
+    <li><span class="n leaf"><span class="k m">M</span>runner efêmero · hermético · OIDC curto · actions por SHA · assinatura em job separado · proveniência pelo builder (SLSA L3) · reprodutível</span></li>
+  </ul></details></li>
+  <li><details open data-l="2"><summary><span class="n etapa">distribuição</span></summary><ul>
+    <li><span class="n leaf">ameaças<span class="w">artefato alterado · registro comprometido · chave roubada · rollback</span></span></li>
+    <li><span class="n leaf"><span class="k m">M</span>Sigstore (cosign + Fulcio + Rekor) · proveniência junto · TUF · Trusted Publishers · promoção por digest</span></li>
+  </ul></details></li>
+  <li><details open data-l="2"><summary><span class="n etapa">consumo</span></summary><ul>
+    <li><span class="n leaf">ameaças<span class="w">latest · cluster aceita tudo · verificação desligada · SBOM nunca lido</span></span></li>
+    <li><span class="n leaf"><span class="k m">M</span>política de admissão (Kyverno, Gatekeeper, policy-controller) · digest · hash na instalação · SBOM consultável + VEX · base mínima</span></li>
+  </ul></details></li>
+  <li><details open data-l="2"><summary><span class="n base">três incidentes, onde o controle agiria</span></summary><ul>
+    <li><span class="n leaf">SolarWinds<span class="w">hermético + proveniência + reprodutível + assinatura separada; SCA não veria</span></span></li>
+    <li><span class="n leaf">Codecov<span class="w">hash do script + OIDC curto + menor privilégio + egress restrito</span></span></li>
+    <li><span class="n leaf">xz<span class="w">dois mantenedores + tarball reprodutível + revisão de binários + quarentena; SCA não veria</span></span></li>
+  </ul></details></li>
+  <li><span class="n leaf">proveniência SLSA<span class="w">sujeito (hash) · builder (quem assina) · invocação (repo, commit, workflow) · materiais (hashes) → política: "só builder X, repo Y, branch main"</span></span></li>
+  <li><span class="n leaf">contêiner = cadeia empacotada<span class="w">base por digest · distroless · multi-stage · scanner · cosign + SBOM como referrers (ponto 9)</span></span></li>
+</ul></details></li>
+
+<li class="j"><span class="bridge">regras que atravessam todos os elos</span></li>
+
+<li><details open data-l="1"><summary><span class="n b1 surf">Princípios<small>10</small></span></summary>
+<ul>
+  <li><span class="n leaf"><span class="k p">P</span>inventário legível por máquina<small>EO 14028; NTIA 21</small> · verificar, não confiar<small>Thompson 84</small> · fixar e atualizar<small>SSDF PW.4</small></span></li>
+  <li><span class="n leaf"><span class="k p">P</span>menor privilégio no pipeline · build hermético e efêmero · proveniência por quem constrói<small>in-toto</small></span></li>
+  <li><span class="n leaf"><span class="k p">P</span>separação de deveres<small>Clark/Wilson 87</small> · minimizar · reprodutibilidade quando possível · responder como processo<small>SSDF RV</small></span></li>
+</ul></details></li>
+
+<li class="j"><span class="bridge">arcabouços com nome</span></li>
+
+<li><details open data-l="1"><summary><span class="n b1 outras">Arcabouços e técnicas</span></summary>
+<ul>
+  <li><span class="n leaf"><span class="k t">T</span>SLSA v1.0<small>OpenSSF 23</small><span class="w">Build L0 nada · L1 proveniência existe · L2 gerada pelo serviço e assinada · L3 build endurecido, proveniência infalsificável</span></span></li>
+  <li><span class="n leaf"><span class="k t">T</span>in-toto<small>Torres-Arias 19</small><span class="w">atestação assinada por passo + layout do dono; formato do SLSA e Sigstore</span></span></li>
+  <li><span class="n leaf"><span class="k t">T</span>Sigstore<small>Newman 22</small><span class="w">Fulcio (cert de minutos para identidade OIDC) · Rekor (transparência) · cosign; npm/PyPI provenance 23</span></span></li>
+  <li><span class="n leaf"><span class="k t">T</span>TUF<small>Samuel 10</small><span class="w">raiz offline · alvos · snapshot · timestamp → resiste a rollback, freeze, chave roubada</span></span></li>
+  <li><span class="n leaf"><span class="k t">T</span>builds reprodutíveis<small>Lamb/Zacchiroli 21</small><span class="w">mesmo fonte → mesmo bit; terceiro reconstrói e compara; Bazel, Nix</span></span></li>
+  <li><span class="n leaf"><span class="k t">T</span>SBOM + VEX<span class="w">SPDX (ISO 5962) · CycloneDX · NTIA mínimos · VEX (CISA 22) · Dependency-Track</span></span></li>
+  <li><span class="n leaf"><span class="k t">T</span>SSDF<small>NIST 800-218, 22</small><span class="w">PO · PS · PW · RV; autoatestação CISA 23</span> · Scorecard<small>OpenSSF 20</small><span class="w">nota 0–10 por prática</span></span></li>
+  <li><span class="n leaf">higiene mínima<small>CIS 22</small><span class="w">actions por hash · permissions mínimas · OIDC · runner efêmero · lockfile · ignore-scripts · proxy · digest · assinatura · SBOM</span></span></li>
+  <li><span class="n leaf">90 dias<span class="w">mês 1 visibilidade → mês 2 fixação e privilégio → mês 3 proveniência e política (auditoria → bloqueio)</span></span></li>
+  <li><span class="n leaf">o próprio ambiente<span class="w">extensões de IDE · curl|bash · agentes de IA e slopsquatting · modelos em pickle → mesmas regras</span></span></li>
+  <li><span class="n leaf">governança<span class="w">NIST 800-161 r1 · política de dependências · inventário de fornecedores · plano de resposta · OSS como fornecedor (xkcd 2347; Alpha-Omega; CRA 24)</span></span></li>
+</ul></details></li>
+
+<li class="j"><span class="bridge">o mesmo sistema, com a cadeia endurecida</span></li>
+
+<li><details data-l="1"><summary><span class="n b1 ex">exemplo-fio<small>API de pagamentos</small></span></summary>
+<ul>
+  <li><span class="n leaf">fonte → FIDO2 · main protegida · gitsign · segredos no push · dependência nova em PR próprio com Scorecard</span></li>
+  <li><span class="n leaf">deps → lockfiles · npm ci · ignore-scripts · Artifactory proxy + @pagamentos/ · Renovate 5 dias · SCA · 1.400 → 800</span></li>
+  <li><span class="n leaf">build → runners efêmeros · actions por SHA · permissions read-all · OIDC · hermético (Bazel) · assinatura em job separado · SLSA L3</span></li>
+  <li><span class="n leaf">distribuição → cosign + Rekor · SBOM Syft como referrer · promoção por digest · SDK com Trusted Publisher</span></li>
+  <li><span class="n leaf">consumo → policy-controller exige assinatura + L3 · digest · distroless · Dependency-Track diário · VEX</span></li>
+  <li><span class="n leaf">resposta → próximo Log4Shell: minutos para saber onde · SLA 48 h · PR do Renovate já aberto · imagem antiga não volta</span></li>
+</ul></details></li>
+
+<li><details data-l="1"><summary><span class="n b1"><span class="k x">✗</span>erros a não cometer</span></summary>
+<ul>
+  <li><span class="n leaf">SCA ≠ cadeia · SBOM ≠ segurança · assinatura decorativa · fixar versão ≠ hash</span></li>
+  <li><span class="n leaf">Log4Shell ≠ ataque à cadeia · aberto ≠ mais arriscado · CI interno ≠ confiável</span></li>
+  <li><span class="n leaf">reprodutibilidade ≠ perfeccionismo · Dependabot aberto ≠ dívida</span></li>
+</ul></details></li>
+
+</ul></details>
+</li>
+</ul>
+</main>
+
+<script>
+  const root = document.documentElement;
+  let fs = 16;
+  const apply = () => root.style.setProperty("--fs", fs + "px");
+  document.getElementById("in").onclick  = () => { fs = Math.min(24, fs+1); apply(); };
+  document.getElementById("out").onclick = () => { fs = Math.max(11, fs-1); apply(); };
+  document.getElementById("full").onclick = () => {
+    if(!document.fullscreenElement) document.documentElement.requestFullscreen();
+    else document.exitFullscreen();
+  };
+  // níveis: 1 = só espinha (ramos de 1º nível fechados), 2 = até P/T/M, 3 = tudo
+  const setLevel = max => document.querySelectorAll("details").forEach(d => {
+    const l = +d.dataset.l; d.open = l < max;
+  });
+  document.getElementById("l1").onclick = () => setLevel(1);
+  document.getElementById("l2").onclick = () => setLevel(3);
+  document.getElementById("l3").onclick = () => setLevel(9);
+  addEventListener("keydown", e => {
+    if(e.key==="+"||e.key==="=") document.getElementById("in").click();
+    if(e.key==="-") document.getElementById("out").click();
+    if(e.key==="f") document.getElementById("full").click();
+    if(e.key==="1") setLevel(1); if(e.key==="2") setLevel(3); if(e.key==="3") setLevel(9);
+  });
+</script>
+</body>
+</html>

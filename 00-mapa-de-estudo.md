@@ -69,8 +69,8 @@ Para cada ponto, o par que mais cai: a âncora nomeada (com fonte) e o mecanismo
 | 4. Vulns web | OWASP Top 10 (2021; 2025) e CWE Top 25 para priorizar; ASVS 4.0.3 para exigir; parametrização (Halfond, Viegas e Orso, 2006); codificação por contexto + CSP (Stamm et al., 2010); token anti-CSRF (Barth, Jackson e Mitchell, 2008) | prepared statements, template com escape automático, CSP com nonce, cookie Secure/HttpOnly/SameSite, middleware de authz |
 | 5. Codificação + memória | SEI CERT C (2016) com regra identificada; funções proibidas (Howard, 2007); sanitizadores (Serebryany et al., 2012); linguagem segura em memória (CISA/NSA, 2023) | ASan/UBSan no CI, flags de endurecimento + checksec, canários/ASLR/CFI, Rust onde C era obrigatório |
 | 6. AuthN/AuthZ/sessão | NIST SP 800-63B (2017); OAuth 2.0 (RFC 6749) + PKCE (RFC 7636) + BCP (RFC 9700); OIDC Core (2014); RBAC (Ferraiolo e Kuhn, 1992) / ABAC (NIST SP 800-162) | Argon2id, passkey/FIDO2, cookie __Host- Secure/HttpOnly/SameSite com rotação, access curto + refresh rotacionado, PDP (Cedar/OPA) + PEP |
-| 7. Testes de segurança | SAST, DAST, SCA, fuzzing (NIST SP 800-115) | scanner no CI, fuzzer (AFL/libFuzzer) |
-| 8. Cadeia de suprimentos | SLSA; SBOM (CycloneDX/SPDX) | assinatura (Sigstore), pin de dependência |
+| 7. Testes de segurança | NIST SP 800-115 (2008) e OWASP WSTG; análise de *taint* (Livshits e Lam, 2005; Chess e West, 2007); fuzzing guiado por cobertura (Miller et al., 1990; AFL, 2013); casos de abuso (McDermott e Fox, 1999) | SAST diferencial no PR, DAST autenticado no noturno, SCA com alcançabilidade, AFL++/libFuzzer com sanitizadores, matriz de autorização |
+| 8. Cadeia de suprimentos | SLSA v1.0 (2023); SSDF (NIST SP 800-218); in-toto (2019); Sigstore (2022); TUF (2010); builds reprodutíveis (2021); SBOM + VEX | lockfile com hash, registro privado, *actions* por SHA, runner efêmero + OIDC, cosign + Rekor, política de admissão, Dependency-Track |
 | 9. APIs/micro/contêineres | OWASP API Top 10; zero trust de rede | mTLS, API gateway, imagem mínima, política |
 | 10. Gestão de vulns | CVSS; CVE; disclosure coordenado | scanner de vuln, patch management, SLA |
 
