@@ -39,19 +39,10 @@ A terceira: **segurança depende de um mecanismo pequeno e sempre invocado**. Ja
 
 ```mermaid
 flowchart LR
-    subgraph A1["① borda — padrões à prova de falha (gateway nega por padrão)"]
-        subgraph A2["② rede / malha — confiança explícita (mTLS, identidade por serviço)"]
-            subgraph A3["③ serviço — mediação completa (PDP/PEP por objeto)"]
-                subgraph A4["④ processo — menor privilégio (compartimento sem root)"]
-                    D[("⑤ dado: saldo · cartão")]
-                end
-            end
-        end
-    end
-    AT["atacante"] -. "cada anel segura o que o anterior deixou passar" .-> D
-    D -.-> LOG["⑥ registro de comprometimento<br/>(log íntegro)"]
+    AT["atacante"] --> A1["① borda<br/>gateway nega por padrão<br/><i>padrões à prova de falha</i>"] --> A2["② rede / malha<br/>mTLS, identidade por serviço<br/><i>confiança explícita</i>"] --> A3["③ serviço<br/>PDP/PEP por objeto<br/><i>mediação completa</i>"] --> A4["④ processo<br/>compartimento sem root<br/><i>menor privilégio</i>"] --> D[("⑤ dado<br/>saldo · cartão")]
+    D -.-> LOG["⑥ registro de comprometimento<br/>log íntegro"]
 ```
-
+Na mão, desenhe como anéis concêntricos com o dado no centro e a seta do atacante atravessando-os de fora para dentro; numere os anéis.
 **A trilha: siga um atacante de fora para dentro.** A Figura 1 são anéis em volta do dado, e cada número é um anel que ele precisa atravessar — rotulado com o princípio de 1975 que o anel aplica.
 
 1. **① A borda.** O gateway nega tudo que não foi declarado: rota fora do catálogo, requisição fora do esquema, token inválido. É o princípio de padrões à prova de falha: o erro fecha, não abre.
