@@ -41,7 +41,7 @@ O segundo é a premissa de que a invasão vai acontecer. *Assume breach*, na exp
 
 ```mermaid
 flowchart LR
-    R["① Requisitos<br/>ativos · casos de abuso"] --> g1{gate} --> D["② Design<br/>modelagem de ameaças · 10 flaws"] --> g2{gate} --> C["③ Código<br/>padrão · revisão · SAST"] --> g3{gate} --> T["④ Testes<br/>SAST · DAST · SCA · fuzz · intrusão"] --> g4{gate} --> M["⑤ Entrega e manutenção<br/>cadeia assinada · detecção · gestão de vulns"]
+    R["① Requisitos<br/>ativos · casos de abuso"] --> g1{gate} --> D["② Design<br/>modelagem de ameaças · revisão das 10 falhas de design"] --> g2{gate} --> C["③ Código<br/>padrão de código · revisão · análise estática"] --> g3{gate} --> T["④ Testes<br/>análise do código · teste da aplicação rodando · análise das dependências · fuzzing · intrusão"] --> g4{gate} --> M["⑤ Entrega e manutenção<br/>cadeia assinada · detecção · gestão de vulns"]
     M -. "⑥ incidente vira requisito" .-> R
 ```
 

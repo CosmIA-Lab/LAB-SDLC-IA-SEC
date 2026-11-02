@@ -45,9 +45,9 @@ flowchart TB
     end
     IN["① memcpy(buf, msg, len)<br/>len = 600"] ==> BUF
     BUF -. "escreve para cima e alcança" .-> RET
-    RET -.- M1["⑤ CFI / shadow stack<br/>restringem o salto"]
-    CAN -.- M2["⑤ StackGuard: canário<br/>verificado antes do retorno"]
-    BUF -.- M3["⑤ NX: pilha não executa<br/>ASLR: endereços aleatórios"]
+    RET -.- M1["⑤ integridade do fluxo de controle<br/>restringe para onde o salto pode ir"]
+    CAN -.- M2["⑤ canário<br/>verificado antes do retorno"]
+    BUF -.- M3["⑤ pilha não executável<br/>endereços aleatórios"]
     REG["⑥ regra: if (len > sizeof buf || len > recebido) return ERRO;"] --> IN
 ```
 

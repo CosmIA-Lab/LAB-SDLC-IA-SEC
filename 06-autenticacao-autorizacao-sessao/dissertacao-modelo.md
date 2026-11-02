@@ -42,13 +42,13 @@ sequenceDiagram
     participant S as servidor de autorização
     participant R as API (servidor de recursos)
     U->>A: ① quer entrar
-    A->>S: ② redireciona com hash(verifier) + state
+    A->>S: ② redireciona com resumo do segredo + estado
     U->>S: ③ autentica (passkey / senha + 2º fator) e consente
-    S-->>A: ④ código de uso único + state
-    A->>S: ⑤ código + verifier
-    S-->>A: ⑥ access token (10 min, aud=API, escopo) + refresh (com estado)
-    A->>R: ⑦ Authorization: Bearer
-    Note over R: PEP: assinatura, iss, aud, exp, escopo
+    S-->>A: ④ código de uso único + estado
+    A->>S: ⑤ código + segredo original
+    S-->>A: ⑥ token de acesso (10 min, para esta API, com escopo) + token de renovação (com estado)
+    A->>R: ⑦ token no cabeçalho da requisição
+    Note over R: verifica: assinatura, emissor, destinatário, prazo, escopo
     Note over R: ⑧ serviço: este objeto é deste sujeito?
 ```
 

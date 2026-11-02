@@ -42,11 +42,11 @@ O que o Top 10 é: instrumento de consciência e de priorização. O que não é
 ```mermaid
 flowchart LR
     B1["navegador<br/>do atacante"] --> V["① parse e<br/>validação"] --> AN["② autenticação"] --> AZ["③ autorização"] --> LG["lógica"] --> DT["④ dados e<br/>serviços"] --> RS["⑤ resposta"] --> B2["⑥ navegador<br/>da vítima"]
-    V -.- v1["validação ausente<br/>upload · XXE · desserialização"]
-    AN -.- v2["credential stuffing<br/>sessão fraca · fixação"]
-    AZ -.- v3["IDOR / BOLA<br/>função sem checagem · CSRF"]
-    DT -.- v4["injeção SQL / comando<br/>SSRF"]
-    RS -.- v5["XSS<br/>cabeçalhos ausentes · dado exposto"]
+    V -.- v1["validação ausente<br/>arquivo sem forma · XML com entidade externa · objeto desserializado"]
+    AN -.- v2["senha reusada de outro vazamento<br/>sessão fraca · identificador plantado"]
+    AZ -.- v3["identificador trocado<br/>função sem checagem · requisição forjada"]
+    DT -.- v4["injeção na consulta ou no comando<br/>servidor buscando URL do atacante"]
+    RS -.- v5["script injetado<br/>cabeçalhos ausentes · dado exposto"]
 ```
 
 **A trilha: siga uma requisição hostil, do navegador do atacante ao navegador da vítima.** A Figura 1 é o caminho que toda requisição percorre dentro da aplicação, e cada número é uma estação em que uma classe de vulnerabilidade pode morar.

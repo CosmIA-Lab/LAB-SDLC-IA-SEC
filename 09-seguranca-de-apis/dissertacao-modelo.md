@@ -33,13 +33,13 @@ A segurança se organiza em três anéis concêntricos. Na **borda**, um gateway
 
 ```mermaid
 flowchart LR
-    CL["cliente"] --> G["① gateway (borda)<br/>TLS · token · rate limit · esquema"] --> M["② malha<br/>mTLS · identidade por serviço<br/>política de quem chama o quê"] --> P1["③ pod contas<br/>sem root · drop ALL · rootfs ro"] --> DEC["④ este objeto é deste sujeito?<br/>só o serviço decide"]
+    CL["cliente"] --> G["① gateway (borda)<br/>conexão segura · token · limite de taxa · esquema"] --> M["② malha<br/>autenticação mútua · identidade por serviço<br/>política de quem chama o quê"] --> P1["③ pod contas<br/>sem administrador · sem capacidades do núcleo · arquivos só leitura"] --> DEC["④ este objeto é deste sujeito?<br/>só o serviço decide"]
 ```
 ```mermaid
 flowchart LR
     P3["⑤ pod notificações<br/>COMPROMETIDO"] --> X1["✗ chamar transferências<br/>a malha recusa: não está na política"]
     P3 --> X2["✗ ler o segredo do banco<br/>não existe: credencial por identidade, curta"]
-    P3 --> X3["✗ escapar do contêiner<br/>sem root, sem capabilities, seccomp"]
+    P3 --> X3["✗ escapar do contêiner<br/>sem administrador, sem capacidades do núcleo, chamadas filtradas"]
     P3 --> X4["✗ sair para a internet<br/>a rede nega por padrão"]
     P3 --> OK["✓ enviar mensagens<br/>só o que a política permitia"]
 ```

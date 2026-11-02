@@ -37,9 +37,9 @@ A análise estática vê bem injeção, uso de API perigosa, erro de memória po
 
 | | Técnica | Vê bem | Não vê | Quando roda |
 |---|---|---|---|---|
-| ① | SAST | injeção, API perigosa, segredo, com a linha | configuração, autorização, dependência | pedido de integração (diferencial) · noturno (completo) |
-| ② | DAST | XSS refletido, cabeçalhos, configuração | linha, estados profundos, autorização, lógica | noturno, autenticado |
-| ③ | SCA | vulnerabilidade publicada, licença | inédita, pacote malicioso, alcançabilidade | pedido de integração |
+| ① | SAST (análise estática do código) | injeção, API perigosa, segredo, com a linha | configuração, autorização, dependência | pedido de integração (diferencial) · noturno (completo) |
+| ② | DAST (teste da aplicação em execução) | script injetado refletido, cabeçalhos, configuração | linha, estados profundos, autorização, lógica | noturno, autenticado |
+| ③ | SCA (análise das dependências) | vulnerabilidade publicada, licença | inédita, pacote malicioso, alcançabilidade | pedido de integração |
 | ④ | Fuzzing | memória, parsing, exceção, laço | lógica, autorização | noturno, contínuo |
 | ⑤ | Intrusão | autorização, lógica, encadeamento | pouca cobertura por hora | por versão |
 | ⑥ | Testes escritos | matriz de autorização, regressão | o que não foi modelado | pedido de integração |

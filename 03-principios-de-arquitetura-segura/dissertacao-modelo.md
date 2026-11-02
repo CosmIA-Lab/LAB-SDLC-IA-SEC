@@ -39,8 +39,8 @@ A terceira: **segurança depende de um mecanismo pequeno e sempre invocado**. Ja
 
 ```mermaid
 flowchart LR
-    AT["atacante"] --> A1["① borda<br/>gateway nega por padrão<br/><i>padrões à prova de falha</i>"] --> A2["② rede / malha<br/>mTLS, identidade por serviço<br/><i>confiança explícita</i>"] --> A3["③ serviço<br/>PDP/PEP por objeto<br/><i>mediação completa</i>"] --> A4["④ processo<br/>compartimento sem root<br/><i>menor privilégio</i>"] --> D[("⑤ dado<br/>saldo · cartão")]
-    D -.-> LOG["⑥ registro de comprometimento<br/>log íntegro"]
+    AT["atacante"] --> A1["① borda<br/>gateway nega por padrão<br/><i>padrões à prova de falha</i>"] --> A2["② rede / malha<br/>autenticação mútua, identidade por serviço<br/><i>confiança explícita</i>"] --> A3["③ serviço<br/>ponto de decisão por objeto<br/><i>mediação completa</i>"] --> A4["④ processo<br/>compartimento sem root<br/><i>menor privilégio</i>"] --> D[("⑤ dado<br/>saldo · cartão")]
+    D -.-> LOG["⑥ registro de comprometimento<br/>(log que ninguém altera)"]
 ```
 Na mão, desenhe como anéis concêntricos com o dado no centro e a seta do atacante atravessando-os de fora para dentro; numere os anéis.
 **A trilha: siga um atacante de fora para dentro.** A Figura 1 são anéis em volta do dado, e cada número é um anel que ele precisa atravessar — rotulado com o princípio de 1975 que o anel aplica.

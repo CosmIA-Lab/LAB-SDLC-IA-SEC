@@ -44,7 +44,7 @@ flowchart LR
     end
     subgraph C["⑥ o ciclo que encurta a janela"]
         direction LR
-        I["inventário"] --> D1["descobrir"] --> P1["priorizar<br/>KEV · EPSS · exposição · impacto → prazo"] --> F1["corrigir /<br/>mitigar"] --> V1["verificar"] --> R1["relatar"]
+        I["inventário"] --> D1["descobrir"] --> P1["priorizar<br/>explorada? provável? exposta? impacto? → prazo"] --> F1["corrigir /<br/>mitigar"] --> V1["verificar"] --> R1["relatar"]
         R1 -. "lição vira requisito do próximo ciclo" .-> I
     end
 ```

@@ -49,19 +49,19 @@ flowchart LR
         APP["aplicativo<br/>(entidade externa)"]
     end
     subgraph N["controlado por nós"]
-        GW(("② gateway / API<br/>E: troca de id"))
+        GW(("② gateway / API<br/>E elevação: troca de identificador"))
         SV(("serviço de contas"))
         DB[("③ banco")]
-        LOG[("④ log<br/>R: sem integridade")]
+        LOG[("④ log<br/>R repúdio: log alterável")]
     end
     subgraph P["parceiro (entidade externa)"]
         PAR["⑤ antifraude"]
     end
-    APP -- "① fluxo app→API<br/>S (CSRF)" --> GW
+    APP -- "① fluxo app→API<br/>S spoofing: requisição forjada" --> GW
     GW --> SV
-    SV -- "T (SQLi)" --> DB
+    SV -- "T tampering: injeção na consulta" --> DB
     SV --> LOG
-    SV -- "fluxo API→parceiro<br/>I (texto claro)" --> PAR
+    SV -- "fluxo API→parceiro<br/>I exposição: canal em texto claro" --> PAR
 ```
 As bordas dos três grupos são as fronteiras de confiança; na mão, desenhe-as tracejadas.
 
