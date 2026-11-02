@@ -1,13 +1,13 @@
 # Dissertação-modelo — Práticas de codificação segura e erros de memória
 
-> Texto corrido, no registro de uma dissertação, com cerca de dez páginas à mão. Três fontes nomeadas, um caso real, um exemplo que atravessa o texto. **[+]** marca onde alongar; **[−]** marca o que cortar primeiro.
+> Texto corrido, no registro de uma dissertação, com cerca de dez páginas à mão. Três fontes nomeadas, um caso construído por molde (real opcional), um exemplo que atravessa o texto. **[+]** marca onde alongar; **[−]** marca o que cortar primeiro.
 
 
 ## Esqueleto — o que você anota em 5 minutos antes de escrever
 
 - **Seções, na ordem:** Introdução → Bug de segurança não é bug comum → O que se toma como dado → Os erros de memória → As regras que valem em qualquer linguagem → As técnicas → Exemplo → Um caso real → O que não confundir → Conclusão
 - **Figura 1:** A pilha durante um estouro de buffer e onde cada mitigação age.
-- **Caso:** Heartbleed, 2014.
+- **Caso:** hipotético pelo molde de cinco lacunas; o elo que falha: um comprimento que veio com o dado tratado como verdade sobre ele. (Real, se lembrar: Heartbleed, 2014.)
 - **Três fontes:** SEI CERT C Coding Standard (2016) e Seacord, *Secure Coding in C and C++* (2013) — regras com identificador; Aleph One, *Smashing the Stack for Fun and Profit* (1996) — o estouro de pilha; CISA e NSA, *The Case for Memory Safe Roadmaps* (2023) — a migração de linguagem.
 - **Exemplo:** a API de pagamentos (aplicativo, gateway, contas, transferências, banco, fila, parceiro).
 - **Desfecho começa com:** "Em síntese, a codificação segura não é uma lista de boas práticas, e sim uma cadeia."
@@ -48,7 +48,7 @@ endereços altos
 endereços baixos          regra: if (len > sizeof buf || len > recebido) return ERRO;
 ```
 
-A Figura 1 mostra o quadro de pilha de uma função em C no momento de um estouro de buffer. O buffer de 256 posições está embaixo; acima dele, o canário, o ponteiro de quadro e o endereço de retorno. A cópia de 600 bytes para o buffer escreve para cima e alcança o endereço de retorno — a técnica do artigo de 1996: quando a função retorna, salta para onde o atacante mandou. As anotações à direita são as mitigações da plataforma, cada uma na posição em que age: o canário entre o buffer e o endereço de retorno, verificado antes do retorno, denuncia a escrita; a pilha não executável impede que o código injetado no buffer rode; a aleatorização de endereços impede que o atacante saiba para onde saltar; a integridade de fluxo de controle restringe para onde o retorno pode ir. A linha de baixo é a regra que torna tudo isso desnecessário: verificar o comprimento contra o buffer alocado e contra os bytes recebidos antes de copiar — a verificação que faltava no Heartbleed, ao contrário: lá a leitura, aqui a escrita.
+A Figura 1 mostra o quadro de pilha de uma função em C no momento de um estouro de buffer. O buffer de 256 posições está embaixo; acima dele, o canário, o ponteiro de quadro e o endereço de retorno. A cópia de 600 bytes para o buffer escreve para cima e alcança o endereço de retorno — a técnica do artigo de 1996: quando a função retorna, salta para onde o atacante mandou. As anotações à direita são as mitigações da plataforma, cada uma na posição em que age: o canário entre o buffer e o endereço de retorno, verificado antes do retorno, denuncia a escrita; a pilha não executável impede que o código injetado no buffer rode; a aleatorização de endereços impede que o atacante saiba para onde saltar; a integridade de fluxo de controle restringe para onde o retorno pode ir. A linha de baixo é a regra que torna tudo isso desnecessário: verificar o comprimento contra o buffer alocado e contra os bytes recebidos antes de copiar — a verificação que falta no caso da seção seguinte.
 
 ## 4. Os erros de memória — e trinta anos de ataque e defesa
 
@@ -76,11 +76,11 @@ A API de pagamentos tem um componente em C que decodifica mensagens de um parcei
 
 No restante da aplicação, os valores em centavos são um tipo cujo construtor recusa negativo e acima do limite, com soma e multiplicação verificadas — um valor que estouraria vira erro de validação, não transferência negativa. Toda chamada que pode falhar é verificada, e a falha nega, libera e registra sem dado de cartão. O log nunca recebe a entrada como string de formato. Arquivos são abertos e então verificados sobre o descritor, nunca verificados pelo nome e abertos depois. Chaves vêm do cofre em tempo de execução, e a varredura de segredos bloqueia o commit que contenha uma. O serviço abre a porta como administrador e desce para um usuário dedicado antes de processar a primeira mensagem. O pedido de integração tem um roteiro de revisão — entradas externas, usos, funções perigosas, erros, segredos — e componente em C exige revisor de segurança.
 
-## 8. Um caso real — Heartbleed, 2014
+## 8. Um caso — como construí-lo
 
-Em abril de 2014, pesquisadores descobriram que a extensão de *heartbeat* do OpenSSL — a biblioteca de TLS usada por cerca de dois terços dos servidores web do mundo — copiava de volta ao cliente a quantidade de bytes que o próprio cliente declarava em um campo de comprimento, sem verificar contra o que ele de fato tinha enviado. Um pedido de um byte, declarando 64 quilobytes, recebia 64 quilobytes da memória do servidor: chaves privadas, cookies de sessão, senhas de outros usuários. Era uma leitura fora dos limites em C, invisível para qualquer teste funcional, introduzida dois anos antes em uma mudança de véspera de Ano Novo, revisada e aprovada.
+> **Como montar o caso hipotético na hora (cinco lacunas).** Não precisa lembrar nome nem ano: invente uma organização plausível — por exemplo, a própria empresa dona da API de pagamentos deste texto — e preencha: (1) **contexto**: que sistema, que decisão de projeto ou de processo estava em vigor; (2) **o elo que falhou**: um comprimento que veio com o dado tratado como verdade sobre ele; (3) **consequência em uma frase**: o que se perdeu, em termos de confidencialidade, integridade ou disponibilidade, sem detalhar o ataque; (4) **a correção**: verificar contra o buffer alocado e contra os bytes recebidos; sanitizador no teste; linguagem segura onde a entrada é hostil; (5) **a lição em uma frase**, que a conclusão retoma. Se lembrar do caso real equivalente, cite em uma frase como reforço: Heartbleed, 2014.
 
-A correção foi uma verificação de uma linha: o comprimento declarado não pode exceder o comprimento recebido. Depois dela, fuzzing com sanitizadores encontrou dezenas de erros semelhantes na mesma biblioteca em poucos meses. O caso é a regra de codificação segura em uma frase — o comprimento que veio com o dado é dado, não verdade sobre ele — e mostra as três camadas que faltaram: a regra escrita, a ferramenta que a cobraria, e a linguagem em que a leitura fora dos limites teria sido uma exceção em vez de um vazamento de chaves.
+O caso entra depois do exemplo e antes dos erros, em dois parágrafos: o primeiro conta (contexto, elo que falhou, consequência); o segundo lê o caso com as lentes do texto (qual premissa foi ignorada, qual princípio violado, qual técnica teria agido) e termina com a lição. A conclusão o retoma em uma frase.
 
 ## 9. O que não confundir
 
@@ -90,7 +90,7 @@ Linguagem segura em memória não resolve segurança: fecha uma classe, e as out
 
 Em síntese, a codificação segura não é uma lista de boas práticas, e sim uma cadeia. Parte da premissa de que a linguagem define a classe de erro possível e de que toda entrada é hostil, inclusive o que parece metadado. Fixa como regra que o dado se valida na borda, se separa da instrução e nunca é confiado sem verificação — e que a regra precisa ser verificável por máquina. Aplica essas regras por padrões com identificador, listas de funções proibidas e sanitizadores no teste, e as executa com mitigações da plataforma ligadas em todo binário e, estruturalmente, com a migração para linguagens que fecham a classe de memória. A eficácia se prova no fuzzing que não derruba mais o programa e no teste que envia o comprimento errado e recebe recusa.
 
-O caso Heartbleed mostra o custo de romper essa cadeia em uma linha: a verificação ausente de um comprimento expôs as chaves privadas de dois terços da web. É por isso que a codificação segura ocupa, no ciclo de vida de desenvolvimento seguro, a posição entre a arquitetura, cujo desenho o código executa, e os testes de segurança, que provam que o executou sem traí-lo — e é essa rastreabilidade, da regra com identificador à ferramenta que a cobra e ao teste que a prova, que faz da segurança uma propriedade do código, e não da atenção de quem o escreveu.
+O caso mostra o custo de romper essa cadeia em uma linha: a verificação ausente de um comprimento expôs as chaves privadas de dois terços da web. É por isso que a codificação segura ocupa, no ciclo de vida de desenvolvimento seguro, a posição entre a arquitetura, cujo desenho o código executa, e os testes de segurança, que provam que o executou sem traí-lo — e é essa rastreabilidade, da regra com identificador à ferramenta que a cobra e ao teste que a prova, que faz da segurança uma propriedade do código, e não da atenção de quem o escreveu.
 
 ---
 

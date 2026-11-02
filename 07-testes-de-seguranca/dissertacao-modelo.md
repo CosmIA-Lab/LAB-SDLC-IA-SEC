@@ -1,13 +1,13 @@
 # Dissertação-modelo — Testes de segurança (SAST, DAST, SCA, fuzzing)
 
-> Texto corrido, no registro de uma dissertação, com cerca de dez páginas à mão. Três fontes nomeadas, um caso real, um exemplo que atravessa o texto. **[+]** marca onde alongar; **[−]** marca o que cortar primeiro.
+> Texto corrido, no registro de uma dissertação, com cerca de dez páginas à mão. Três fontes nomeadas, um caso construído por molde (real opcional), um exemplo que atravessa o texto. **[+]** marca onde alongar; **[−]** marca o que cortar primeiro.
 
 
 ## Esqueleto — o que você anota em 5 minutos antes de escrever
 
 - **Seções, na ordem:** Introdução → O que se toma como dado → Análise estática → Análise dinâmica → Análise de composição → Fuzzing → Os testes que o time escreve → Exemplo → Um caso real → O que não confundir → Conclusão
 - **Figura 1:** As janelas das técnicas de teste e onde cada uma roda no pipeline.
-- **Caso:** Log4Shell, 2021.
+- **Caso:** hipotético pelo molde de cinco lacunas; o elo que falha: a dependência vulnerável que ninguém sabia que estava lá, porque não havia inventário de componentes. (Real, se lembrar: Log4Shell, 2021.)
 - **Três fontes:** NIST SP 800-115, *Technical Guide to Information Security Testing and Assessment* (2008), com o OWASP Web Security Testing Guide como roteiro; Chess e West, *Secure Programming with Static Analysis* (2007), e Livshits e Lam (2005) — análise de fluxo de dados; Miller, Fredriksen e So (1990) e Zalewski, AFL (2013) — fuzzing.
 - **Exemplo:** a API de pagamentos (aplicativo, gateway, contas, transferências, banco, fila, parceiro).
 - **Desfecho começa com:** "Em síntese, os testes de segurança não são uma lista de ferramentas, e sim uma cadeia."
@@ -47,7 +47,7 @@ testes escritos  matriz de authz, regressão o que não foi modelado         PR
                         ▲ modelagem de ameaças (ponto 2) alimenta os casos de abuso ▲
 ```
 
-A Figura 1 é uma tabela-figura com as cinco técnicas e os testes escritos pelo time, em três colunas: o que cada uma vê bem, o que não vê, e em que momento do pipeline roda. Lida linha a linha, ela é o argumento central do texto: a análise estática vê a injeção com a linha exata e não vê autorização; a dinâmica vê o cabeçalho ausente e não vê a linha; a de composição vê a vulnerabilidade publicada e não vê a inédita; o fuzzing vê o erro de memória e não vê a lógica; a intrusão vê a autorização e a lógica e cobre pouco por hora. Lida por colunas, ela mostra que as lacunas de uma linha são cobertas por outra — o programa é a soma. A última coluna distribui as técnicas no tempo pela regra de Boehm: as baratas no pedido de integração, as lentas à noite, a cara por versão. A linha de baixo lembra de onde vêm os casos de abuso: da modelagem de ameaças. O caso Log4Shell está na linha da análise de composição — a janela que a maioria das organizações não tinha aberta.
+A Figura 1 é uma tabela-figura com as cinco técnicas e os testes escritos pelo time, em três colunas: o que cada uma vê bem, o que não vê, e em que momento do pipeline roda. Lida linha a linha, ela é o argumento central do texto: a análise estática vê a injeção com a linha exata e não vê autorização; a dinâmica vê o cabeçalho ausente e não vê a linha; a de composição vê a vulnerabilidade publicada e não vê a inédita; o fuzzing vê o erro de memória e não vê a lógica; a intrusão vê a autorização e a lógica e cobre pouco por hora. Lida por colunas, ela mostra que as lacunas de uma linha são cobertas por outra — o programa é a soma. A última coluna distribui as técnicas no tempo pela regra de Boehm: as baratas no pedido de integração, as lentas à noite, a cara por versão. A linha de baixo lembra de onde vêm os casos de abuso: da modelagem de ameaças. O caso da seção seguinte está na linha da análise de composição — a janela que ficou fechada.
 
 ## 4. Análise dinâmica — testar o sistema em execução
 
@@ -81,11 +81,11 @@ No pré-commit, em segundos: varredura de segredos e regras de segurança por li
 
 O que cada janela encontrou. A análise estática apontou a consulta montada por concatenação na busca — e cinquenta falsos positivos sobre uso de aleatoriedade em nomes de arquivo temporário, suprimidos com justificativa e regra ajustada. A análise dinâmica encontrou o cabeçalho de política de conteúdo ausente e um cross-site scripting refletido na página de erro, e não encontrou a falha de autorização porque só tinha uma conta. A análise de composição listou uma biblioteca de XML com vulnerabilidade crítica que o time nem sabia usar — era transitiva. O fuzzer derrubou o decodificador em quarenta minutos com um comprimento negativo. O teste de intrusão, com duas contas, encontrou a falha de autorização em dez minutos. Cinco técnicas, cinco achados diferentes, nenhum redundante, cinco testes de regressão.
 
-## 9. Um caso real — Log4Shell, 2021
+## 9. Um caso — como construí-lo
 
-Em 10 de dezembro de 2021, foi publicada uma vulnerabilidade na biblioteca de registro mais usada do ecossistema Java, o Log4j: uma string de log contendo uma expressão de busca de diretório era interpretada e fazia o servidor buscar e executar código remoto. Severidade máxima; exploração massiva em dias; a biblioteca estava em uma fração enorme do software Java do mundo — e a maioria das organizações não sabia que a carregava, porque ela vinha como dependência de dependência, dentro de centenas de produtos e bibliotecas.
+> **Como montar o caso hipotético na hora (cinco lacunas).** Não precisa lembrar nome nem ano: invente uma organização plausível — por exemplo, a própria empresa dona da API de pagamentos deste texto — e preencha: (1) **contexto**: que sistema, que decisão de projeto ou de processo estava em vigor; (2) **o elo que falhou**: a dependência vulnerável que ninguém sabia que estava lá, porque não havia inventário de componentes; (3) **consequência em uma frase**: o que se perdeu, em termos de confidencialidade, integridade ou disponibilidade, sem detalhar o ataque; (4) **a correção**: análise de composição com inventário por artefato; cada técnica cobrindo a sua janela; (5) **a lição em uma frase**, que a conclusão retoma. Se lembrar do caso real equivalente, cite em uma frase como reforço: Log4Shell, 2021.
 
-O problema das organizações não foi corrigir: a versão corrigida saiu no mesmo dia. Foi descobrir *onde*. Quem tinha análise de composição com inventário dos componentes de cada artefato em produção soube em horas; quem não tinha passou semanas varrendo sistemas de arquivos por nome de pacote, e foi explorado nesse intervalo. O caso mostra as janelas em ação: a análise estática do código próprio não via nada, porque a falha estava na dependência; a análise dinâmica só encontrava com a carga certa no campo certo; a análise de composição via — se houvesse inventário. O tempo de exposição de cada organização foi exatamente o tempo que ela levou para responder a uma pergunta de inventário.
+O caso entra depois do exemplo e antes dos erros, em dois parágrafos: o primeiro conta (contexto, elo que falhou, consequência); o segundo lê o caso com as lentes do texto (qual premissa foi ignorada, qual princípio violado, qual técnica teria agido) e termina com a lição. A conclusão o retoma em uma frase.
 
 ## 10. O que não confundir
 
@@ -95,7 +95,7 @@ Análise estática limpa não é código seguro: o analisador só vê padrões c
 
 Em síntese, os testes de segurança não são uma lista de ferramentas, e sim uma cadeia. Partem da premissa de que o teste mostra presença e não ausência, e de que o requisito negativo exige o caso de abuso. Fixam como regra que cada técnica observa por uma janela e que o programa é a combinação das janelas, com cobertura declarada e triagem como trabalho. Aplicam essa regra por técnicas nomeadas — a análise de fluxo de dados no código, a análise dinâmica autenticada, a análise de composição com alcançabilidade, o fuzzing guiado por cobertura com sanitizadores, o teste de intrusão guiado pelo modelo — e as executam em um pipeline em que cada falha é encontrada pela técnica mais barata capaz. A eficácia se mede pelo tempo de correção e pela taxa de escape para produção.
 
-O caso Log4Shell mostra o custo de romper essa cadeia na janela da composição: a correção existia no primeiro dia, e o tempo de exposição de cada organização foi o tempo que ela levou para descobrir onde a biblioteca estava. É por isso que os testes de segurança ocupam, no ciclo de vida de desenvolvimento seguro, a posição em que a intenção vira prova — recebem os requisitos da modelagem, da arquitetura e do código, e entregam à cadeia de suprimentos e à gestão de vulnerabilidades os achados triados — e é essa rastreabilidade, da ameaça ao requisito, do requisito ao teste e do teste à evidência, que faz da segurança uma propriedade demonstrada do sistema, e não uma afirmação sobre ele.
+O caso mostra o custo de romper essa cadeia na janela da composição: a correção existia no primeiro dia, e o tempo de exposição de cada organização foi o tempo que ela levou para descobrir onde a biblioteca estava. É por isso que os testes de segurança ocupam, no ciclo de vida de desenvolvimento seguro, a posição em que a intenção vira prova — recebem os requisitos da modelagem, da arquitetura e do código, e entregam à cadeia de suprimentos e à gestão de vulnerabilidades os achados triados — e é essa rastreabilidade, da ameaça ao requisito, do requisito ao teste e do teste à evidência, que faz da segurança uma propriedade demonstrada do sistema, e não uma afirmação sobre ele.
 
 ---
 

@@ -1,13 +1,13 @@
 # Dissertação-modelo — Segurança de APIs, microsserviços e contêineres
 
-> Texto corrido, no registro de uma dissertação, com cerca de dez páginas à mão. Três fontes nomeadas, um caso real, um exemplo que atravessa o texto. **[+]** marca onde alongar; **[−]** marca o que cortar primeiro.
+> Texto corrido, no registro de uma dissertação, com cerca de dez páginas à mão. Três fontes nomeadas, um caso construído por molde (real opcional), um exemplo que atravessa o texto. **[+]** marca onde alongar; **[−]** marca o que cortar primeiro.
 
 
 ## Esqueleto — o que você anota em 5 minutos antes de escrever
 
 - **Seções, na ordem:** Introdução → O que se toma como dado → Três anéis → APIs → Microsserviços → Contêineres e orquestração → Exemplo → Dois casos reais → O que não confundir → Conclusão
 - **Figura 1:** Os três anéis — borda, malha e pod — com o que cada um faz e o que nenhum faz.
-- **Caso:** Tesla, 2018, e o escape do runc, 2019.
+- **Caso:** hipotético pelo molde de cinco lacunas; o elo que falha: o plano de controle tratado como interno e o contêiner tratado como máquina isolada. (Real, se lembrar: Tesla, 2018, e o escape do runc, 2019.)
 - **Três fontes:** OWASP API Security Top 10 (2023) — as dez categorias; NIST SP 800-204, *Security Strategies for Microservices-based Application Systems* (2019), e SP 800-190, *Application Container Security Guide* (2017); NSA e CISA, *Kubernetes Hardening Guide* (2022).
 - **Exemplo:** a API de pagamentos (aplicativo, gateway, contas, transferências, banco, fila, parceiro).
 - **Desfecho começa com:** "Em síntese, a segurança de APIs, microsserviços e contêineres não é uma lista de boas práticas, e sim a mesma cadeia aplicada em três anéis."
@@ -44,7 +44,7 @@ clientes ──TLS·token·rate limit·esquema──▶ ╔═══════
                                              ╚═════ política como código (admissão, Pod Security) ═══════╝
 ```
 
-A Figura 1 mostra os três anéis em que a segurança de uma plataforma de serviços se organiza. O anel externo é o gateway na borda: termina a conexão segura, valida o token, aplica limites de taxa, valida o esquema e recusa rotas fora do catálogo. O anel do meio é a malha entre serviços: cada chamada entre pods passa por um proxy que impõe autenticação mútua com identidade por serviço e uma política de quem pode chamar o quê. O anel interno é o pod: cada serviço roda sem privilégio de administrador, sem capacidades do núcleo, com sistema de arquivos só de leitura. A moldura de baixo é a política como código, que torna os três anéis obrigatórios para tudo que entra no cluster. A seta que sai do pod de contas marca o que nenhum anel faz: decidir se este objeto é deste sujeito — isso é do código do serviço, porque só ele conhece o domínio, e é por isso que a falha de autorização por objeto atravessa gateway e malha. Os casos Tesla e runc estão, respectivamente, fora da moldura — o plano de controle exposto — e dentro do pod — o contêiner que achou que isolava.
+A Figura 1 mostra os três anéis em que a segurança de uma plataforma de serviços se organiza. O anel externo é o gateway na borda: termina a conexão segura, valida o token, aplica limites de taxa, valida o esquema e recusa rotas fora do catálogo. O anel do meio é a malha entre serviços: cada chamada entre pods passa por um proxy que impõe autenticação mútua com identidade por serviço e uma política de quem pode chamar o quê. O anel interno é o pod: cada serviço roda sem privilégio de administrador, sem capacidades do núcleo, com sistema de arquivos só de leitura. A moldura de baixo é a política como código, que torna os três anéis obrigatórios para tudo que entra no cluster. A seta que sai do pod de contas marca o que nenhum anel faz: decidir se este objeto é deste sujeito — isso é do código do serviço, porque só ele conhece o domínio, e é por isso que a falha de autorização por objeto atravessa gateway e malha. O caso da seção seguinte tem duas metades: fora da moldura — o plano de controle exposto — e dentro do pod — o contêiner que achou que isolava.
 
 ## 4. APIs — o contrato como verdade
 
@@ -72,13 +72,11 @@ Na borda, o gateway termina a conexão segura, valida o token completo, aplica c
 
 Os contêineres usam imagens mínimas, por hash, assinadas; todo espaço de nomes de aplicação está no perfil restrito: sem administrador, sem escalada, sem capacidades, sistema de arquivos só de leitura, filtro de chamadas, limites. O decodificador em C — o que mais processa entrada hostil — roda em runtime isolado. Nenhuma conta de serviço monta token automaticamente nem pode criar pods. A admissão exige imagem do registro interno, por hash, com assinatura e proveniência; o servidor da API é privado; o estado é cifrado; os nós são mínimos e atualizados semanalmente; três pessoas têm administração de cluster, com chave física. A detecção em tempo de execução tem regras para shell em contêiner, escrita fora do temporário, conexão inesperada e leitura de token de conta de serviço. O resultado, se o serviço de notificações for comprometido por uma dependência: alcança só a leitura de contato, não lê o segredo do banco, não escapa do contêiner, não cria pod, não sai para a internet — e o alerta dispara quando alguém abre um shell.
 
-## 8. Dois casos reais — Tesla, 2018, e o escape do runc, 2019
+## 8. Um caso — como construí-lo
 
-Em 2018, pesquisadores encontraram o painel administrativo do Kubernetes da Tesla acessível pela internet, sem autenticação. Dentro dele, credenciais de armazenamento em nuvem em texto claro; e atacantes já usavam o cluster para minerar criptomoeda — com cuidado para limitar o uso de processador e não disparar alertas. É a camada do orquestrador da publicação do NIST: um componente do plano de controle exposto sem autenticação, segredos em configuração legível, e nenhuma detecção em tempo de execução que visse o minerador.
+> **Como montar o caso hipotético na hora (cinco lacunas).** Não precisa lembrar nome nem ano: invente uma organização plausível — por exemplo, a própria empresa dona da API de pagamentos deste texto — e preencha: (1) **contexto**: que sistema, que decisão de projeto ou de processo estava em vigor; (2) **o elo que falhou**: o plano de controle tratado como interno e o contêiner tratado como máquina isolada; (3) **consequência em uma frase**: o que se perdeu, em termos de confidencialidade, integridade ou disponibilidade, sem detalhar o ataque; (4) **a correção**: autenticação e rede no plano de controle; menor privilégio dentro do contêiner e runtime atualizado; (5) **a lição em uma frase**, que a conclusão retoma. Se lembrar do caso real equivalente, cite em uma frase como reforço: Tesla, 2018, e o escape do runc, 2019.
 
-Em 2019, uma vulnerabilidade no runc — o executor de contêineres usado pelo Docker e pelo Kubernetes — permitiu que um contêiner rodando como administrador sobrescrevesse o binário do runc no nó ao ser executado, obtendo administrador no hospedeiro: um escape completo. O ataque exigia administrador dentro do contêiner; um contêiner sem privilégio, com escalada bloqueada e filtro de chamadas, não o permitiria. É a camada do contêiner: o isolamento é software, e software tem vulnerabilidades.
-
-Os dois casos, com um ano de diferença, são os dois erros de modelo deste assunto. O primeiro é achar que o plano de controle está protegido porque é interno. O segundo é achar que o contêiner isola como uma máquina virtual. O primeiro se corrige com autenticação e rede; o segundo, com menor privilégio dentro do contêiner e atualização do runtime.
+O caso entra depois do exemplo e antes dos erros, em dois parágrafos: o primeiro conta (contexto, elo que falhou, consequência); o segundo lê o caso com as lentes do texto (qual premissa foi ignorada, qual princípio violado, qual técnica teria agido) e termina com a lição. A conclusão o retoma em uma frase.
 
 ## 9. O que não confundir
 
@@ -88,7 +86,7 @@ Contêiner não isola como máquina virtual: o núcleo é compartilhado e o isol
 
 Em síntese, a segurança de APIs, microsserviços e contêineres não é uma lista de boas práticas, e sim a mesma cadeia aplicada em três anéis. Parte da premissa de que toda chamada cruza uma fronteira, de que o contrato é a superfície, de que o contêiner é um processo com isolamento parcial e de que a plataforma é código. Fixa como regra que a borda valida e o serviço autoriza, que entre serviços a identidade é de carga de trabalho e a autorização é por política, e que o processo roda com o mínimo. Aplica essas regras por técnicas nomeadas — o gateway como ponto único de acesso, a malha com identidade atestada, os perfis de segurança de pods, a admissão por política — e as executa com mecanismos cuja eficácia se prova pela pergunta: se este serviço for comprometido agora, até onde chega?
 
-Os casos Tesla e runc mostram o custo de romper a cadeia por erro de modelo — o plano de controle tratado como interno, o contêiner tratado como máquina. É por isso que este tema ocupa, no ciclo de vida de desenvolvimento seguro, a posição entre a cadeia de suprimentos, que lhe entrega a imagem assinada, e a gestão de vulnerabilidades, que recebe o alerta de produção — e é essa rastreabilidade, da fronteira ao anel que a protege e do anel à política que o torna obrigatório, que faz da segurança uma propriedade da plataforma, e não um acréscimo a cada serviço.
+O caso mostram o custo de romper a cadeia por erro de modelo — o plano de controle tratado como interno, o contêiner tratado como máquina. É por isso que este tema ocupa, no ciclo de vida de desenvolvimento seguro, a posição entre a cadeia de suprimentos, que lhe entrega a imagem assinada, e a gestão de vulnerabilidades, que recebe o alerta de produção — e é essa rastreabilidade, da fronteira ao anel que a protege e do anel à política que o torna obrigatório, que faz da segurança uma propriedade da plataforma, e não um acréscimo a cada serviço.
 
 ---
 

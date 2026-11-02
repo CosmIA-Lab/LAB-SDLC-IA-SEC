@@ -1,13 +1,13 @@
 # Dissertação-modelo — Ciclo de vida de desenvolvimento seguro e DevSecOps
 
-> Texto corrido, no registro de uma dissertação, com cerca de dez páginas à mão. Três fontes nomeadas, um caso real, um exemplo que atravessa o texto. **[+]** marca onde alongar; **[−]** marca o que cortar primeiro.
+> Texto corrido, no registro de uma dissertação, com cerca de dez páginas à mão. Três fontes nomeadas, um caso construído por molde (real opcional), um exemplo que atravessa o texto. **[+]** marca onde alongar; **[−]** marca o que cortar primeiro.
 
 
 ## Esqueleto — o que você anota em 5 minutos antes de escrever
 
 - **Seções, na ordem:** Introdução → A ideia que sustenta o ciclo → O que vale em todas as fases → As fases e a atividade de cada uma → Os modelos nomeados → O que DevSecOps acrescenta → Exemplo → O caso que deu origem a tudo → O que não confundir → Conclusão
 - **Figura 1:** O ciclo com uma atividade de segurança por fase e um gate entre fases.
-- **Caso:** Trustworthy Computing, 2002.
+- **Caso:** hipotético pelo molde de cinco lacunas; o elo que falha: a segurança tratada como etapa final: os achados chegam quando o código já está pronto e prometido. (Real, se lembrar: Trustworthy Computing, Microsoft, 2002.)
 - **Três fontes:** Boehm, *Software Engineering Economics* (1981) — custo por fase; Janca, *Alice and Bob Learn Application Security* (2020) — pushing left e fundamentos; Howard e Lipner, *The Security Development Lifecycle* (2006) — o SDL.
 - **Exemplo:** a API de pagamentos (aplicativo, gateway, contas, transferências, banco, fila, parceiro).
 - **Desfecho começa com:** "Em síntese, o ciclo de vida de desenvolvimento seguro não é uma lista de boas práticas, e sim uma cadeia."
@@ -86,11 +86,11 @@ Considere uma API de pagamentos com aplicativo móvel, gateway, serviços de con
 
 No design, a modelagem de ameaças desenha as duas fronteiras — aplicativo e parceiro — e produz, entre outras, a ameaça de um cliente trocar o identificador da conta na requisição; a mitigação é um ponto único de verificação de dono, que vira requisito de arquitetura. No código, a consulta ao banco é parametrizada por regra do padrão de codificação, e o analisador estático bloqueia no pedido de integração qualquer consulta montada por concatenação. Nos testes, a análise dinâmica noturna encontra um cabeçalho de segurança ausente na página de erro; o fuzzer derruba o decodificador de mensagens do parceiro com um comprimento negativo; o teste de intrusão, com duas contas, confirma que a verificação de dono vale em todos os endpoints. Na entrega, a imagem vai assinada, com a lista de componentes; em produção, o cruzamento dessa lista com as bases de vulnerabilidades avisa em horas quando uma dependência ganha uma falha pública, e a correção sai pelo mesmo pipeline. Quando um incidente acontece, a lição vira regra nova do analisador estático ou caso de teste novo — e o ciclo recomeça um pouco mais à esquerda.
 
-## 8. O caso que deu origem a tudo — Trustworthy Computing, 2002
+## 8. Um caso — como construí-lo
 
-Em 2001, dois vermes — Code Red e Nimda — exploraram falhas no servidor web e no sistema operacional da Microsoft em escala global, infectando centenas de milhares de máquinas em horas e causando prejuízo estimado em bilhões de dólares. A resposta da empresa, em janeiro de 2002, foi um memorando de Bill Gates a todos os funcionários, intitulado *Trustworthy Computing*, que colocava a segurança acima de qualquer funcionalidade nova. O desenvolvimento do Windows foi interrompido por cerca de dois meses para que milhares de engenheiros fossem treinados e revisassem o código existente em busca de falhas.
+> **Como montar o caso hipotético na hora (cinco lacunas).** Não precisa lembrar nome nem ano: invente uma organização plausível — por exemplo, a própria empresa dona da API de pagamentos deste texto — e preencha: (1) **contexto**: que sistema, que decisão de projeto ou de processo estava em vigor; (2) **o elo que falhou**: a segurança tratada como etapa final: os achados chegam quando o código já está pronto e prometido; (3) **consequência em uma frase**: o que se perdeu, em termos de confidencialidade, integridade ou disponibilidade, sem detalhar o ataque; (4) **a correção**: inserir a atividade de segurança em cada fase, com gate entre fases; (5) **a lição em uma frase**, que a conclusão retoma. Se lembrar do caso real equivalente, cite em uma frase como reforço: Trustworthy Computing, Microsoft, 2002.
 
-Dessa interrupção nasceu o SDL: a conclusão de que revisar depois era caro demais, e de que a única forma de não parar a empresa de novo era inserir a segurança em cada fase, com atividades obrigatórias e um gate antes do lançamento. A Microsoft publicou nos anos seguintes a queda na contagem de vulnerabilidades por versão de produto, e o SDL se tornou o molde de que os demais modelos descendem. O caso ilustra a curva de Boehm em escala de empresa: dois meses de desenvolvimento parados para corrigir o que já estava escrito custaram mais do que teria custado prevenir, fase a fase — e foi exatamente isso que o ciclo de vida seguro passou a fazer.
+O caso entra depois do exemplo e antes dos erros, em dois parágrafos: o primeiro conta (contexto, elo que falhou, consequência); o segundo lê o caso com as lentes do texto (qual premissa foi ignorada, qual princípio violado, qual técnica teria agido) e termina com a lição. A conclusão o retoma em uma frase.
 
 ## 9. O que não confundir
 
@@ -100,7 +100,7 @@ DevSecOps não é instalar scanners no pipeline; sem gate proporcional, retorno 
 
 Em síntese, o ciclo de vida de desenvolvimento seguro não é uma lista de boas práticas, e sim uma cadeia. Parte da premissa, medida por Boehm, de que o custo de corrigir cresce com a fase. Fixa como regra que cada fase tem a sua atividade de segurança e que nenhuma mudança passa de uma fase à seguinte sem verificação. Aplica essa regra por meio de modelos nomeados — o SDL que prescreve, o SSDF que define resultados, o SAMM que mede — e a executa, em DevSecOps, por um pipeline em camadas em que cada falha é encontrada pela técnica mais barata capaz de encontrá-la, com métricas de tempo de correção e de escape que dizem se o ciclo funciona.
 
-O caso da Microsoft em 2002 mostra o custo de não ter essa cadeia: uma empresa inteira parada por dois meses para corrigir o que a atividade por fase teria evitado. E é por isso que o ciclo de vida seguro é a moldura dos demais temas da engenharia de software seguro — a modelagem de ameaças é a sua fase de design, a codificação segura é a sua fase de código, os testes de segurança são a sua fase de verificação, a cadeia de suprimentos é a sua entrega, e a gestão de vulnerabilidades é a sua manutenção, que devolve o incidente ao início. Essa rastreabilidade, do requisito ao teste e do incidente ao requisito, é o que faz da segurança uma propriedade do processo, e não um acréscimo ao seu fim.
+O caso mostra o custo de não ter essa cadeia: uma empresa inteira parada por dois meses para corrigir o que a atividade por fase teria evitado. E é por isso que o ciclo de vida seguro é a moldura dos demais temas da engenharia de software seguro — a modelagem de ameaças é a sua fase de design, a codificação segura é a sua fase de código, os testes de segurança são a sua fase de verificação, a cadeia de suprimentos é a sua entrega, e a gestão de vulnerabilidades é a sua manutenção, que devolve o incidente ao início. Essa rastreabilidade, do requisito ao teste e do incidente ao requisito, é o que faz da segurança uma propriedade do processo, e não um acréscimo ao seu fim.
 
 ---
 

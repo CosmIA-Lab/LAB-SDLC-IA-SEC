@@ -1,13 +1,13 @@
 # Dissertação-modelo — Gestão de vulnerabilidades
 
-> Texto corrido, no registro de uma dissertação, com cerca de dez páginas à mão. Três fontes nomeadas, um caso real, um exemplo que atravessa o texto. **[+]** marca onde alongar; **[−]** marca o que cortar primeiro.
+> Texto corrido, no registro de uma dissertação, com cerca de dez páginas à mão. Três fontes nomeadas, um caso construído por molde (real opcional), um exemplo que atravessa o texto. **[+]** marca onde alongar; **[−]** marca o que cortar primeiro.
 
 
 ## Esqueleto — o que você anota em 5 minutos antes de escrever
 
 - **Seções, na ordem:** Introdução → O que mudou → O vocabulário → O ciclo → Divulgação coordenada → Quando é explorada → Exemplo → Dois casos reais → O que não confundir → Conclusão
 - **Figura 1:** A janela de exposição e o ciclo que a encurta.
-- **Caso:** Equifax e WannaCry, 2017.
+- **Caso:** hipotético pelo molde de cinco lacunas; o elo que falha: uma correção publicada há semanas e não aplicada, porque o ativo não estava no inventário e não havia prazo. (Real, se lembrar: Equifax e WannaCry, 2017.)
 - **Três fontes:** NIST SP 800-40 rev. 4, *Guide to Enterprise Patch Management Planning* (2022) — o ciclo como gestão de risco; FIRST, CVSS e EPSS, e CISA, catálogo KEV (2021) e SSVC — o vocabulário de priorização; ISO/IEC 29147 e 30111 com o guia de divulgação coordenada do CERT/CC (2017).
 - **Exemplo:** a API de pagamentos (aplicativo, gateway, contas, transferências, banco, fila, parceiro).
 - **Desfecho começa com:** "Em síntese, a gestão de vulnerabilidades não é uma lista de boas práticas, e sim uma cadeia."
@@ -39,13 +39,13 @@ nascimento   descoberta   divulgação   correção      exploit       correçã
 ────┼────────────┼───────────┼─────┼─────────┼────────────────┼──────────────────────┼────▶ tempo
                              ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
                              ░ janela que a organização controla ░
-                             ░ (Equifax e WannaCry: 2 meses)      ░
+                             ░ (no caso: semanas)      ░
 ciclo que a encurta:  INVENTÁRIO ─▶ descobrir ─▶ priorizar (KEV·EPSS·exposição·impacto → prazo) ─▶ corrigir/mitigar ─▶ verificar ─▶ relatar ─┐
                           ▲                                                                                                                │
                           └──────────────────────── lição → requisito do próximo ciclo ◀──────────────────────────────────────────────────┘
 ```
 
-A Figura 1 tem duas partes. Em cima, a linha do tempo de uma vulnerabilidade segundo Arbaugh, Fithen e McHugh: nasce, é descoberta, é divulgada, ganha correção publicada, ganha código de exploração, é corrigida em um sistema específico, e morre quando a maioria foi corrigida. A faixa sombreada é a janela que a organização controla — da correção publicada à correção aplicada e verificada — e é nela que a maioria das invasões por falha conhecida acontece; nos casos Equifax e WannaCry, essa faixa durou dois meses. Embaixo, o ciclo que existe para encurtá-la: o inventário que alimenta a descoberta; a priorização que combina exploração conhecida, probabilidade estimada, exposição e impacto para produzir um prazo; a correção ou, enquanto ela não chega, a mitigação; a verificação com evidência; o relatório com o tempo de exposição por classe; e a seta de retorno — a lição que vira requisito do próximo ciclo de desenvolvimento. A figura mostra a primeira premissa do texto: a vulnerabilidade é certa, e o que o processo governa é o comprimento da faixa sombreada.
+A Figura 1 tem duas partes. Em cima, a linha do tempo de uma vulnerabilidade segundo Arbaugh, Fithen e McHugh: nasce, é descoberta, é divulgada, ganha correção publicada, ganha código de exploração, é corrigida em um sistema específico, e morre quando a maioria foi corrigida. A faixa sombreada é a janela que a organização controla — da correção publicada à correção aplicada e verificada — e é nela que a maioria das invasões por falha conhecida acontece; no caso da seção seguinte, essa faixa dura semanas. Embaixo, o ciclo que existe para encurtá-la: o inventário que alimenta a descoberta; a priorização que combina exploração conhecida, probabilidade estimada, exposição e impacto para produzir um prazo; a correção ou, enquanto ela não chega, a mitigação; a verificação com evidência; o relatório com o tempo de exposição por classe; e a seta de retorno — a lição que vira requisito do próximo ciclo de desenvolvimento. A figura mostra a primeira premissa do texto: a vulnerabilidade é certa, e o que o processo governa é o comprimento da faixa sombreada.
 
 ## 4. O ciclo — cinco etapas
 
@@ -77,11 +77,11 @@ Dez horas: mitigação enquanto a correção não sai — regra na borda interna
 
 Na quinta-feira, um pesquisador escreve ao endereço publicado: uma falha de autorização em um endpoint da versão antiga da API, que o catálogo marcava como descontinuada mas o gateway ainda roteava. O time confirma em um dia, reproduz, classifica, desliga a rota no gateway no mesmo dia, publica o aviso, credita o pesquisador e paga a recompensa. A lição vai ao desenvolvimento: o catálogo de rotas passa a ser gerado do que o gateway roteia, e um teste novo afirma que rota fora do catálogo não responde.
 
-## 8. Dois casos reais — Equifax e WannaCry, 2017
+## 8. Um caso — como construí-lo
 
-Em março de 2017, a Apache divulgou uma vulnerabilidade crítica no framework Struts, com correção disponível no mesmo dia e código de exploração público em horas. A Equifax foi avisada, mas a varredura interna não identificou o portal afetado — o inventário estava incompleto — e a correção não foi aplicada. A invasão começou em maio e só foi detectada no fim de julho, em parte porque um certificado expirado havia deixado o inspetor de tráfego cego por dez meses. Dados de cento e quarenta e sete milhões de pessoas vazaram. Cada etapa do ciclo falhou: a descoberta, porque o ativo não estava no inventário; a priorização, porque uma crítica exposta com exploração pública deveria ter prazo de dias; a correção, porque dois meses se passaram; a verificação, porque ninguém confirmou; e a detecção.
+> **Como montar o caso hipotético na hora (cinco lacunas).** Não precisa lembrar nome nem ano: invente uma organização plausível — por exemplo, a própria empresa dona da API de pagamentos deste texto — e preencha: (1) **contexto**: que sistema, que decisão de projeto ou de processo estava em vigor; (2) **o elo que falhou**: uma correção publicada há semanas e não aplicada, porque o ativo não estava no inventário e não havia prazo; (3) **consequência em uma frase**: o que se perdeu, em termos de confidencialidade, integridade ou disponibilidade, sem detalhar o ataque; (4) **a correção**: inventário automático, priorização por risco real com prazo escrito, verificação com evidência; (5) **a lição em uma frase**, que a conclusão retoma. Se lembrar do caso real equivalente, cite em uma frase como reforço: Equifax e WannaCry, 2017.
 
-Dois meses antes, em maio, o WannaCry havia explorado uma falha no protocolo de compartilhamento de arquivos do Windows corrigida pela Microsoft em março, infectando mais de duzentos mil sistemas em cento e cinquenta países — hospitais do serviço de saúde britânico entre eles — porque a correção não tinha sido aplicada, e muitos sistemas estavam fora de suporte. Nenhum dos dois casos foi uma vulnerabilidade sem correção. Os dois tiveram a mesma causa: correção publicada há dois meses e não aplicada. Foram falhas de inventário, de prazo e de verificação — exatamente as etapas que a gestão de vulnerabilidades existe para governar.
+O caso entra depois do exemplo e antes dos erros, em dois parágrafos: o primeiro conta (contexto, elo que falhou, consequência); o segundo lê o caso com as lentes do texto (qual premissa foi ignorada, qual princípio violado, qual técnica teria agido) e termina com a lição. A conclusão o retoma em uma frase.
 
 ## 9. O que não confundir
 
@@ -91,7 +91,7 @@ Nota alta não é corrigir primeiro: exploração conhecida, exposição e impac
 
 Em síntese, a gestão de vulnerabilidades não é uma lista de boas práticas, e sim uma cadeia. Parte da premissa de que a vulnerabilidade é certa e a variável é o tempo, e de que não se gerencia o que não se conhece. Fixa como regra que a prioridade é decidida por risco real — exploração, exposição, impacto — e não por nota, e que cada classe tem prazo escrito antes do incidente. Aplica essa regra por um ciclo em cinco etapas — descobrir, priorizar, corrigir, verificar, relatar —, com técnicas nomeadas — o cruzamento do inventário com as bases, a árvore de decisão, a aplicação em anéis, a reconstrução de imagens, a divulgação coordenada — e a executa com mecanismos cuja eficácia se mede pelo tempo de exposição e pelo número de vulnerabilidades exploradas conhecidas em aberto, que deve ser zero.
 
-Os casos Equifax e WannaCry mostram o custo de romper essa cadeia no inventário e no prazo: duas correções publicadas, dois meses de janela, e nenhum dos dois era uma falha sem solução. É por isso que a gestão de vulnerabilidades ocupa, no ciclo de vida de desenvolvimento seguro, a posição final que devolve ao início — recebe da operação a falha que escapou a todas as fases anteriores, e entrega ao próximo ciclo a lição que vira requisito. Essa rastreabilidade, do incidente à causa e da causa ao requisito, é o que faz do ciclo um ciclo, e da segurança uma propriedade que se mantém no tempo, e não um estado que se atinge uma vez.
+O caso mostram o custo de romper essa cadeia no inventário e no prazo: duas correções publicadas, dois meses de janela, e nenhum dos dois era uma falha sem solução. É por isso que a gestão de vulnerabilidades ocupa, no ciclo de vida de desenvolvimento seguro, a posição final que devolve ao início — recebe da operação a falha que escapou a todas as fases anteriores, e entrega ao próximo ciclo a lição que vira requisito. Essa rastreabilidade, do incidente à causa e da causa ao requisito, é o que faz do ciclo um ciclo, e da segurança uma propriedade que se mantém no tempo, e não um estado que se atinge uma vez.
 
 ---
 
