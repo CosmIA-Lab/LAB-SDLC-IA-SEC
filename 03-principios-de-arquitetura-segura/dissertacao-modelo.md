@@ -35,20 +35,31 @@ A terceira: **segurança depende de um mecanismo pequeno e sempre invocado**. Ja
 
 ## Figura 1 — Anéis de defesa em profundidade com o princípio que cada anel aplica
 
-> Desenhe à mão em três ou quatro minutos, com todos os elementos rotulados, e cite "a Figura 1" no texto antes e depois. A explicação abaixo é o parágrafo que a acompanha — percorra os elementos na ordem, diga o que cada um é, por que está ali e o que acontece quando falha.
+> Desenhe à mão em três ou quatro minutos, à caneta, com os elementos rotulados e numerados. Cite "a Figura 1" antes de desenhar e percorra a trilha abaixo no texto: cada número é um parágrafo, com um protagonista que atravessa a figura. É assim que o desenho vira uma página — e que o leitor o acompanha em vez de pular.
 
-```
-        ╭──────────────── borda: gateway ─ padrões à prova de falha (nega por padrão) ────────────────╮
-        │   ╭──────────── rede/malha ─ confiança explícita (mTLS, identidade por serviço) ──────────╮   │
-        │   │   ╭──────── serviço ─ mediação completa (PDP/PEP por objeto) ────────────────╮        │   │
-        │   │   │   ╭──── processo ─ menor privilégio (compartimento sem root) ──╮          │        │   │
-        │   │   │   │                  ╔═════ dado ═════╗                        │          │        │   │
-   atacante ──▶ ─ ─ ▶ ─ ─ ─ ▶ ─ ─ ─ ▶  ║ saldo · cartão ║   ◀ registro de comprometimento (log íntegro)
-        │   │   │   ╰──────────────────╚════════════════╝────────────────────────╯          │        │   │
-        ╰───╰───╰────────────────────────────────────────────────────────────────────────────╯────────╯───╯
+```mermaid
+flowchart LR
+    subgraph A1["① borda — padrões à prova de falha (gateway nega por padrão)"]
+        subgraph A2["② rede / malha — confiança explícita (mTLS, identidade por serviço)"]
+            subgraph A3["③ serviço — mediação completa (PDP/PEP por objeto)"]
+                subgraph A4["④ processo — menor privilégio (compartimento sem root)"]
+                    D[("⑤ dado: saldo · cartão")]
+                end
+            end
+        end
+    end
+    AT["atacante"] -. "cada anel segura o que o anterior deixou passar" .-> D
+    D -.-> LOG["⑥ registro de comprometimento<br/>(log íntegro)"]
 ```
 
-A Figura 1 mostra o dado a proteger no centro — saldo e dados de cartão — e quatro anéis em volta, cada um rotulado com o princípio de Saltzer e Schroeder que ele aplica. O anel externo é a borda, com o gateway negando por padrão o que não está declarado: padrões à prova de falha. O segundo é a rede entre serviços, em que nenhuma chamada é aceita pela posição de origem, só pela identidade provada: confiança explícita, o zero trust. O terceiro é o serviço, em que todo acesso a todo objeto passa por um ponto de decisão: mediação completa. O quarto é o processo, rodando sem privilégio em um compartimento que, comprometido, não alcança o vizinho: menor privilégio. A seta do atacante atravessa os anéis para mostrar o que a defesa em profundidade significa — cada anel segura o que o anterior deixou passar, e os anéis são independentes em mecanismo e em modo de falha. O registro de comprometimento, à direita, é o que resta quando todos falham: saber que falharam. O caso da seção seguinte é a figura sem o segundo anel.
+**A trilha: siga um atacante de fora para dentro.** A Figura 1 são anéis em volta do dado, e cada número é um anel que ele precisa atravessar — rotulado com o princípio de 1975 que o anel aplica.
+
+1. **① A borda.** O gateway nega tudo que não foi declarado: rota fora do catálogo, requisição fora do esquema, token inválido. É o princípio de padrões à prova de falha: o erro fecha, não abre.
+2. **② A rede.** Se o atacante entrou por um serviço qualquer, nenhuma chamada dali é aceita por "estar dentro": cada serviço prova identidade e só chama o que a política permite. Confiança explícita — o zero trust — no lugar do centro mole.
+3. **③ O serviço.** Mesmo chamando o serviço certo, cada acesso a cada objeto passa pelo ponto de decisão: "este sujeito pode esta ação sobre este recurso?". Mediação completa.
+4. **④ O processo.** Se o código do serviço for comprometido, roda sem privilégio, em compartimento que não alcança o vizinho nem o nó. Menor privilégio: o dano fica do tamanho do compartimento.
+5. **⑤ O dado.** É o que se protege — saldo e cartão — e a razão de os anéis existirem. Cada anel segurou o que o anterior deixou passar; é isso que defesa em profundidade significa, e por isso os anéis precisam falhar de modos diferentes.
+6. **⑥ O registro.** Se todos os anéis falharem, resta saber que falharam: o log íntegro, que ninguém altera. É o registro de comprometimento de Saltzer e Schroeder — o princípio para quando os outros não bastam. O caso da seção seguinte é esta figura sem o anel ②.
 
 ## 4. Os oito princípios de Saltzer e Schroeder
 

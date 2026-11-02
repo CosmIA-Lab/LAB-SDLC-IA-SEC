@@ -31,21 +31,32 @@ Sem o vocabulário não se descreve o processo, e cada sigla é frequentemente c
 
 ## Figura 1 — A janela de exposição e o ciclo que a encurta
 
-> Desenhe à mão em três ou quatro minutos, com todos os elementos rotulados, e cite "a Figura 1" no texto antes e depois. A explicação abaixo é o parágrafo que a acompanha — percorra os elementos na ordem, diga o que cada um é, por que está ali e o que acontece quando falha.
+> Desenhe à mão em três ou quatro minutos, à caneta, com os elementos rotulados e numerados. Cite "a Figura 1" antes de desenhar e percorra a trilha abaixo no texto: cada número é um parágrafo, com um protagonista que atravessa a figura. É assim que o desenho vira uma página — e que o leitor o acompanha em vez de pular.
 
-```
-nascimento   descoberta   divulgação   correção      exploit       correção APLICADA    morte
-    │            │           │  publicada   público       e verificada
-────┼────────────┼───────────┼─────┼─────────┼────────────────┼──────────────────────┼────▶ tempo
-                             ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-                             ░ janela que a organização controla ░
-                             ░ (no caso: semanas)      ░
-ciclo que a encurta:  INVENTÁRIO ─▶ descobrir ─▶ priorizar (KEV·EPSS·exposição·impacto → prazo) ─▶ corrigir/mitigar ─▶ verificar ─▶ relatar ─┐
-                          ▲                                                                                                                │
-                          └──────────────────────── lição → requisito do próximo ciclo ◀──────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph T["vida de uma vulnerabilidade"]
+        direction LR
+        N["① nasce"] --> DS["descoberta"] --> DV["② divulgada"] --> CP["③ correção<br/>publicada"] --> EX["④ exploit<br/>público"] --> CA["⑤ correção<br/>APLICADA e verificada"] --> MO["morre"]
+    end
+    subgraph J["janela que a organização controla (no caso: semanas)"]
+        CP2["③ correção publicada"] -.-> CA2["⑤ correção aplicada"]
+    end
+    subgraph C["⑥ o ciclo que encurta a janela"]
+        direction LR
+        I["inventário"] --> D1["descobrir"] --> P1["priorizar<br/>KEV · EPSS · exposição · impacto → prazo"] --> F1["corrigir /<br/>mitigar"] --> V1["verificar"] --> R1["relatar"]
+        R1 -. "lição vira requisito do próximo ciclo" .-> I
+    end
 ```
 
-A Figura 1 tem duas partes. Em cima, a linha do tempo de uma vulnerabilidade segundo Arbaugh, Fithen e McHugh: nasce, é descoberta, é divulgada, ganha correção publicada, ganha código de exploração, é corrigida em um sistema específico, e morre quando a maioria foi corrigida. A faixa sombreada é a janela que a organização controla — da correção publicada à correção aplicada e verificada — e é nela que a maioria das invasões por falha conhecida acontece; no caso da seção seguinte, essa faixa dura semanas. Embaixo, o ciclo que existe para encurtá-la: o inventário que alimenta a descoberta; a priorização que combina exploração conhecida, probabilidade estimada, exposição e impacto para produzir um prazo; a correção ou, enquanto ela não chega, a mitigação; a verificação com evidência; o relatório com o tempo de exposição por classe; e a seta de retorno — a lição que vira requisito do próximo ciclo de desenvolvimento. A figura mostra a primeira premissa do texto: a vulnerabilidade é certa, e o que o processo governa é o comprimento da faixa sombreada.
+**A trilha: siga uma vulnerabilidade da biblioteca de XML da Lumen, do dia em que nasceu ao dia em que morreu.** A Figura 1 tem a linha do tempo em cima e, embaixo, o ciclo que decide quanto dessa linha a organização fica exposta.
+
+1. **① Nasce.** Um commit em uma biblioteca de terceiros, anos antes, introduz a falha. Ninguém sabe.
+2. **② É divulgada.** Um pesquisador a encontra e o identificador público sai. A partir daqui, quem souber da falha pode procurá-la.
+3. **③ A correção é publicada.** No mesmo dia, em geral. Começa a faixa sombreada: a janela que a organização controla.
+4. **④ O código de exploração aparece.** Em dias. A probabilidade de exploração salta, e a faixa, que era risco, vira ataque em curso.
+5. **⑤ A correção é aplicada e verificada.** Aqui a faixa fecha — para esta organização. Quantos dias ou semanas depois de ③ é a única pergunta que importa; no caso da seção seguinte, foram semanas.
+6. **⑥ O ciclo embaixo é o que encurta a faixa.** O inventário diz onde a biblioteca está; a descoberta cruza o inventário com as bases; a priorização combina exploração conhecida, probabilidade, exposição e impacto para dar um prazo; a correção — ou a mitigação enquanto ela não chega — fecha; a verificação prova; o relatório mede o tempo entre ③ e ⑤. E a seta de volta leva a lição ao desenvolvimento, para que a próxima linha do tempo seja mais curta.
 
 ## 4. O ciclo — cinco etapas
 

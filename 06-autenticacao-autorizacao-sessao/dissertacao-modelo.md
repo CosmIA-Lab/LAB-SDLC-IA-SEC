@@ -33,23 +33,35 @@ O segundo fator combina naturezas distintas — algo que se sabe, algo que se te
 
 ## Figura 1 — O fluxo OAuth 2.0 com código de autorização e PKCE, e onde a autorização por objeto acontece
 
-> Desenhe à mão em três ou quatro minutos, com todos os elementos rotulados, e cite "a Figura 1" no texto antes e depois. A explicação abaixo é o parágrafo que a acompanha — percorra os elementos na ordem, diga o que cada um é, por que está ali e o que acontece quando falha.
+> Desenhe à mão em três ou quatro minutos, à caneta, com os elementos rotulados e numerados. Cite "a Figura 1" antes de desenhar e percorra a trilha abaixo no texto: cada número é um parágrafo, com um protagonista que atravessa a figura. É assim que o desenho vira uma página — e que o leitor o acompanha em vez de pular.
 
-```
-usuário        cliente (app)              servidor de autorização          servidor de recursos (API)
-  │   1. login     │  2. redireciona c/ hash(verifier), state   │                              │
-  │ ─────────────▶ │ ──────────────────────────────────────────▶ │                              │
-  │ 3. autentica e consente (passkey / senha + 2º fator)         │                              │
-  │ ◀────────────────────────────────────────────────────────── │                              │
-  │                │ 4. ◀── código (uso único) + state           │                              │
-  │                │ 5. código + verifier ─────────────────────▶ │                              │
-  │                │ 6. ◀── access token (10 min, aud=API, escopo) + refresh (c/ estado)        │
-  │                │ 7. Authorization: Bearer ─────────────────────────────────────────────────▶ │ PEP: assinatura, iss,
-  │                │                                             │                              │ aud, exp, escopo
-  │                │                                             │                              │ ▶ serviço: dono == sujeito?
+```mermaid
+sequenceDiagram
+    participant U as usuário
+    participant A as cliente (app)
+    participant S as servidor de autorização
+    participant R as API (servidor de recursos)
+    U->>A: ① quer entrar
+    A->>S: ② redireciona com hash(verifier) + state
+    U->>S: ③ autentica (passkey / senha + 2º fator) e consente
+    S-->>A: ④ código de uso único + state
+    A->>S: ⑤ código + verifier
+    S-->>A: ⑥ access token (10 min, aud=API, escopo) + refresh (com estado)
+    A->>R: ⑦ Authorization: Bearer
+    Note over R: PEP: assinatura, iss, aud, exp, escopo
+    Note over R: ⑧ serviço: este objeto é deste sujeito?
 ```
 
-A Figura 1 é o fluxo de código de autorização do OAuth 2.0 com PKCE, nas quatro colunas do protocolo: o usuário, o cliente, o servidor de autorização e o servidor de recursos. O cliente redireciona o usuário ao servidor de autorização levando o hash de um segredo gerado para esta requisição e um valor de estado; o usuário autentica ali — com passkey ou senha e segundo fator — e consente; o servidor devolve um código de uso único; o cliente troca o código pelo token apresentando o segredo original, de modo que quem interceptou o código não consegue trocá-lo; e recebe um token de acesso curto, com audiência e escopo, mais um token de renovação guardado com estado. A última linha é o que o protocolo não faz: na API, o ponto de aplicação verifica assinatura, emissor, audiência, prazo e escopo — e o serviço, só então, pergunta se o objeto pedido é do sujeito. A figura separa as três perguntas do texto: a autenticação acontece no servidor de autorização, a sessão é o par de tokens, e a autorização por objeto é a última seta, dentro do serviço. O caso da seção seguinte está na etapa 3: o segundo fator que não resiste.
+**A trilha: siga um cliente da Lumen entrando pelo aplicativo e consultando o saldo.** A Figura 1 é o fluxo de código de autorização do OAuth 2.0 com PKCE, nas quatro colunas do protocolo, e cada número é um passo — e um ataque que ele fecha.
+
+1. **① O usuário quer entrar.** O aplicativo não pede a senha: ele não é quem autentica.
+2. **② O redirecionamento.** O aplicativo gera um segredo para esta tentativa, envia só o hash dele e um valor de estado. Quem interceptar o que vem depois não tem o segredo.
+3. **③ A autenticação.** Acontece no servidor de autorização, não no aplicativo: passkey, ou senha com segundo fator. É aqui que o nível de garantia é decidido — e aqui que o caso da seção seguinte falha.
+4. **④ O código.** De uso único, volta com o valor de estado; o aplicativo confere o estado — sem isso, o atacante poderia completar o fluxo com um código dele e ligar a conta da vítima à sua.
+5. **⑤ A troca.** O aplicativo apresenta o código e o segredo original; o servidor confere o hash. Código interceptado não vale nada sem o segredo.
+6. **⑥ Os tokens.** Um de acesso, curto, com audiência da API e escopo; um de renovação, guardado com estado e rotacionado a cada uso — a sessão sem estado com revogação possível.
+7. **⑦ A chamada.** O token vai no cabeçalho de autorização — por isso não sofre falsificação entre sítios — e o ponto de aplicação verifica assinatura, emissor, audiência, prazo e escopo.
+8. **⑧ O que o protocolo não faz.** O serviço, só então, pergunta se a conta pedida é deste sujeito. Autenticação em ③, sessão em ⑥, autorização por objeto em ⑧: as três perguntas do texto, em três lugares diferentes da figura.
 
 ## 4. Sessão — lembrar a prova sem que ela vire a falha
 

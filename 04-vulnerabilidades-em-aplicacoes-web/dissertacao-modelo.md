@@ -37,17 +37,26 @@ O que o Top 10 é: instrumento de consciência e de priorização. O que não é
 
 ## Figura 1 — O caminho da requisição e onde cada classe de vulnerabilidade vive
 
-> Desenhe à mão em três ou quatro minutos, com todos os elementos rotulados, e cite "a Figura 1" no texto antes e depois. A explicação abaixo é o parágrafo que a acompanha — percorra os elementos na ordem, diga o que cada um é, por que está ali e o que acontece quando falha.
+> Desenhe à mão em três ou quatro minutos, à caneta, com os elementos rotulados e numerados. Cite "a Figura 1" antes de desenhar e percorra a trilha abaixo no texto: cada número é um parágrafo, com um protagonista que atravessa a figura. É assim que o desenho vira uma página — e que o leitor o acompanha em vez de pular.
 
-```
-navegador ──entrada──▶ parse/validação ──▶ autenticação ──▶ autorização ──▶ lógica ──▶ dados/serviços ──▶ resposta ──saída──▶ navegador
-(do atacante)              │                    │                │                           │                  │
-                      validação ausente     credential       IDOR / BOLA                injeção SQL       XSS
-                      upload · XXE          stuffing ·       função sem                  comando · LDAP    cabeçalhos ausentes
-                      desserialização       sessão fraca     checagem · CSRF             SSRF              dado exposto
+```mermaid
+flowchart LR
+    B1["navegador<br/>do atacante"] --> V["① parse e<br/>validação"] --> AN["② autenticação"] --> AZ["③ autorização"] --> LG["lógica"] --> DT["④ dados e<br/>serviços"] --> RS["⑤ resposta"] --> B2["⑥ navegador<br/>da vítima"]
+    V -.- v1["validação ausente<br/>upload · XXE · desserialização"]
+    AN -.- v2["credential stuffing<br/>sessão fraca · fixação"]
+    AZ -.- v3["IDOR / BOLA<br/>função sem checagem · CSRF"]
+    DT -.- v4["injeção SQL / comando<br/>SSRF"]
+    RS -.- v5["XSS<br/>cabeçalhos ausentes · dado exposto"]
 ```
 
-A Figura 1 desenha o caminho de uma requisição pela aplicação, da entrada à saída, como uma linha de estações: análise e validação da entrada, autenticação, autorização, lógica de negócio, acesso a dados e serviços, montagem da resposta. Embaixo de cada estação está a classe de vulnerabilidade que é a falha daquela estação. A figura organiza o que a lista da OWASP apresenta por frequência: na validação, o que entra sem forma — upload, XML com entidades, objeto desserializado; na autenticação, a senha reusada e a sessão fraca; na autorização, o identificador trocado e a requisição forjada entre sítios; nos dados, a injeção e a requisição que o servidor faz para onde o atacante manda; na resposta, o script que volta ao navegador e os cabeçalhos que faltam. Os dois fatos do modelo aparecem nas pontas: à esquerda, o navegador do atacante envia o que quiser; à direita, o navegador da vítima executa o que receber. O caso da seção seguinte está na estação da resposta.
+**A trilha: siga uma requisição hostil, do navegador do atacante ao navegador da vítima.** A Figura 1 é o caminho que toda requisição percorre dentro da aplicação, e cada número é uma estação em que uma classe de vulnerabilidade pode morar.
+
+1. **① Validação.** A requisição chega com o que o atacante quis colocar nela — um arquivo que não é imagem, um XML com entidade externa, um objeto serializado. Se a estação aceita o que não tem forma, a classe é validação ausente. O fato do modelo: o servidor recebe o que o cliente mandar.
+2. **② Autenticação.** Quem é? Aqui moram a senha reusada de outro vazamento, a sessão que nunca expira, o identificador plantado antes do login.
+3. **③ Autorização.** Pode? Aqui mora a vulnerabilidade mais frequente: o identificador trocado que o servidor atende porque só verificou que há sessão; e a requisição forjada entre sítios, que chega autenticada porque o cookie viaja sozinho.
+4. **④ Dados e serviços.** A requisição vira consulta, comando ou chamada a outro sistema. Se o dado entrou no texto da instrução, é injeção; se o servidor buscou a URL que o atacante indicou, é falsificação do lado do servidor.
+5. **⑤ Resposta.** O servidor monta o que devolve. Se devolve o dado do atacante sem codificar, o navegador da vítima o executa: cross-site scripting. Se devolve sem os cabeçalhos de proteção, a plataforma roda em modo aberto.
+6. **⑥ O outro navegador.** O fato do modelo que fecha a trilha: o navegador executa o que o servidor devolver. O caso da seção seguinte vive na estação ⑤.
 
 ## 4. Injeção — dado interpretado como instrução
 

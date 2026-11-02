@@ -33,21 +33,27 @@ A análise estática vê bem injeção, uso de API perigosa, erro de memória po
 
 ## Figura 1 — As janelas das técnicas de teste e onde cada uma roda no pipeline
 
-> Desenhe à mão em três ou quatro minutos, com todos os elementos rotulados, e cite "a Figura 1" no texto antes e depois. A explicação abaixo é o parágrafo que a acompanha — percorra os elementos na ordem, diga o que cada um é, por que está ali e o que acontece quando falha.
+> Desenhe à mão em três ou quatro minutos, à caneta, com os elementos rotulados e numerados. Cite "a Figura 1" antes de desenhar e percorra a trilha abaixo no texto: cada número é um parágrafo, com um protagonista que atravessa a figura. É assim que o desenho vira uma página — e que o leitor o acompanha em vez de pular.
 
-```
-técnica      vê bem                         não vê                        quando roda
-─────────    ─────────────────────────────  ───────────────────────────   ─────────────────────
-SAST         injeção, API perigosa, linha   config, authz, dependência    PR (diff) · noturno (completo)
-DAST         XSS refletido, cabeçalhos      linha, estados, authz, lógica  noturno, autenticado
-SCA          CVE conhecida, licença         inédita, malicioso, alcance    PR
-fuzzing      memória, parsing, exceção      lógica, authz                  noturno, contínuo
-intrusão     authz, lógica, encadeamento    pouca cobertura por hora       por release
-testes escritos  matriz de authz, regressão o que não foi modelado         PR
-                        ▲ modelagem de ameaças (ponto 2) alimenta os casos de abuso ▲
-```
+| | Técnica | Vê bem | Não vê | Quando roda |
+|---|---|---|---|---|
+| ① | SAST | injeção, API perigosa, segredo, com a linha | configuração, autorização, dependência | pedido de integração (diferencial) · noturno (completo) |
+| ② | DAST | XSS refletido, cabeçalhos, configuração | linha, estados profundos, autorização, lógica | noturno, autenticado |
+| ③ | SCA | vulnerabilidade publicada, licença | inédita, pacote malicioso, alcançabilidade | pedido de integração |
+| ④ | Fuzzing | memória, parsing, exceção, laço | lógica, autorização | noturno, contínuo |
+| ⑤ | Intrusão | autorização, lógica, encadeamento | pouca cobertura por hora | por versão |
+| ⑥ | Testes escritos | matriz de autorização, regressão | o que não foi modelado | pedido de integração |
 
-A Figura 1 é uma tabela-figura com as cinco técnicas e os testes escritos pelo time, em três colunas: o que cada uma vê bem, o que não vê, e em que momento do pipeline roda. Lida linha a linha, ela é o argumento central do texto: a análise estática vê a injeção com a linha exata e não vê autorização; a dinâmica vê o cabeçalho ausente e não vê a linha; a de composição vê a vulnerabilidade publicada e não vê a inédita; o fuzzing vê o erro de memória e não vê a lógica; a intrusão vê a autorização e a lógica e cobre pouco por hora. Lida por colunas, ela mostra que as lacunas de uma linha são cobertas por outra — o programa é a soma. A última coluna distribui as técnicas no tempo pela regra de Boehm: as baratas no pedido de integração, as lentas à noite, a cara por versão. A linha de baixo lembra de onde vêm os casos de abuso: da modelagem de ameaças. O caso da seção seguinte está na linha da análise de composição — a janela que ficou fechada.
+Na mão, desenhe a tabela com as quatro colunas e uma seta embaixo: "modelagem de ameaças → casos de abuso".
+
+**A trilha: siga seis defeitos diferentes e veja qual janela pega cada um.** A Figura 1 é uma tabela-figura, e a forma de percorrê-la é por defeito: para cada um, a linha que o enxerga e a linha que não.
+
+1. **① Uma consulta montada por concatenação.** A análise estática a vê — fonte, destino, nenhum neutralizador — e aponta a linha. A dinâmica talvez a veja, se a carga certa chegar ao campo certo. É a primeira linha.
+2. **② Um cabeçalho de proteção ausente.** Só quem vê o sistema montado enxerga: a análise dinâmica, à noite, autenticada. A estática não sabe o que o servidor web acrescenta.
+3. **③ Uma biblioteca com vulnerabilidade publicada, três níveis abaixo nas dependências.** Só a análise de composição vê — e só se houver inventário. É o caso da seção seguinte.
+4. **④ Um estouro de buffer no decodificador, com um comprimento que ninguém pensou em testar.** O fuzzing o encontra em quarenta minutos, com sanitizador; nenhuma outra linha saberia por onde começar.
+5. **⑤ Um cliente lendo a conta de outro.** Nenhuma ferramenta vê, porque é preciso duas identidades e comparar respostas: teste de intrusão — ou, melhor, a linha seguinte.
+6. **⑥ O mesmo defeito, para sempre.** A matriz de autorização escrita pelo time, rodando a cada integração, encontra a falha de ⑤ antes do testador e impede que volte. Lida assim, a tabela é o argumento do texto: cada defeito tem uma janela, e o programa é a soma das janelas — na última coluna, cada uma no momento mais barato do pipeline.
 
 ## 4. Análise dinâmica — testar o sistema em execução
 

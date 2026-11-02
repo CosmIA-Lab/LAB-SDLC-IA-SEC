@@ -31,24 +31,34 @@ Quatro premissas. **A linguagem define a classe de erro possível**: a escolha d
 
 ## Figura 1 — A pilha durante um estouro de buffer e onde cada mitigação age
 
-> Desenhe à mão em três ou quatro minutos, com todos os elementos rotulados, e cite "a Figura 1" no texto antes e depois. A explicação abaixo é o parágrafo que a acompanha — percorra os elementos na ordem, diga o que cada um é, por que está ali e o que acontece quando falha.
+> Desenhe à mão em três ou quatro minutos, à caneta, com os elementos rotulados e numerados. Cite "a Figura 1" antes de desenhar e percorra a trilha abaixo no texto: cada número é um parágrafo, com um protagonista que atravessa a figura. É assim que o desenho vira uma página — e que o leitor o acompanha em vez de pular.
 
-```
-endereços altos
-┌──────────────────────┐
-│ endereço de retorno  │ ◀── sobrescrito: salta para o shellcode / ROP   ← CFI, shadow stack
-├──────────────────────┤
-│ ponteiro de quadro   │
-├──────────────────────┤
-│ canário (aleatório)  │ ◀── verificado antes do retorno                 ← StackGuard 1998
-├──────────────────────┤
-│ buf[256]  ▲▲▲▲▲▲▲▲▲▲ │ ◀── memcpy(buf, msg, len) com len = 600 escreve para cima
-│           ▲▲▲▲▲▲▲▲▲▲ │     (ASLR: endereços aleatórios · NX: pilha não executa)
-└──────────────────────┘
-endereços baixos          regra: if (len > sizeof buf || len > recebido) return ERRO;
+```mermaid
+flowchart TB
+    subgraph Q["quadro de pilha (endereços crescem para cima)"]
+        direction TB
+        RET["④ endereço de retorno"]
+        FP["ponteiro de quadro"]
+        CAN["③ canário (valor aleatório)"]
+        BUF["② buf[256]"]
+        RET --- FP --- CAN --- BUF
+    end
+    IN["① memcpy(buf, msg, len)<br/>len = 600"] ==> BUF
+    BUF -. "escreve para cima e alcança" .-> RET
+    RET -.- M1["⑤ CFI / shadow stack<br/>restringem o salto"]
+    CAN -.- M2["⑤ StackGuard: canário<br/>verificado antes do retorno"]
+    BUF -.- M3["⑤ NX: pilha não executa<br/>ASLR: endereços aleatórios"]
+    REG["⑥ regra: if (len > sizeof buf || len > recebido) return ERRO;"] --> IN
 ```
 
-A Figura 1 mostra o quadro de pilha de uma função em C no momento de um estouro de buffer. O buffer de 256 posições está embaixo; acima dele, o canário, o ponteiro de quadro e o endereço de retorno. A cópia de 600 bytes para o buffer escreve para cima e alcança o endereço de retorno — a técnica do artigo de 1996: quando a função retorna, salta para onde o atacante mandou. As anotações à direita são as mitigações da plataforma, cada uma na posição em que age: o canário entre o buffer e o endereço de retorno, verificado antes do retorno, denuncia a escrita; a pilha não executável impede que o código injetado no buffer rode; a aleatorização de endereços impede que o atacante saiba para onde saltar; a integridade de fluxo de controle restringe para onde o retorno pode ir. A linha de baixo é a regra que torna tudo isso desnecessário: verificar o comprimento contra o buffer alocado e contra os bytes recebidos antes de copiar — a verificação que falta no caso da seção seguinte.
+**A trilha: siga uma mensagem de 600 bytes que chega a um buffer de 256.** A Figura 1 é o quadro de pilha de uma função em C, e cada número é um passo do que acontece — e do que poderia ter acontecido.
+
+1. **① A cópia.** O código lê o comprimento que veio no pacote — 600 — e chama a cópia para o buffer. O comprimento é dado do pacote, não verdade sobre ele; a função confia.
+2. **② O buffer.** Os primeiros 256 bytes cabem. Os 344 restantes continuam a escrita para cima, por cima do que vier.
+3. **③ O canário.** Se estiver lá, o valor aleatório entre o buffer e o resto é sobrescrito — e, quando a função for retornar, a verificação percebe e aborta. Sem ele, a escrita segue.
+4. **④ O endereço de retorno.** É o que o atacante quer: sobrescrevê-lo é decidir para onde o programa vai quando a função terminar. Em 1996, apontava-se para código colocado no próprio buffer.
+5. **⑤ As mitigações.** A pilha não executável impede que o código no buffer rode; a aleatorização impede saber para onde saltar; a integridade de fluxo de controle restringe o salto. Cada uma elevou o custo em uma década diferente; nenhuma corrigiu o bug.
+6. **⑥ A regra.** Uma linha antes da cópia: o comprimento não pode exceder o buffer nem o que de fato chegou. Com ela, a trilha para em ①. É a verificação que falta no caso da seção seguinte — e a classe inteira que a linguagem segura em memória elimina.
 
 ## 4. Os erros de memória — e trinta anos de ataque e defesa
 

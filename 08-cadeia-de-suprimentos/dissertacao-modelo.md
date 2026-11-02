@@ -31,20 +31,22 @@ Quatro premissas. **Código que você não escreveu é seu risco**: a responsabi
 
 ## Figura 1 — A cadeia de suprimentos com as ameaças A–H do SLSA e um incidente por letra
 
-> Desenhe à mão em três ou quatro minutos, com todos os elementos rotulados, e cite "a Figura 1" no texto antes e depois. A explicação abaixo é o parágrafo que a acompanha — percorra os elementos na ordem, diga o que cada um é, por que está ali e o que acontece quando falha.
+> Desenhe à mão em três ou quatro minutos, à caneta, com os elementos rotulados e numerados. Cite "a Figura 1" antes de desenhar e percorra a trilha abaixo no texto: cada número é um parágrafo, com um protagonista que atravessa a figura. É assim que o desenho vira uma página — e que o leitor o acompanha em vez de pular.
 
-```
-dev ──A──▶ fonte ──B──▶ build ──C,D──▶ artefato ──F──▶ registro ──G──▶ consumidor ──H──▶ produção
-                          ▲ E
-                   dependências (a mesma cadeia, alheia)
-
-A mudança não autorizada · B repositório comprometido (mantenedor) · C build de fonte alterada
-D processo de build comprometido · E dependência comprometida
-F artefato alterado após o build · G registro comprometido · H usa pacote comprometido (typosquatting, confusão)
-controle por elo: 2FA+revisão │ lockfile+hash+proxy │ hermético+efêmero+proveniência │ assinatura+Rekor+TUF │ admissão+digest+SBOM
+```mermaid
+flowchart LR
+    DEV["desenvolvedor"] -- "A mudança não autorizada" --> SRC["① fonte"] -- "B repositório comprometido" --> BLD["② build"] -- "C fonte alterada · D processo comprometido" --> ART["③ artefato"] -- "F alterado após o build" --> REG["④ registro"] -- "G registro comprometido" --> CON["⑤ consumidor"] -- "H usa pacote comprometido" --> PROD["⑥ produção"]
+    DEP["dependências<br/>(a mesma cadeia, alheia)"] -- "E dependência comprometida" --> BLD
 ```
 
-A Figura 1 desenha a cadeia de suprimentos como uma linha do desenvolvedor à produção — fonte, build, artefato, registro, consumidor — com as dependências entrando no build por cima, porque cada dependência percorreu a mesma cadeia em outra organização. As letras nas setas são o modelo de ameaças do SLSA, e a legenda diz o que cada letra significa: o mantenedor que se infiltra é a fonte comprometida; o implante no servidor de build e o script de pipeline alterado são o processo de build comprometido; o pacote com nome parecido e a confusão de dependências são o consumidor usando um pacote comprometido. A linha de baixo lista o controle de cada elo, na mesma ordem: segundo fator e revisão na fonte; travamento com hash e registro privado nas dependências; build hermético e efêmero com proveniência; assinatura com registro de transparência na distribuição; política de admissão e inventário no consumo. A figura mostra a terceira premissa — o atacante escolhe o elo mais fraco — e por que o controle em um elo não protege o seguinte.
+**A trilha: siga uma imagem de contêiner da Lumen, do commit à produção.** A Figura 1 é a cadeia de suprimentos, e cada número é um elo que a imagem atravessa — com a letra da ameaça que o espreita e o controle que o fecha.
+
+1. **① A fonte.** O commit entra no repositório. Ameaças A e B: a mudança não autorizada e o repositório comprometido. Controle: segundo fator para quem escreve, revisão obrigatória, commit assinado.
+2. **A entrada lateral: as dependências.** Antes do build, o gerenciador baixa centenas de pacotes que percorreram esta mesma cadeia em outras organizações. Ameaça E. Controle: travamento com hash, registro privado, quarentena de versões novas.
+3. **② O build.** O código vira binário. Ameaças C e D: a fonte trocada durante a compilação, o servidor de build comprometido. Controle: ambiente efêmero e hermético, e a proveniência — o documento, gerado pelo próprio serviço de build, que diz de que commit e com que entradas o artefato foi feito.
+4. **③ O artefato.** Ameaça F: alterado depois do build. Controle: assinatura ligada à identidade do pipeline, com registro público de transparência.
+5. **④ O registro.** Ameaça G: o registro comprometido serve outra coisa. Controle: referência por hash, nunca por etiqueta móvel.
+6. **⑤ e ⑥ O consumidor e a produção.** Ameaça H: usar sem verificar. Controle: a política de admissão que exige assinatura válida e proveniência de nível mínimo antes de executar — o ponto em que toda a cadeia é cobrada. A trilha mostra a terceira premissa: o atacante escolhe o elo mais fraco, e o controle de um elo não protege o seguinte.
 
 ## 4. Os elos — ameaças e controles
 

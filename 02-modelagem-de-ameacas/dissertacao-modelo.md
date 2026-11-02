@@ -41,22 +41,38 @@ A terceira: **a ameaça concentra-se na fronteira de confiança**. Um sistema é
 
 ## Figura 1 — O diagrama de fluxo de dados da API de pagamentos com fronteiras de confiança e STRIDE por elemento
 
-> Desenhe à mão em três ou quatro minutos, com todos os elementos rotulados, e cite "a Figura 1" no texto antes e depois. A explicação abaixo é o parágrafo que a acompanha — percorra os elementos na ordem, diga o que cada um é, por que está ali e o que acontece quando falha.
+> Desenhe à mão em três ou quatro minutos, à caneta, com os elementos rotulados e numerados. Cite "a Figura 1" antes de desenhar e percorra a trilha abaixo no texto: cada número é um parágrafo, com um protagonista que atravessa a figura. É assim que o desenho vira uma página — e que o leitor o acompanha em vez de pular.
 
+```mermaid
+flowchart LR
+    subgraph C["controlado pelo cliente"]
+        APP["aplicativo<br/>(entidade externa)"]
+    end
+    subgraph N["controlado por nós"]
+        GW(("② gateway / API<br/>E: troca de id"))
+        SV(("serviço de contas"))
+        DB[("③ banco")]
+        LOG[("④ log<br/>R: sem integridade")]
+    end
+    subgraph P["parceiro (entidade externa)"]
+        PAR["⑤ antifraude"]
+    end
+    APP -- "① fluxo app→API<br/>S (CSRF)" --> GW
+    GW --> SV
+    SV -- "T (SQLi)" --> DB
+    SV --> LOG
+    SV -- "fluxo API→parceiro<br/>I (texto claro)" --> PAR
 ```
-┌─────────┐  fluxo app→API   ╭──────────╮  fluxo    ╭─────────────╮
-│aplicativo│ ───────────────▶ │ gateway/ │ ────────▶ │  serviço de │ ═══▶ ║ banco ║
-│ (ent.ext)│  S  (CSRF)      │   API    │  T (SQLi) │   contas    │      ╚═══════╝
-└─────────┘  ┆ fronteira 1  ╰──────────╯           ╰─────────────╯  ═══▶ ║  log  ║ R
-              ┆                E (troca de id)            │                ╚═══════╝
-┌─────────┐  ┆                                            ▼ fluxo API→parceiro  ┆ fronteira 2
-│ parceiro │ ◀────────────────────────────────────────── I (texto claro)       ┆
-│ (ent.ext)│
-└─────────┘
-legenda: ▭ entidade externa · ╭╮ processo · ═ armazenamento · ─▶ fluxo · ┆ fronteira de confiança
-```
+As bordas dos três grupos são as fronteiras de confiança; na mão, desenhe-as tracejadas.
 
-A Figura 1 é o diagrama de fluxo de dados da API de pagamentos, com os quatro tipos de elemento de DeMarco — entidade externa, processo, fluxo e armazenamento — e o quinto que a segurança acrescenta, a fronteira de confiança, desenhada tracejada. Há duas fronteiras: entre o aplicativo, que o cliente controla, e o gateway, que nós controlamos; e entre o serviço de transferências e o parceiro externo. As letras ao lado de cada elemento são o STRIDE por elemento: no fluxo que cruza a primeira fronteira, spoofing — a requisição que parece do cliente e não é; no processo da API, elevação — o cliente que troca o identificador da conta; no fluxo entre a API e o banco, tampering — a consulta alterada por injeção; no armazenamento de log, repúdio — o registro que pode ser alterado; no fluxo para o parceiro, exposição de informação — o canal que cai para texto claro. A figura torna visível a terceira premissa: as ameaças se concentram nas duas linhas tracejadas, e o que não está desenhado — o elemento esquecido do caso da seção seguinte — não recebe letra nenhuma.
+**A trilha: siga um pedido de transferência, do dedo do cliente ao parceiro.** A Figura 1 é o diagrama de fluxo de dados da API, e cada número é um lugar em que o pedido muda de mãos — e em que uma letra do STRIDE aparece.
+
+1. **① O pedido sai do aplicativo e cruza a primeira fronteira.** Do lado de lá, o cliente controla tudo; do lado de cá, nós. É o primeiro lugar em que a identidade de quem pede precisa ser verificada — e onde mora o *spoofing*: a requisição que parece do cliente e não é.
+2. **② O pedido chega ao gateway e ao serviço.** Aqui o processo decide; aqui o cliente pode trocar o identificador da conta e pedir o que não é dele — *elevação de privilégio*, a letra que só processos recebem, porque só eles executam código.
+3. **③ O pedido vira consulta ao banco.** Se o texto da consulta foi montado com o que veio do cliente, o dado virou instrução — *tampering* no fluxo entre o serviço e o armazenamento.
+4. **④ O pedido deixa rastro no log.** Se o registro pode ser alterado por quem o escreve, ninguém prova depois o que aconteceu — *repúdio*, a letra dos armazenamentos que guardam evidência.
+5. **⑤ O pedido cruza a segunda fronteira e vai ao parceiro.** Outro dono, outro nível de confiança; se o canal cai para texto claro, o dado vaza no caminho — *exposição de informação*.
+6. **O que não tem número.** O que não está desenhado não recebe letra: é o elemento esquecido do caso da seção seguinte. A trilha mostra a terceira premissa — as ameaças se concentram onde o pedido muda de mãos.
 
 ## 4. Primeira pergunta — o que estamos construindo?
 

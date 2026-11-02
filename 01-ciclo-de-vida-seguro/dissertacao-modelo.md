@@ -37,20 +37,22 @@ O segundo é a premissa de que a invasão vai acontecer. *Assume breach*, na exp
 
 ## Figura 1 — O ciclo com uma atividade de segurança por fase e um gate entre fases
 
-> Desenhe à mão em três ou quatro minutos, com todos os elementos rotulados, e cite "a Figura 1" no texto antes e depois. A explicação abaixo é o parágrafo que a acompanha — percorra os elementos na ordem, diga o que cada um é, por que está ali e o que acontece quando falha.
+> Desenhe à mão em três ou quatro minutos, à caneta, com os elementos rotulados e numerados. Cite "a Figura 1" antes de desenhar e percorra a trilha abaixo no texto: cada número é um parágrafo, com um protagonista que atravessa a figura. É assim que o desenho vira uma página — e que o leitor o acompanha em vez de pular.
 
-```
-requisitos ──▶ design ──▶ código ──▶ testes ──▶ entrega/manutenção
-    │              │           │           │              │
- ativos e      modelagem    padrão de   SAST·DAST·    cadeia assinada
- casos de      de ameaças   código,     SCA·fuzz·     detecção, gestão
- abuso         10 flaws     revisão     intrusão      de vulnerabilidades
-    ◇ gate        ◇ gate       ◇ gate      ◇ gate
-    ▲                                                   │
-    └───────────── incidente vira requisito ◀───────────┘
+```mermaid
+flowchart LR
+    R["① Requisitos<br/>ativos · casos de abuso"] --> g1{gate} --> D["② Design<br/>modelagem de ameaças · 10 flaws"] --> g2{gate} --> C["③ Código<br/>padrão · revisão · SAST"] --> g3{gate} --> T["④ Testes<br/>SAST · DAST · SCA · fuzz · intrusão"] --> g4{gate} --> M["⑤ Entrega e manutenção<br/>cadeia assinada · detecção · gestão de vulns"]
+    M -. "⑥ incidente vira requisito" .-> R
 ```
 
-A Figura 1 mostra as cinco fases do desenvolvimento em linha, com a atividade de segurança de cada uma escrita embaixo e um losango de verificação entre fases. Lida da esquerda para a direita, a figura é o ciclo de vida seguro: na fase de requisitos, os ativos são classificados e os casos de abuso produzem os requisitos negativos; no design, a modelagem de ameaças e a revisão contra as falhas de design conhecidas; no código, o padrão de codificação e a revisão; nos testes, as quatro técnicas automatizadas e o teste de intrusão; na entrega e manutenção, a cadeia de suprimentos assinada, a detecção e a gestão de vulnerabilidades. Os losangos são os gates: nenhuma mudança passa de uma fase à seguinte sem a verificação daquela fase. A seta de retorno, de baixo para a esquerda, é o que faz da linha um ciclo — o incidente de produção volta como requisito da próxima iteração. A curva de Boehm está implícita na figura: quanto mais à direita a falha é encontrada, mais caro corrigi-la, e por isso cada atividade está o mais à esquerda que o seu objeto permite.
+**A trilha: siga uma mudança — "transferência agendada" — do pedido à produção.** A Figura 1 é o caminho que essa mudança percorre, e cada número é uma parada em que a segurança age.
+
+1. **① Requisitos.** A mudança nasce como história de usuário. Aqui se pergunta que ativos ela toca (saldo, agenda) e o que ela não pode permitir: nasce o requisito negativo "não agenda a partir de conta alheia", já com o teste que o prova.
+2. **② Design.** A história ganha desenho: um fluxo novo entre o aplicativo e um serviço de agendamento, cruzando uma fronteira. A modelagem de ameaças produz as ameaças desse fluxo e as mitigações viram requisitos de arquitetura; a revisão contra as falhas de design conhecidas é o gate.
+3. **③ Código.** O desenho vira linhas. O padrão de codificação proíbe a consulta concatenada; a análise estática bloqueia no pedido de integração o que o padrão proíbe; a revisão segue o dado da entrada ao uso.
+4. **④ Testes.** O que foi prometido em ① vira evidência: o caso de abuso tenta agendar da conta alheia e recebe negação; a análise dinâmica, a de composição e o fuzzing cobrem o que o teste escrito não vê.
+5. **⑤ Entrega e manutenção.** A imagem sai assinada, com inventário; em produção, a detecção observa e a gestão de vulnerabilidades governa o tempo até a próxima correção.
+6. **⑥ A seta de volta.** Um incidente, ou um achado em produção, não é fim: volta a ① como requisito da próxima mudança. É essa seta que transforma a linha em ciclo — e cada parada está o mais à esquerda que a curva de Boehm permite.
 
 ## 4. As fases e a atividade de cada uma
 

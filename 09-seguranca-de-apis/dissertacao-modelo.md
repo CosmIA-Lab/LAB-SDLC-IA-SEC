@@ -29,22 +29,32 @@ A segurança se organiza em três anéis concêntricos. Na **borda**, um gateway
 
 ## Figura 1 — Os três anéis — borda, malha e pod — com o que cada um faz e o que nenhum faz
 
-> Desenhe à mão em três ou quatro minutos, com todos os elementos rotulados, e cite "a Figura 1" no texto antes e depois. A explicação abaixo é o parágrafo que a acompanha — percorra os elementos na ordem, diga o que cada um é, por que está ali e o que acontece quando falha.
+> Desenhe à mão em três ou quatro minutos, à caneta, com os elementos rotulados e numerados. Cite "a Figura 1" antes de desenhar e percorra a trilha abaixo no texto: cada número é um parágrafo, com um protagonista que atravessa a figura. É assim que o desenho vira uma página — e que o leitor o acompanha em vez de pular.
 
-```
-clientes ──TLS·token·rate limit·esquema──▶ ╔═══════ GATEWAY (borda) ═══════╗
-                                             ║ ┌──── MALHA (entre serviços) ──────────────────────────┐ ║
-                                             ║ │ mTLS · identidade SPIFFE · AuthorizationPolicy       │ ║
-                                             ║ │  ╭── POD ──╮   ╭── POD ──╮   ╭── POD ──╮             │ ║
-                                             ║ │  │ contas  │◀─▶│transfer.│──▶│notific. │             │ ║
-                                             ║ │  │sem root │   │drop ALL │   │rootfs ro│             │ ║
-                                             ║ │  ╰────┬────╯   ╰─────────╯   ╰─────────╯             │ ║
-                                             ║ │       ▼ "este objeto é deste sujeito?" ← só o SERVIÇO decide │ ║
-                                             ║ └──────────────────────────────────────────────────────┘ ║
-                                             ╚═════ política como código (admissão, Pod Security) ═══════╝
+```mermaid
+flowchart LR
+    CL["clientes"] -- "① TLS · token · rate limit · esquema" --> G
+    subgraph G["GATEWAY (borda)"]
+        subgraph M["② MALHA (entre serviços): mTLS · identidade SPIFFE · política de quem chama o quê"]
+            P1["③ pod contas<br/>sem root · drop ALL · rootfs ro"]
+            P2["pod transferências"]
+            P3["⑤ pod notificações"]
+            P2 --> P1
+            P3 --> P1
+        end
+    end
+    P1 -. "④ este objeto é deste sujeito?<br/>só o SERVIÇO decide" .-> DEC["autorização por objeto"]
+    POL["⑥ política como código<br/>admissão · Pod Security"] -.-> G
 ```
 
-A Figura 1 mostra os três anéis em que a segurança de uma plataforma de serviços se organiza. O anel externo é o gateway na borda: termina a conexão segura, valida o token, aplica limites de taxa, valida o esquema e recusa rotas fora do catálogo. O anel do meio é a malha entre serviços: cada chamada entre pods passa por um proxy que impõe autenticação mútua com identidade por serviço e uma política de quem pode chamar o quê. O anel interno é o pod: cada serviço roda sem privilégio de administrador, sem capacidades do núcleo, com sistema de arquivos só de leitura. A moldura de baixo é a política como código, que torna os três anéis obrigatórios para tudo que entra no cluster. A seta que sai do pod de contas marca o que nenhum anel faz: decidir se este objeto é deste sujeito — isso é do código do serviço, porque só ele conhece o domínio, e é por isso que a falha de autorização por objeto atravessa gateway e malha. O caso da seção seguinte tem duas metades: fora da moldura — o plano de controle exposto — e dentro do pod — o contêiner que achou que isolava.
+**A trilha: siga uma consulta de saldo de fora para dentro — e depois siga um pod comprometido de dentro para fora.** A Figura 1 são os três anéis da plataforma, e os números percorrem os dois sentidos.
+
+1. **① A borda.** A consulta chega ao gateway: conexão segura, token verificado em assinatura, emissor, audiência, prazo e escopo, limite de taxa, esquema. Rota fora do catálogo não responde.
+2. **② A malha.** O gateway chama o serviço de contas; a chamada é autenticada mutuamente, e a política diz que o gateway pode chamar contas nesta operação. Nenhuma chamada é aceita por vir "de dentro".
+3. **③ O pod.** O serviço de contas roda como processo com o mínimo: sem administrador, sem capacidades do núcleo, sistema de arquivos só de leitura, filtro de chamadas de sistema.
+4. **④ A decisão que nenhum anel toma.** O serviço carrega a conta e pergunta se ela é deste sujeito. Gateway e malha não sabem de quem é a conta; por isso a falha de autorização por objeto passa pelos dois, e por isso esta seta sai do pod.
+5. **⑤ Agora de dentro para fora: o pod de notificações comprometido.** Ele tenta chamar transferências — a malha recusa, não está na política. Tenta ler o segredo do banco — não há, as credenciais são por identidade e de curta duração. Tenta escapar do contêiner — sem privilégio, sem capacidades, não consegue. Tenta sair para a internet — a rede nega. Alcança só o que a política permitia: enviar mensagens.
+6. **⑥ A moldura.** A política como código é o que torna ①, ②, ③ obrigatórios para tudo que entra no cluster. O caso da seção seguinte tem duas metades: fora da moldura e dentro do pod.
 
 ## 4. APIs — o contrato como verdade
 
