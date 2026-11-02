@@ -1,0 +1,27 @@
+08-cadeia-de-suprimentos/README.md
+  s_7cc7673de0adc8::t_533ec6256ad576 111-124,143-154,292-296
+  s_7cc7673de0adc8::t_8a7d68e725a6f7 208-215
+  s_7cc7673de0adc8::t_c0226e8b341b33 3,5-110,125-142,155-207,216-291
+08-cadeia-de-suprimentos/arvore.html
+  s_7cc7673de0adc8::t_8a7d68e725a6f7 1-242
+08-cadeia-de-suprimentos/arvore-memoria.md
+  s_7cc7673de0adc8::t_8a7d68e725a6f7 1-94
+00-mapa-de-estudo.md
+  s_7cc7673de0adc8::t_3748d62bef958a 72-73
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b85cbfe38acb596aa590f729dae0a774007798ce",
+  "prompts": {},
+  "sessions": {
+    "s_7cc7673de0adc8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9ffe1f51-e813-456c-ad90-77b82c1de23c",
+        "model": "unknown"
+      },
+      "human_author": "alan <nascimentoalankst@gmail.com>"
+    }
+  }
+}
