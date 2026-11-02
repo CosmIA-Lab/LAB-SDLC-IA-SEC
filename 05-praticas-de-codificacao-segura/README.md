@@ -226,6 +226,8 @@ A plataforma oferece mitigações que não custam código: `-fstack-protector-st
 
 **Mecanismo.** Política de linguagem por tipo de componente; blocos `unsafe` como item de revisão obrigatório; FFI isolada em módulo pequeno e testado com sanitizador.
 
+**Quando a linguagem não é escolha.** Janca (2020, cap. 4) trata o caso comum em que a linguagem e o framework já estão dados e formula duas regras de prática. Para o framework: escolher um suportado e com perspectiva de suporte longo, usar a versão atual ou a imediatamente anterior, verificar com SCA que a versão não tem vulnerabilidade conhecida, e varrer o repositório a cada build. Para o código que fica em linguagem sem segurança de memória, sete regras firmes: verificar limites em toda entrada, sempre; usar uma camada do framework ou dependência que verifique limites, se houver; verificar tipo em toda entrada; criar testes unitários de limites como regressão a cada commit; revisar código verificando que toda entrada tem teste; reservar tempo de teste de intrusão para limites de entrada; ligar as opções de compilação que detectam esses erros. E, por cima, as mitigações da plataforma (ASLR, DEP, canário) como camada adicional, nunca única. A lista é a versão de prática das regras CERT desta seção: diz o que o time faz na segunda-feira enquanto a migração não chega.
+
 ### Revisão de código orientada a segurança
 
 **O que é.** Revisão com roteiro: OWASP Code Review Guide (2017) e o *checklist* de Howard e LeBlanc (2002) — por onde entra dado externo, onde ele é usado, que funções perigosas aparecem, como erros são tratados, onde ficam segredos. Difere da revisão de qualidade porque segue o dado, não a estrutura.
@@ -282,7 +284,7 @@ O que o exemplo mostra: o código executa o desenho do ponto 3 e fecha a frontei
 | Erros de memória | conhecer a classe e sua história | posse e tempo de vida explícitos; aritmética verificada; validar comprimento contra o buffer | Aleph One (1996); Cowan et al. (1998); PaX (2001); Shacham (2007); Abadi et al. (2005); Serebryany et al. (2012) | canários, NX/DEP, ASLR, CFI, CET, MTE; ASan/UBSan/MSan/TSan |
 | Princípios de codificação | regras que o código não viola | validar na borda; separar dado de instrução; falhar fechado; aritmética verificada; posse explícita; menor privilégio; sem segredo no código; compilar com tudo ligado | Howard e LeBlanc (2002); Seacord (2013); Saltzer e Schroeder (1975) | tipos que só existem válidos; tratamento de erro; cofre; flags de endurecimento |
 | Padrões e ferramentas | regra com identificador e cobrança automática | regra verificável vence conselho | SEI CERT C (2016); MISRA C (2012); funções proibidas (Howard, 2007); OWASP Code Review Guide (2017) | SAST com perfil, `banned.h`, `checksec`, template de revisão |
-| Mudança de linguagem | fechar a classe | linguagem define a classe | *Case for Memory Safe Roadmaps* (CISA/NSA, 2023); Miller (2019) | Rust/Go/Java/C# por padrão; `unsafe` e FFI isolados e revisados |
+| Mudança de linguagem | fechar a classe | linguagem define a classe | *Case for Memory Safe Roadmaps* (CISA/NSA, 2023); Miller (2019); sete regras para código não seguro em memória e regra de framework (Janca, 2020) | Rust/Go/Java/C# por padrão; `unsafe` e FFI isolados e revisados; SCA do framework a cada build |
 
 A cadeia em uma linha: entrada hostil → regra com identificador → ferramenta que cobra → mitigação que segura o que escapou → linguagem que fecha a classe. Codificação segura é o ponto do ciclo em que o desenho vira linha, e a linha pode trair o desenho.
 
@@ -310,3 +312,4 @@ A cadeia em uma linha: entrada hostil → regra com identificador → ferramenta
 - **OWASP. *Secure Coding Practices Quick Reference Guide*, 2010; *Code Review Guide* 2.0, 2017**
 - **Provos, Niels; Friedl, Markus; Honeyman, Peter. "Preventing Privilege Escalation". *USENIX Security*, 2003** — descer privilégio no processo
 - **Saltzer, Jerome; Schroeder, Michael. "The Protection of Information in Computer Systems". *Proc. IEEE*, 1975** — padrões à prova de falha e menor privilégio aplicados ao código
+- **Janca, Tanya. *Alice and Bob Learn Application Security*. Wiley, 2020, cap. 4 ("Secure Code")** — escolha de framework (suportado, versão atual ou anterior, SCA a cada build); validação de dado não confiável com fluxograma; sete regras para código em linguagem sem segurança de memória; ASLR, DEP e canário como camada adicional

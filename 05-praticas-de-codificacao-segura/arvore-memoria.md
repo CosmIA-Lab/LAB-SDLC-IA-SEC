@@ -64,6 +64,8 @@ Espinha mínima:
         ENDURECIMENTO DO BINÁRIO        ASLR (PIE) · canários · NX · RELRO · CFI/CET · checksec no pipeline
         LINGUAGEM SEGURA POR PADRÃO     CISA/NSA 23 · Rust onde C era obrigatório (Linux 22; Android 76%→24%) · unsafe/FFI isolados e revisados
                                         ✗ não resolve lógica, authz, injeção, segredo, dependência
+        QUANDO NÃO É ESCOLHA (Janca 20, cap. 4)  framework suportado · versão atual ou anterior · SCA a cada build
+                                        7 regras p/ C: limites em toda entrada · overlay que checa · tipo · teste de regressão de limites · revisão · pentest de limites · opções de compilação
         REVISÃO ORIENTADA A SEGURANÇA   OWASP Code Review Guide 17 · Howard/LeBlanc 02: siga o DADO, não a estrutura
                                         │
            ⟪ junta: o mesmo sistema, na linha do código ⟫
