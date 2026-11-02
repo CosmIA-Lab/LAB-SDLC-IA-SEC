@@ -109,6 +109,12 @@ Teste final por ponto: escrever a seção dele de memória, com pelo menos uma t
 
 ---
 
+## Pontes a partir do que você domina
+
+Se um ponto está mais firme que os outros, ele serve de âncora: [00-pontes-web.md](00-pontes-web.md) mostra onde injeção, XSS, CSRF, IDOR e SSRF entram legitimamente em cada um dos outros nove pontos, com a frase que faz a ponte, e nomeia a classe que atravessa tudo — dado interpretado como instrução.
+
+---
+
 ## Pontos
 
 1. [Ciclo de vida de desenvolvimento seguro e DevSecOps](01-ciclo-de-vida-seguro/README.md)
