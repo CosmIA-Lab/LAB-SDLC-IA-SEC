@@ -1,0 +1,21 @@
+05-praticas-de-codificacao-segura/README.md
+  s_7cc7673de0adc8::t_0c670d0e557d68 152-169,201-214,269-292,371-373
+06-autenticacao-autorizacao-sessao/README.md
+  s_7cc7673de0adc8::t_1fc15fa5299d33 119-144,181-192,230-241,274-281,365-370
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0512d30d1cfe8eea5758c0a25068393d52965f56",
+  "prompts": {},
+  "sessions": {
+    "s_7cc7673de0adc8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9ffe1f51-e813-456c-ad90-77b82c1de23c",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "alan <nascimentoalankst@gmail.com>"
+    }
+  }
+}
