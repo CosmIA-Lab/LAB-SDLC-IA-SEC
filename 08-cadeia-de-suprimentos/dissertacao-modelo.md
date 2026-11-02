@@ -34,7 +34,7 @@ Quatro premissas. **Código que você não escreveu é seu risco**: a responsabi
 > Desenhe à mão em três ou quatro minutos, à caneta, com os elementos rotulados e numerados. Cite "a Figura 1" antes de desenhar e percorra a trilha abaixo no texto: cada número é um parágrafo, com um protagonista que atravessa a figura. É assim que o desenho vira uma página — e que o leitor o acompanha em vez de pular.
 
 ```mermaid
-flowchart LR
+flowchart TB
     DEV["desenvolvedor"] -- "A mudança não autorizada" --> SRC["① fonte"] -- "B repositório comprometido" --> BLD["② build"] -- "C fonte alterada · D processo comprometido" --> ART["③ artefato"] -- "F alterado após o build" --> REG["④ registro"] -- "G registro comprometido" --> CON["⑤ consumidor"] -- "H usa pacote comprometido" --> PROD["⑥ produção"]
     DEP["dependências<br/>(a mesma cadeia, alheia)"] -- "E dependência comprometida" --> BLD
 ```

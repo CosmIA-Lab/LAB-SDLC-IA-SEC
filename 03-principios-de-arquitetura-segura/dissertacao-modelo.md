@@ -38,7 +38,7 @@ A terceira: **segurança depende de um mecanismo pequeno e sempre invocado**. Ja
 > Desenhe à mão em três ou quatro minutos, à caneta, com os elementos rotulados e numerados. Cite "a Figura 1" antes de desenhar e percorra a trilha abaixo no texto: cada número é um parágrafo, com um protagonista que atravessa a figura. É assim que o desenho vira uma página — e que o leitor o acompanha em vez de pular.
 
 ```mermaid
-flowchart LR
+flowchart TB
     AT["atacante"] --> A1["① borda<br/>gateway nega por padrão<br/><i>padrões à prova de falha</i>"] --> A2["② rede / malha<br/>autenticação mútua, identidade por serviço<br/><i>confiança explícita</i>"] --> A3["③ serviço<br/>ponto de decisão por objeto<br/><i>mediação completa</i>"] --> A4["④ processo<br/>compartimento sem root<br/><i>menor privilégio</i>"] --> D[("⑤ dado<br/>saldo · cartão")]
     D -.-> LOG["⑥ registro de comprometimento<br/>(log que ninguém altera)"]
 ```

@@ -40,7 +40,7 @@ O segundo é a premissa de que a invasão vai acontecer. *Assume breach*, na exp
 > Desenhe à mão em três ou quatro minutos, à caneta, com os elementos rotulados e numerados. Cite "a Figura 1" antes de desenhar e percorra a trilha abaixo no texto: cada número é um parágrafo, com um protagonista que atravessa a figura. É assim que o desenho vira uma página — e que o leitor o acompanha em vez de pular.
 
 ```mermaid
-flowchart LR
+flowchart TB
     R["① Requisitos<br/>ativos · casos de abuso"] --> g1{gate} --> D["② Design<br/>modelagem de ameaças · revisão das 10 falhas de design"] --> g2{gate} --> C["③ Código<br/>padrão de código · revisão · análise estática"] --> g3{gate} --> T["④ Testes<br/>análise do código · teste da aplicação rodando · análise das dependências · fuzzing · intrusão"] --> g4{gate} --> M["⑤ Entrega e manutenção<br/>cadeia assinada · detecção · gestão de vulns"]
     M -. "⑥ incidente vira requisito" .-> R
 ```
