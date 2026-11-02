@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ponto 7 — Testes de segurança (SAST, DAST, SCA, fuzzing)</title>
+<style>
+  :root{
+    --bg:#0e1116; --surface:#161b22; --line:#3a4350;
+    --fg:#e6edf3; --dim:#9aa4b0;
+    --root:#58a6ff; --base:#8b949e; --etapa:#3fb950; --surf:#d29922; --outras:#bc8cff; --ex:#f778ba;
+    --p:#79c0ff; --t:#3fb950; --m:#d29922;
+    --fs:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--bg); color:var(--fg);
+    font:var(--fs)/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;}
+
+  header{position:sticky; top:0; z-index:5; background:var(--surface);
+    border-bottom:1px solid var(--line); padding:10px 16px;
+    display:flex; align-items:center; gap:12px; flex-wrap:wrap;}
+  header h1{font-size:1rem; margin:0; font-weight:700}
+  header .hint{color:var(--dim); font-size:.78rem}
+  header .ctr{margin-left:auto; display:flex; gap:6px; flex-wrap:wrap}
+  button{border:1px solid var(--line); background:#21262d; color:var(--fg);
+    border-radius:8px; padding:6px 10px; font-weight:600; cursor:pointer; font-size:.85rem}
+  button:hover{border-color:var(--root)}
+
+  main{max-width:980px; margin:0 auto; padding:18px 16px 90px}
+  .spine{color:var(--dim); font-size:.88rem; margin:0 0 14px; padding:8px 12px;
+    border:1px dashed var(--line); border-radius:10px}
+  .spine b{color:var(--root)}
+
+  /* ---------- árvore ---------- */
+  .tree, .tree ul{list-style:none; margin:0; padding:0}
+  .tree ul{margin-left:14px; padding-left:18px; border-left:2px solid var(--line)}
+  .tree li{position:relative; margin:4px 0; padding-left:6px}
+  .tree li::before{content:""; position:absolute; left:-18px; top:.85em; width:16px; height:2px; background:var(--line)}
+  .tree > li::before{display:none}
+
+  details{margin:0}
+  summary{cursor:pointer; list-style:none; display:inline-block}
+  summary::-webkit-details-marker{display:none}
+  summary::before{content:"▸"; display:inline-block; width:1em; color:var(--dim); transition:transform .15s}
+  details[open] > summary::before{transform:rotate(90deg)}
+
+  .n{display:inline-block; padding:3px 9px; border-radius:8px; background:var(--surface);
+    border:1px solid var(--line); border-left-width:4px; font-weight:600}
+  .n small{font-weight:500; color:var(--dim); margin-left:6px; font-size:.8em}
+  .n .w{font-weight:400; color:var(--dim)}
+  .n .w::before{content:" — "}
+
+  .n.root{border-left-color:var(--root); color:var(--root); font-size:1.15em; font-weight:800}
+  .n.b1{border-left-color:var(--root); font-size:1.05em; font-weight:800}
+  .n.base{border-left-color:var(--base)}
+  .n.etapa{border-left-color:var(--etapa); font-weight:800}
+  .n.surf{border-left-color:var(--surf); color:var(--surf); font-weight:800}
+  .n.outras{border-left-color:var(--outras); color:var(--outras); font-weight:800}
+  .n.ex{border-left-color:var(--ex); color:var(--ex); font-weight:800}
+  .n.leaf{background:transparent; border-color:transparent; padding-left:0; font-weight:500}
+  .n.leaf small{margin-left:4px}
+
+  /* rótulos P / T / M / saída */
+  .k{display:inline-block; min-width:1.5em; text-align:center; font-weight:800; font-size:.78em;
+    border-radius:5px; padding:1px 4px; margin-right:6px; vertical-align:1px}
+  .k.p{background:#1b2a3d; color:var(--p)} .k.t{background:#1f3b2a; color:var(--t)}
+  .k.m{background:#2a2f1f; color:var(--m)} .k.o{background:#2b2231; color:var(--ex)}
+  .k.x{background:#3a2626; color:#ff7b72}
+
+  /* junta (ponte) */
+  li.j{list-style:none}
+  li.j::before{display:none}
+  .bridge{display:inline-block; color:var(--dim); font-style:italic; font-size:.9em; padding:2px 6px}
+  .bridge::before{content:"⟪ "} .bridge::after{content:" ⟫"}
+
+  /* grade STRIDE × elemento */
+  .grid{display:inline-grid; grid-template-columns:auto repeat(6,1.7em); gap:3px; margin:4px 0 2px 1.6em; font-size:.82rem; text-align:center}
+  .grid div{padding:2px 1px; border-radius:4px; background:#21262d}
+  .grid .h{font-weight:800; color:var(--dim)}
+  .grid .r{text-align:left; padding:2px 8px 2px 4px; font-weight:600}
+  .grid .y{background:#1f3b2a; color:var(--t); font-weight:800}
+  .grid .mm{background:#2a2f1f; color:var(--m); font-size:.7rem; font-weight:700}
+
+  @media (max-width:520px){ .tree ul{margin-left:6px; padding-left:12px} .tree li::before{left:-12px; width:10px} .n .w{display:block; margin-top:2px} .n .w::before{content:""} }
+</style>
+</head>
+<body>
+<header>
+  <h1>Ponto 7 — Testes de segurança (SAST, DAST, SCA, fuzzing) <span class="hint">· árvore de conceitos</span></h1>
+  <span class="hint">clique num nó para abrir/fechar · <b style="color:var(--p)">P</b> princípio · <b style="color:var(--t)">T</b> técnica · <b style="color:var(--m)">M</b> mecanismo · <b style="color:var(--ex)">→</b> saída</span>
+  <div class="ctr">
+    <button id="l1">só espinha</button>
+    <button id="l2">até P/T/M</button>
+    <button id="l3">tudo</button>
+    <button id="out">A−</button>
+    <button id="in">A+</button>
+    <button id="full">⛶</button>
+  </div>
+</header>
+
+<main>
+<p class="spine">espinha: <b>o que um teste prova → 4 fundamentos → janelas no ciclo → SAST → dinâmico → SCA → fuzzing → testes escritos + programa → exemplo → erros</b></p>
+
+<ul class="tree">
+<li>
+<details open data-l="0"><summary><span class="n root">Testes de segurança (SAST, DAST, SCA, fuzzing)<span class="w">transformar requisito em evidência, dizendo o que não foi provado</span></span></summary>
+<ul>
+
+<li><details open data-l="1"><summary><span class="n b1">O que um teste prova</span></summary>
+<ul>
+  <li><span class="n leaf">presença, não ausência<small>Dijkstra 70</small><span class="w">o atacante procura o caso não coberto</span></span></li>
+  <li><span class="n leaf">requisito negativo exige caso de abuso<small>McDermott/Fox 99</small><span class="w">o caminho feliz não prova que o indevido é negado</span></span></li>
+  <li><span class="n leaf">cada técnica vê por uma janela<span class="w">estático · dinâmico · composição · fuzz · manual</span></span></li>
+  <li><span class="n leaf">exemplo<span class="w">5 técnicas na API de pagamentos: 5 achados diferentes, nenhum redundante</span></span></li>
+</ul></details></li>
+
+<li class="j"><span class="bridge">antes das técnicas, o que elas pressupõem</span></li>
+
+<li><details open data-l="1"><summary><span class="n b1">Fundamentos<small>4 premissas</small></span></summary>
+<ul>
+  <li><span class="n base">teste mostra presença, não ausência<span class="w">cobertura declarada; "SAST limpo" = padrões conhecidos não achados</span></span></li>
+  <li><span class="n base">requisito negativo → teste negativo<span class="w">ameaça (ponto 2) → requisito → teste que espera 403</span></span></li>
+  <li><span class="n base">cada técnica, uma janela<span class="w">branca/cinza/preta × estático/dinâmico × manual/automático; combinar, não substituir</span></span></li>
+  <li><span class="n base">achado sem triagem é ruído<small>Johnson 13</small><span class="w">falso positivo em volume mata a ferramenta; dono + prazo + decisão</span></span></li>
+</ul></details></li>
+
+<li class="j"><span class="bridge">onde cada janela entra no ciclo</span></li>
+
+<li><details open data-l="1"><summary><span class="n b1">Janelas no ciclo<span class="w">cada falha pega pela técnica mais barata capaz (Boehm 81)</span></span></summary>
+<ul>
+  <li><span class="n leaf">pré-commit (segundos)<span class="w">lint de segurança · segredos</span> → PR (minutos)<span class="w">SAST no diff · SCA · IaC</span></span></li>
+  <li><span class="n leaf">build<span class="w">sanitizadores · casos de abuso · checksec</span> → noturno (horas)<span class="w">SAST completo · DAST autenticado · fuzz contínuo</span></span></li>
+  <li><span class="n leaf">release<span class="w">intrusão · revisão de arquitetura</span> → produção<span class="w">bug bounty · gestão de vulnerabilidades (ponto 10)</span></span></li>
+</ul></details></li>
+
+<li><details open data-l="1"><summary><span class="n etapa">SAST<small>Chess/West 07</small><span class="w">código, estático, caixa branca</span></span></summary>
+<ul>
+  <li><details open data-l="2"><summary><span class="n base">como funciona</span></summary><ul>
+    <li><span class="n leaf">léxico<span class="w">Flawfinder: nomes de função</span> → AST<span class="w">Semgrep: padrões estruturais</span></span></li>
+    <li><span class="n leaf"><span class="k t">T</span>taint<small>Livshits/Lam 05; CodeQL 16</small><span class="w">fonte → destino sem neutralizador; interprocedural</span></span></li>
+    <li><span class="n leaf">interpretação abstrata<small>Cousot 77</small><span class="w">Infer, Frama-C</span> · execução simbólica<small>King 76; KLEE 08</small></span></li>
+  </ul></details></li>
+  <li><span class="n leaf">vê bem<span class="w">injeção · API perigosa · memória por padrão · segredo · todo o código, com linha</span></span></li>
+  <li><span class="n leaf">não vê<span class="w">configuração · autorização · dependência · runtime · reflexão; falsos positivos 30–70%</span></span></li>
+  <li><span class="n leaf">anatomia do falso positivo<span class="w">framework não modelado · neutralizador caseiro · caminho dependente de valor · abstração conservadora</span></span></li>
+  <li><span class="n leaf">medir antes de adotar<span class="w">precisão × revocação · Juliet (NIST SAMATE) · OWASP Benchmark · 2 semanas em observação</span></span></li>
+  <li><span class="n leaf"><span class="k p">P</span>diferencial no PR, completo no noturno · linha de base + dívida · regra ajustada · supressão com motivo · resultado no fluxo do dev</span></li>
+  <li><span class="n leaf"><span class="k m">M</span>Semgrep · CodeQL · Fortify · Brakeman · gosec · Bandit · ESLint-security</span></li>
+</ul></details></li>
+
+<li><details open data-l="1"><summary><span class="n etapa">Dinâmico<span class="w">DAST · IAST · intrusão</span></span></summary>
+<ul>
+  <li><details open data-l="2"><summary><span class="n base">DAST<span class="w">caixa preta, em execução</span></span></summary><ul>
+    <li><span class="n leaf">como<span class="w">rastreia + envia cargas + lê resposta; OpenAPI para API</span> · vê<span class="w">XSS refletido · SQLi por erro/tempo · cabeçalhos · configuração</span></span></li>
+    <li><span class="n leaf">não vê<span class="w">linha · estados profundos · XSS armazenado · autorização (2 identidades) · lógica; lento, destrutivo</span></span></li>
+    <li><span class="n leaf"><span class="k p">P</span>autenticado · ambiente de teste · passivo no PR, ativo no noturno · <span class="k m">M</span>ZAP · Burp · Nuclei</span></li>
+  </ul></details></li>
+  <li><span class="n leaf">IAST<span class="w">agente no runtime: linha + caminho real, poucos FP; só o que os testes exercitam</span> · RASP<span class="w">= controle, não teste</span></span></li>
+  <li><details open data-l="2"><summary><span class="n base">teste de intrusão<small>NIST 800-115 08; WSTG 4.2; PTES 14</small></span></summary><ul>
+    <li><span class="n leaf">vê<span class="w">autorização · lógica · encadeamento · o que o modelo marcou</span> · custo<span class="w">pouca cobertura por hora → o modelo diz onde cavar</span></span></li>
+    <li><span class="n leaf"><span class="k p">P</span>escopo escrito · dados sintéticos · reprodução + impacto + CVSS como vocabulário · reteste · por release</span></li>
+    <li><span class="n leaf">bug bounty<span class="w">intrusão contínua paga por achado; só depois de tirar o óbvio</span></span></li>
+  </ul></details></li>
+  <li><span class="n leaf">APIs e distribuído<span class="w">contrato como roteiro · matriz de authz gerada (tenant, escopo, aud, expirado, X-User-Id) · sequência e estado · fila como fonte · infra: Prowler, kube-bench</span></span></li>
+</ul></details></li>
+
+<li><details open data-l="1"><summary><span class="n etapa">SCA<span class="w">dependências</span></span></summary>
+<ul>
+  <li><span class="n leaf">como<span class="w">lockfile → árvore com versões → NVD · GitHub Advisory · OSV · licença · SBOM</span></span></li>
+  <li><span class="n leaf">vê<span class="w">CVE conhecida · licença · abandono</span> · não vê<span class="w">inédita · pacote malicioso (ponto 8) · alcançabilidade</span></span></li>
+  <li><span class="n leaf">Log4Shell 21<span class="w">ninguém sabia que carregava; transitivas são a maioria</span> · VEX<small>CISA 22</small></span></li>
+  <li><span class="n leaf"><span class="k p">P</span>inventário antes · transitivas contam · severidade no contexto · atualizar como rotina · política por severidade</span></li>
+  <li><span class="n leaf"><span class="k m">M</span>Dependency-Check · Renovate · Snyk · Trivy · Grype · govulncheck · Syft</span></li>
+</ul></details></li>
+
+<li><details open data-l="1"><summary><span class="n etapa">Fuzzing<small>Miller/Fredriksen/So 90; Manès 19</small><span class="w">entrada gerada, execução</span></span></summary>
+<ul>
+  <li><span class="n leaf">geração<span class="w">gramática: Peach</span> × mutação<span class="w">corpus</span> → <span class="k t">T</span>guiado por cobertura<small>AFL Zalewski 13; libFuzzer; Böhme 16</small></span></li>
+  <li><span class="n leaf">+ sanitizadores<span class="w">senão só vê travamento</span> · contínuo em escala<small>OSS-Fuzz 16</small></span></li>
+  <li><span class="n leaf">alvo<span class="w">parsers · decodificadores · protocolos; gerenciadas também (Jazzer, Atheris, go -fuzz): exceção, laço, ReDoS</span></span></li>
+  <li><span class="n leaf">além<span class="w">property-based (QuickCheck 00) = fuzz com oráculo · diferencial · API com estado (RESTler 19)</span></span></li>
+  <li><span class="n leaf"><span class="k p">P</span>harness pequeno e determinístico · corpus válido e versionado · sanitizadores · falha minimizada vira regressão · contínuo</span></li>
+</ul></details></li>
+
+<li class="j"><span class="bridge">o que não é técnica de descoberta: o teste escrito de propósito e o programa</span></li>
+
+<li><details open data-l="1"><summary><span class="n b1 surf">Testes escritos e programa</span></summary>
+<ul>
+  <li><span class="n leaf">casos de abuso como testes<span class="w">403 esperado</span> · matriz de autorização · regressão de toda vuln corrigida · testes de arquitetura (ArchUnit)</span></li>
+  <li><span class="n leaf"><span class="k p">P</span>rastreabilidade ao modelo · técnica mais barata · gate proporcional · triagem como trabalho · cobertura declarada · métricas (tempo de correção, taxa de escape, FP por regra)</span></li>
+  <li><span class="n leaf">outras varreduras<span class="w">segredos (gitleaks) · IaC (Checkov) · imagem (Trivy) · nuvem (Prowler)</span></span></li>
+  <li><span class="n leaf">triagem<span class="w">confirmar → classificar (CVSS 3.1/4.0 como vocabulário; EPSS; bug bar) → decidir (corrigir · aceitar · FP) → fechar (reteste + regressão)</span></span></li>
+</ul></details></li>
+
+<li class="j"><span class="bridge">o mesmo sistema, com o pipeline montado</span></li>
+
+<li><details data-l="1"><summary><span class="n b1 ex">exemplo-fio<small>API de pagamentos</small></span></summary>
+<ul>
+  <li><span class="n leaf">pré-commit → segredos · Brakeman/gosec/Semgrep · CERT formato</span></li>
+  <li><span class="n leaf">PR → SAST diff · SCA · IaC · abuso + matriz · ArchUnit · ASan/UBSan · checksec</span></li>
+  <li><span class="n leaf">noturno → SAST completo · ZAP autenticado + OpenAPI · AFL++/libFuzzer no ISO 8583 e webhook · RESTler · imagens</span></li>
+  <li><span class="n leaf">release → intrusão guiada pelo modelo · 10 flaws · prod → divulgação · bounty · ponto 10</span></li>
+  <li><span class="n leaf">5 janelas, 5 achados<span class="w">SAST concatenação · DAST CSP+XSS · SCA XML transitiva · fuzz comprimento negativo · intrusão IDOR → 5 regressões</span></span></li>
+</ul></details></li>
+
+<li><details data-l="1"><summary><span class="n b1"><span class="k x">✗</span>erros a não cometer</span></summary>
+<ul>
+  <li><span class="n leaf">SAST limpo ≠ seguro · DAST ≠ cobertura total · SCA ≠ cadeia de suprimentos</span></li>
+  <li><span class="n leaf">fuzz ≠ só C · intrusão anual ≠ basta · mais achados ≠ melhor</span></li>
+  <li><span class="n leaf">cobertura funcional ≠ segurança · WAF/RASP ≠ correção · scanner em produção</span></li>
+</ul></details></li>
+
+</ul></details>
+</li>
+</ul>
+</main>
+
+<script>
+  const root = document.documentElement;
+  let fs = 16;
+  const apply = () => root.style.setProperty("--fs", fs + "px");
+  document.getElementById("in").onclick  = () => { fs = Math.min(24, fs+1); apply(); };
+  document.getElementById("out").onclick = () => { fs = Math.max(11, fs-1); apply(); };
+  document.getElementById("full").onclick = () => {
+    if(!document.fullscreenElement) document.documentElement.requestFullscreen();
+    else document.exitFullscreen();
+  };
+  // níveis: 1 = só espinha (ramos de 1º nível fechados), 2 = até P/T/M, 3 = tudo
+  const setLevel = max => document.querySelectorAll("details").forEach(d => {
+    const l = +d.dataset.l; d.open = l < max;
+  });
+  document.getElementById("l1").onclick = () => setLevel(1);
+  document.getElementById("l2").onclick = () => setLevel(3);
+  document.getElementById("l3").onclick = () => setLevel(9);
+  addEventListener("keydown", e => {
+    if(e.key==="+"||e.key==="=") document.getElementById("in").click();
+    if(e.key==="-") document.getElementById("out").click();
+    if(e.key==="f") document.getElementById("full").click();
+    if(e.key==="1") setLevel(1); if(e.key==="2") setLevel(3); if(e.key==="3") setLevel(9);
+  });
+</script>
+</body>
+</html>
