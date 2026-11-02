@@ -1,0 +1,23 @@
+01-ciclo-de-vida-seguro/dissertacao-modelo.md
+  s_7cc7673de0adc8::t_8bd1c57a2abb5f 43
+03-principios-de-arquitetura-segura/dissertacao-modelo.md
+  s_7cc7673de0adc8::t_baff7979708872 41
+08-cadeia-de-suprimentos/dissertacao-modelo.md
+  s_7cc7673de0adc8::t_78482a0e6f0fd0 37
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "49c0c74cd6f42591f05b75884cf39d92c160f8bc",
+  "prompts": {},
+  "sessions": {
+    "s_7cc7673de0adc8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9ffe1f51-e813-456c-ad90-77b82c1de23c",
+        "model": "unknown"
+      },
+      "human_author": "alan <nascimentoalankst@gmail.com>"
+    }
+  }
+}
