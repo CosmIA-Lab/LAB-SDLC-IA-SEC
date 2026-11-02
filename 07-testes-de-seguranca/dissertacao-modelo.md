@@ -20,6 +20,25 @@ A sofisticação cresceu em camadas. As primeiras ferramentas procuravam nomes d
 
 A análise estática vê bem injeção, uso de API perigosa, erro de memória por padrão, segredo em código e tratamento de erro ausente — em todo o código, inclusive o que nenhum teste executa, e aponta a linha. Não vê configuração de produção, comportamento que depende de dado em tempo de execução, lógica de autorização — "este usuário pode ver esta conta?" não tem padrão sintático —, nem vulnerabilidade em dependência. E produz falsos positivos, por causas conhecidas: o framework que parametriza por dentro e a ferramenta não modela; o neutralizador caseiro que não está na lista; o caminho que só é decidido com dado real. **[+]** Os princípios de uso decorrem disso: análise diferencial no pedido de integração, para que o desenvolvedor veja só o que introduziu, e completa à noite; achados pré-existentes como dívida com dono, com o gate bloqueando só o novo e grave; regras ajustadas ao projeto, com supressões justificadas; e medição de precisão com suítes de referência — a Juliet do NIST, o Benchmark da OWASP — antes de adotar.
 
+
+## Figura 1 — As janelas das técnicas de teste e onde cada uma roda no pipeline
+
+> Desenhe à mão em três ou quatro minutos, com todos os elementos rotulados, e cite "a Figura 1" no texto antes e depois. A explicação abaixo é o parágrafo que a acompanha — percorra os elementos na ordem, diga o que cada um é, por que está ali e o que acontece quando falha.
+
+```
+técnica      vê bem                         não vê                        quando roda
+─────────    ─────────────────────────────  ───────────────────────────   ─────────────────────
+SAST         injeção, API perigosa, linha   config, authz, dependência    PR (diff) · noturno (completo)
+DAST         XSS refletido, cabeçalhos      linha, estados, authz, lógica  noturno, autenticado
+SCA          CVE conhecida, licença         inédita, malicioso, alcance    PR
+fuzzing      memória, parsing, exceção      lógica, authz                  noturno, contínuo
+intrusão     authz, lógica, encadeamento    pouca cobertura por hora       por release
+testes escritos  matriz de authz, regressão o que não foi modelado         PR
+                        ▲ modelagem de ameaças (ponto 2) alimenta os casos de abuso ▲
+```
+
+A Figura 1 é uma tabela-figura com as cinco técnicas e os testes escritos pelo time, em três colunas: o que cada uma vê bem, o que não vê, e em que momento do pipeline roda. Lida linha a linha, ela é o argumento central do texto: a análise estática vê a injeção com a linha exata e não vê autorização; a dinâmica vê o cabeçalho ausente e não vê a linha; a de composição vê a vulnerabilidade publicada e não vê a inédita; o fuzzing vê o erro de memória e não vê a lógica; a intrusão vê a autorização e a lógica e cobre pouco por hora. Lida por colunas, ela mostra que as lacunas de uma linha são cobertas por outra — o programa é a soma. A última coluna distribui as técnicas no tempo pela regra de Boehm: as baratas no pedido de integração, as lentas à noite, a cara por versão. A linha de baixo lembra de onde vêm os casos de abuso: da modelagem de ameaças. O caso Log4Shell está na linha da análise de composição — a janela que a maioria das organizações não tinha aberta.
+
 ## 4. Análise dinâmica — testar o sistema em execução
 
 A análise dinâmica, ou DAST, testa a aplicação rodando, sem acesso ao código: um rastreador descobre páginas e endpoints, um motor envia cargas — aspas, scripts, caminhos relativos — e analisa respostas: erros de banco, eco da carga, diferença de tempo, cabeçalhos. Vê bem o cross-site scripting refletido, a injeção com erro visível ou cega por tempo, e sobretudo a configuração — cabeçalhos ausentes, métodos abertos, versão exposta, TLS fraco —, porque testa o sistema como o atacante o vê. Não vê onde no código está a falha, não alcança fluxos com várias etapas nem áreas atrás de autenticação se não estiver autenticada, não encontra o cross-site scripting armazenado que aparece em outra página, e — o limite mais importante — não encontra falhas de autorização, porque para isso é preciso duas identidades e comparar respostas. É lenta e pode ser destrutiva; roda contra ambiente de teste, autenticada, com a especificação da API quando há uma.

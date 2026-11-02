@@ -24,6 +24,21 @@ O OWASP Top 10 é a lista das dez categorias de risco mais relevantes em aplica�
 
 O que o Top 10 é: instrumento de consciência e de priorização. O que não é: padrão de requisitos nem lista completa — a própria OWASP diz isso e aponta o ASVS, o *Application Security Verification Standard*, para quem precisa de requisitos: cerca de 280 itens em 14 capítulos, em três níveis de garantia, que viram critério de aceite e roteiro de teste. **[−]** O terceiro vocabulário é o CWE do MITRE, que dá nome formal a cada tipo de fraqueza — o cross-site scripting é CWE-79, a injeção de SQL é CWE-89 — e cuja lista anual das 25 mais perigosas colocou, em 2024, o cross-site scripting em primeiro lugar.
 
+
+## Figura 1 — O caminho da requisição e onde cada classe de vulnerabilidade vive
+
+> Desenhe à mão em três ou quatro minutos, com todos os elementos rotulados, e cite "a Figura 1" no texto antes e depois. A explicação abaixo é o parágrafo que a acompanha — percorra os elementos na ordem, diga o que cada um é, por que está ali e o que acontece quando falha.
+
+```
+navegador ──entrada──▶ parse/validação ──▶ autenticação ──▶ autorização ──▶ lógica ──▶ dados/serviços ──▶ resposta ──saída──▶ navegador
+(do atacante)              │                    │                │                           │                  │
+                      validação ausente     credential       IDOR / BOLA                injeção SQL       XSS
+                      upload · XXE          stuffing ·       função sem                  comando · LDAP    cabeçalhos ausentes
+                      desserialização       sessão fraca     checagem · CSRF             SSRF              dado exposto
+```
+
+A Figura 1 desenha o caminho de uma requisição pela aplicação, da entrada à saída, como uma linha de estações: análise e validação da entrada, autenticação, autorização, lógica de negócio, acesso a dados e serviços, montagem da resposta. Embaixo de cada estação está a classe de vulnerabilidade que é a falha daquela estação. A figura organiza o que a lista da OWASP apresenta por frequência: na validação, o que entra sem forma — upload, XML com entidades, objeto desserializado; na autenticação, a senha reusada e a sessão fraca; na autorização, o identificador trocado e a requisição forjada entre sítios; nos dados, a injeção e a requisição que o servidor faz para onde o atacante manda; na resposta, o script que volta ao navegador e os cabeçalhos que faltam. Os dois fatos do modelo aparecem nas pontas: à esquerda, o navegador do atacante envia o que quiser; à direita, o navegador da vítima executa o que receber. O caso British Airways está na estação da resposta — o script de terceiro que o servidor mandou buscar.
+
 ## 4. Injeção — dado interpretado como instrução
 
 A injeção acontece quando dado do usuário é interpretado como instrução por um interpretador: SQL, shell, LDAP, motor de template. O caso canônico é a consulta montada por concatenação: a aplicação escreve o texto da consulta juntando um pedaço fixo com o que o usuário digitou, e o banco não tem como saber onde o dado termina e a instrução começa. Com `1 OR 1=1` a consulta devolve tudo; com um comando a mais, apaga; com uma união, extrai a tabela de senhas. Halfond, Viegas e Orso classificaram em 2006 as variantes — tautologia, união, consulta anexada, inferência cega por tempo ou por erro — e as contramedidas.

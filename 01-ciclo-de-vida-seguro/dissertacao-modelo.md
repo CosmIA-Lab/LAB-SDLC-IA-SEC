@@ -24,6 +24,24 @@ O segundo é a premissa de que a invasão vai acontecer. *Assume breach*, na exp
 
 **[+]** O terceiro é a desconfiança como padrão: toda entrada é hostil até ser verificada, inclusive a que vem de dentro da rede ou de outro sistema nosso; é o que hoje se chama de *zero trust*. O quarto é que segredo não vive em código: senha, chave e token no repositório são segredo vazado, porque o repositório é copiado, clonado e guardado para sempre. O quinto é a redução da superfície de ataque: menos pontos de entrada, menos coisa para defender. E o sexto é a segurança usável: o controle que atrapalha é o controle que o usuário contorna, de modo que a segurança bem projetada é a que torna o caminho seguro o mais fácil.
 
+
+## Figura 1 — O ciclo com uma atividade de segurança por fase e um gate entre fases
+
+> Desenhe à mão em três ou quatro minutos, com todos os elementos rotulados, e cite "a Figura 1" no texto antes e depois. A explicação abaixo é o parágrafo que a acompanha — percorra os elementos na ordem, diga o que cada um é, por que está ali e o que acontece quando falha.
+
+```
+requisitos ──▶ design ──▶ código ──▶ testes ──▶ entrega/manutenção
+    │              │           │           │              │
+ ativos e      modelagem    padrão de   SAST·DAST·    cadeia assinada
+ casos de      de ameaças   código,     SCA·fuzz·     detecção, gestão
+ abuso         10 flaws     revisão     intrusão      de vulnerabilidades
+    ◇ gate        ◇ gate       ◇ gate      ◇ gate
+    ▲                                                   │
+    └───────────── incidente vira requisito ◀───────────┘
+```
+
+A Figura 1 mostra as cinco fases do desenvolvimento em linha, com a atividade de segurança de cada uma escrita embaixo e um losango de verificação entre fases. Lida da esquerda para a direita, a figura é o ciclo de vida seguro: na fase de requisitos, os ativos são classificados e os casos de abuso produzem os requisitos negativos; no design, a modelagem de ameaças e a revisão contra as falhas de design conhecidas; no código, o padrão de codificação e a revisão; nos testes, as quatro técnicas automatizadas e o teste de intrusão; na entrega e manutenção, a cadeia de suprimentos assinada, a detecção e a gestão de vulnerabilidades. Os losangos são os gates: nenhuma mudança passa de uma fase à seguinte sem a verificação daquela fase. A seta de retorno, de baixo para a esquerda, é o que faz da linha um ciclo — o incidente de produção volta como requisito da próxima iteração. A curva de Boehm está implícita na figura: quanto mais à direita a falha é encontrada, mais caro corrigi-la, e por isso cada atividade está o mais à esquerda que o seu objeto permite.
+
 ## 4. As fases e a atividade de cada uma
 
 Na fase de **requisitos**, a atividade de segurança é escrever o que o sistema não pode permitir. Os requisitos funcionais dizem o que o sistema faz; os requisitos de segurança são negativos — "um cliente não lê a conta de outro", "uma transferência acima de um valor exige segundo fator" — e nascem de duas fontes: a classificação dos ativos (que dado importa e quanto) e os casos de abuso, que descrevem o que um atacante tentaria. Cada requisito negativo precisa ser verificável, isto é, precisa ter um teste que o prove.

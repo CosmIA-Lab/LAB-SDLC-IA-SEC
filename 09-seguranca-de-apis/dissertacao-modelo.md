@@ -16,6 +16,26 @@ Quatro premissas. **Toda chamada entre serviços cruza uma fronteira**: não há
 
 A segurança se organiza em três anéis concêntricos. Na **borda**, um gateway por onde todo tráfego externo passa: termina a conexão segura, valida o token de acesso — assinatura, emissor, audiência, prazo, escopo —, aplica limites de taxa, valida a requisição contra o esquema e recusa rotas fora do catálogo. Na **malha entre serviços**, um proxy ao lado de cada contêiner intercepta toda chamada e aplica autenticação mútua com identidade por serviço e política de quem pode chamar o quê. No **processo**, o contêiner roda com o mínimo: sem privilégio de administrador, sem capacidades do núcleo, sistema de arquivos só de leitura, filtro de chamadas de sistema, limites de recursos. E uma política como código atravessa os três, decidindo o que pode existir no cluster. O que nenhum anel faz é autorizar por objeto — decidir se *esta* conta é *deste* cliente — porque nenhum deles conhece o domínio; isso continua no código do serviço.
 
+
+## Figura 1 — Os três anéis — borda, malha e pod — com o que cada um faz e o que nenhum faz
+
+> Desenhe à mão em três ou quatro minutos, com todos os elementos rotulados, e cite "a Figura 1" no texto antes e depois. A explicação abaixo é o parágrafo que a acompanha — percorra os elementos na ordem, diga o que cada um é, por que está ali e o que acontece quando falha.
+
+```
+clientes ──TLS·token·rate limit·esquema──▶ ╔═══════ GATEWAY (borda) ═══════╗
+                                             ║ ┌──── MALHA (entre serviços) ──────────────────────────┐ ║
+                                             ║ │ mTLS · identidade SPIFFE · AuthorizationPolicy       │ ║
+                                             ║ │  ╭── POD ──╮   ╭── POD ──╮   ╭── POD ──╮             │ ║
+                                             ║ │  │ contas  │◀─▶│transfer.│──▶│notific. │             │ ║
+                                             ║ │  │sem root │   │drop ALL │   │rootfs ro│             │ ║
+                                             ║ │  ╰────┬────╯   ╰─────────╯   ╰─────────╯             │ ║
+                                             ║ │       ▼ "este objeto é deste sujeito?" ← só o SERVIÇO decide │ ║
+                                             ║ └──────────────────────────────────────────────────────┘ ║
+                                             ╚═════ política como código (admissão, Pod Security) ═══════╝
+```
+
+A Figura 1 mostra os três anéis em que a segurança de uma plataforma de serviços se organiza. O anel externo é o gateway na borda: termina a conexão segura, valida o token, aplica limites de taxa, valida o esquema e recusa rotas fora do catálogo. O anel do meio é a malha entre serviços: cada chamada entre pods passa por um proxy que impõe autenticação mútua com identidade por serviço e uma política de quem pode chamar o quê. O anel interno é o pod: cada serviço roda sem privilégio de administrador, sem capacidades do núcleo, com sistema de arquivos só de leitura. A moldura de baixo é a política como código, que torna os três anéis obrigatórios para tudo que entra no cluster. A seta que sai do pod de contas marca o que nenhum anel faz: decidir se este objeto é deste sujeito — isso é do código do serviço, porque só ele conhece o domínio, e é por isso que a falha de autorização por objeto atravessa gateway e malha. Os casos Tesla e runc estão, respectivamente, fora da moldura — o plano de controle exposto — e dentro do pod — o contêiner que achou que isolava.
+
 ## 4. APIs — o contrato como verdade
 
 A OWASP publicou em 2023 uma lista das dez categorias de risco específicas de APIs, e seis delas são problemas de fronteira e contrato, não de código. Em primeiro, a autorização quebrada no nível de objeto: o cliente pede um objeto que não é dele e recebe, porque o serviço verificou que há token e não verificou o dono. Em segundo, autenticação quebrada: token sem validação de audiência, chave de API em URL. Em terceiro, a autorização quebrada no nível de propriedade — o cliente envia um campo que não deveria poder alterar e o servidor grava; ou o servidor devolve o objeto inteiro e confia que a tela filtra. Em quarto, consumo irrestrito de recursos: sem limite de taxa, de tamanho, de paginação. Em quinto, autorização quebrada no nível de função: a rota administrativa atende a qualquer autenticado. Depois, acesso irrestrito a fluxos de negócio sensíveis, falsificação de requisição do lado do servidor, configuração insegura, inventário impróprio — a versão antiga ainda no ar, o endpoint de depuração exposto — e consumo inseguro de APIs de terceiros.

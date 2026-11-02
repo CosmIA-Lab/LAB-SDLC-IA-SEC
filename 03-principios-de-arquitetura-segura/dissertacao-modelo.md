@@ -22,6 +22,24 @@ A terceira: **segurança depende de um mecanismo pequeno e sempre invocado**. Ja
 
 **[+]** A quarta: **quem opera o sistema é parte dele**. O mecanismo que o usuário não entende é o que ele contorna; a política de senha que ignora como as pessoas trabalham produz senhas anotadas. Anne Adams e Angela Sasse mostraram isso empiricamente em 1999, e a conclusão é de projeto: o controle precisa contar com o comportamento previsível de quem o usa.
 
+
+## Figura 1 — Anéis de defesa em profundidade com o princípio que cada anel aplica
+
+> Desenhe à mão em três ou quatro minutos, com todos os elementos rotulados, e cite "a Figura 1" no texto antes e depois. A explicação abaixo é o parágrafo que a acompanha — percorra os elementos na ordem, diga o que cada um é, por que está ali e o que acontece quando falha.
+
+```
+        ╭──────────────── borda: gateway ─ padrões à prova de falha (nega por padrão) ────────────────╮
+        │   ╭──────────── rede/malha ─ confiança explícita (mTLS, identidade por serviço) ──────────╮   │
+        │   │   ╭──────── serviço ─ mediação completa (PDP/PEP por objeto) ────────────────╮        │   │
+        │   │   │   ╭──── processo ─ menor privilégio (compartimento sem root) ──╮          │        │   │
+        │   │   │   │                  ╔═════ dado ═════╗                        │          │        │   │
+   atacante ──▶ ─ ─ ▶ ─ ─ ─ ▶ ─ ─ ─ ▶  ║ saldo · cartão ║   ◀ registro de comprometimento (log íntegro)
+        │   │   │   ╰──────────────────╚════════════════╝────────────────────────╯          │        │   │
+        ╰───╰───╰────────────────────────────────────────────────────────────────────────────╯────────╯───╯
+```
+
+A Figura 1 mostra o dado a proteger no centro — saldo e dados de cartão — e quatro anéis em volta, cada um rotulado com o princípio de Saltzer e Schroeder que ele aplica. O anel externo é a borda, com o gateway negando por padrão o que não está declarado: padrões à prova de falha. O segundo é a rede entre serviços, em que nenhuma chamada é aceita pela posição de origem, só pela identidade provada: confiança explícita, o zero trust. O terceiro é o serviço, em que todo acesso a todo objeto passa por um ponto de decisão: mediação completa. O quarto é o processo, rodando sem privilégio em um compartimento que, comprometido, não alcança o vizinho: menor privilégio. A seta do atacante atravessa os anéis para mostrar o que a defesa em profundidade significa — cada anel segura o que o anterior deixou passar, e os anéis são independentes em mecanismo e em modo de falha. O registro de comprometimento, à direita, é o que resta quando todos falham: saber que falharam. A Operação Aurora é a figura sem o segundo anel.
+
 ## 4. Os oito princípios de Saltzer e Schroeder
 
 Em 1975, Jerome Saltzer e Michael Schroeder publicaram *The Protection of Information in Computer Systems*, e nele oito princípios de projeto de mecanismos de proteção que, cinquenta anos depois, continuam sendo o tronco de tudo que se escreve sobre arquitetura segura.

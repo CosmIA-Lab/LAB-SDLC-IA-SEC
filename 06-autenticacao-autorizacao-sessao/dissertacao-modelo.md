@@ -20,6 +20,27 @@ O segundo fator combina naturezas distintas — algo que se sabe, algo que se te
 
 **[+]** Duas regras completam a autenticação. A autenticação em degraus: nem toda operação exige o mesmo nível — consultar saldo pode aceitar um fator; transferir acima de um valor exige o segundo fator naquele momento, e a sessão registra o nível atingido. E a recuperação de conta como autenticação: o fluxo "esqueci a senha" é um caminho de entrada com outra evidência, costuma ser o elo mais fraco, e recebe o mesmo nível — link de uso único com prazo curto, segundo fator se a conta o tem, invalidação das sessões existentes, aviso por outro canal.
 
+
+## Figura 1 — O fluxo OAuth 2.0 com código de autorização e PKCE, e onde a autorização por objeto acontece
+
+> Desenhe à mão em três ou quatro minutos, com todos os elementos rotulados, e cite "a Figura 1" no texto antes e depois. A explicação abaixo é o parágrafo que a acompanha — percorra os elementos na ordem, diga o que cada um é, por que está ali e o que acontece quando falha.
+
+```
+usuário        cliente (app)              servidor de autorização          servidor de recursos (API)
+  │   1. login     │  2. redireciona c/ hash(verifier), state   │                              │
+  │ ─────────────▶ │ ──────────────────────────────────────────▶ │                              │
+  │ 3. autentica e consente (passkey / senha + 2º fator)         │                              │
+  │ ◀────────────────────────────────────────────────────────── │                              │
+  │                │ 4. ◀── código (uso único) + state           │                              │
+  │                │ 5. código + verifier ─────────────────────▶ │                              │
+  │                │ 6. ◀── access token (10 min, aud=API, escopo) + refresh (c/ estado)        │
+  │                │ 7. Authorization: Bearer ─────────────────────────────────────────────────▶ │ PEP: assinatura, iss,
+  │                │                                             │                              │ aud, exp, escopo
+  │                │                                             │                              │ ▶ serviço: dono == sujeito?
+```
+
+A Figura 1 é o fluxo de código de autorização do OAuth 2.0 com PKCE, nas quatro colunas do protocolo: o usuário, o cliente, o servidor de autorização e o servidor de recursos. O cliente redireciona o usuário ao servidor de autorização levando o hash de um segredo gerado para esta requisição e um valor de estado; o usuário autentica ali — com passkey ou senha e segundo fator — e consente; o servidor devolve um código de uso único; o cliente troca o código pelo token apresentando o segredo original, de modo que quem interceptou o código não consegue trocá-lo; e recebe um token de acesso curto, com audiência e escopo, mais um token de renovação guardado com estado. A última linha é o que o protocolo não faz: na API, o ponto de aplicação verifica assinatura, emissor, audiência, prazo e escopo — e o serviço, só então, pergunta se o objeto pedido é do sujeito. A figura separa as três perguntas do texto: a autenticação acontece no servidor de autorização, a sessão é o par de tokens, e a autorização por objeto é a última seta, dentro do serviço. O caso Uber está na etapa 3: o segundo fator vencido por cansaço.
+
 ## 4. Sessão — lembrar a prova sem que ela vire a falha
 
 Depois do login, o servidor entrega ao navegador um identificador de sessão, e cada requisição que o carrega é tratada como daquele usuário. O identificador é, portanto, equivalente à senha enquanto vale, e tudo que vale para a senha vale para ele. Precisa ser imprevisível — gerado por fonte criptográfica, com entropia suficiente, sem dado codificado dentro. Precisa ser rotacionado nas mudanças de estado: um identificador novo no login mata a fixação de sessão, em que o atacante planta um identificador conhecido antes de a vítima autenticar. Precisa expirar — por prazo absoluto e por inatividade — e ser revogável no servidor: logout que só apaga o cookie deixa o identificador válido. E precisa ter escopo de envio controlado: cookie transportado só por TLS, inacessível a script, não enviado em requisições iniciadas por outros sítios.

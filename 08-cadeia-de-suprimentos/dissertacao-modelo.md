@@ -18,6 +18,24 @@ O problema saiu da teoria para a rotina em meia década. Em 2020, o sistema de b
 
 Quatro premissas. **Código que você não escreveu é seu risco**: a responsabilidade pelo artefato em produção é de quem o coloca lá; "não sabia que usava" não é defesa, e a primeira regra é saber o que se roda, em formato legível por máquina, gerado a cada build. **Confiança precisa ser verificável, não assumida**: o build que roda em máquina compartilhada com segredos de longa duração, o pacote baixado sem verificar hash, o complemento do pipeline que aponta para uma etiqueta que o mantenedor pode mover — em cada um, a confiança é assumida porque "sempre funcionou"; a resposta é fazer da confiança uma evidência gerada pelo próprio processo e verificada por quem consome. **A cadeia tem muitos elos e o atacante escolhe o mais fraco**: fonte, dependências, build, distribuição e consumo são superfícies distintas, e controle em um elo não protege o seguinte. **[+]** E **integridade é prova criptográfica mais política**: um hash verifica que o artefato não mudou desde que o hash foi calculado — mas quem calculou? Uma assinatura liga o artefato a uma chave — mas de quem é, e foi roubada? E nada disso protege se o consumidor não *exige* a verificação: o pipeline que aceita uma imagem sem assinatura válida tem assinatura decorativa.
 
+
+## Figura 1 — A cadeia de suprimentos com as ameaças A–H do SLSA e um incidente por letra
+
+> Desenhe à mão em três ou quatro minutos, com todos os elementos rotulados, e cite "a Figura 1" no texto antes e depois. A explicação abaixo é o parágrafo que a acompanha — percorra os elementos na ordem, diga o que cada um é, por que está ali e o que acontece quando falha.
+
+```
+dev ──A──▶ fonte ──B──▶ build ──C,D──▶ artefato ──F──▶ registro ──G──▶ consumidor ──H──▶ produção
+                          ▲ E
+                   dependências (a mesma cadeia, alheia)
+
+A mudança não autorizada · B repositório comprometido (xz 2024: mantenedor) · C build de fonte alterada
+D processo de build comprometido (SolarWinds 2020; Codecov 2021) · E dependência comprometida (xz; ua-parser-js)
+F artefato alterado após o build · G registro comprometido · H usa pacote comprometido (typosquatting, confusão)
+controle por elo: 2FA+revisão │ lockfile+hash+proxy │ hermético+efêmero+proveniência │ assinatura+Rekor+TUF │ admissão+digest+SBOM
+```
+
+A Figura 1 desenha a cadeia de suprimentos como uma linha do desenvolvedor à produção — fonte, build, artefato, registro, consumidor — com as dependências entrando no build por cima, porque cada dependência percorreu a mesma cadeia em outra organização. As letras nas setas são o modelo de ameaças do SLSA, e a legenda coloca um incidente real em cada letra: o mantenedor que se infiltrou no projeto xz é a fonte comprometida; o implante nos servidores da SolarWinds e o script alterado da Codecov são o processo de build comprometido; os pacotes com nome parecido e a confusão de dependências são o consumidor usando um pacote comprometido. A linha de baixo lista o controle de cada elo, na mesma ordem: segundo fator e revisão na fonte; travamento com hash e registro privado nas dependências; build hermético e efêmero com proveniência; assinatura com registro de transparência na distribuição; política de admissão e inventário no consumo. A figura mostra a terceira premissa — o atacante escolhe o elo mais fraco — e por que o controle em um elo não protege o seguinte.
+
 ## 4. Os elos — ameaças e controles
 
 O arcabouço SLSA, publicado pela Open Source Security Foundation em sua primeira versão estável em 2023, enumera as ameaças ao longo da cadeia com letras: o desenvolvedor submete uma mudança não autorizada; o repositório é comprometido; o build parte de fonte alterada; o processo de build é comprometido; uma dependência é comprometida; o artefato é alterado depois do build; o registro é comprometido; o consumidor usa um pacote comprometido. Convém percorrer os elos.

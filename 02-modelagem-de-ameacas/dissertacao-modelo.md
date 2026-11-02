@@ -28,6 +28,26 @@ A terceira: **a ameaça concentra-se na fronteira de confiança**. Um sistema é
 
 **[+]** A quarta: **o atacante escolhe a porta**. Quem defende precisa proteger todos os pontos de entrada; quem ataca precisa de um só. Daí decorre que o tamanho da superfície de ataque é, na prática, o tamanho do trabalho de defesa — e que reduzir a superfície antes de proteger o que resta é a decisão mais barata de todas.
 
+
+## Figura 1 — O diagrama de fluxo de dados da API de pagamentos com fronteiras de confiança e STRIDE por elemento
+
+> Desenhe à mão em três ou quatro minutos, com todos os elementos rotulados, e cite "a Figura 1" no texto antes e depois. A explicação abaixo é o parágrafo que a acompanha — percorra os elementos na ordem, diga o que cada um é, por que está ali e o que acontece quando falha.
+
+```
+┌─────────┐  fluxo app→API   ╭──────────╮  fluxo    ╭─────────────╮
+│aplicativo│ ───────────────▶ │ gateway/ │ ────────▶ │  serviço de │ ═══▶ ║ banco ║
+│ (ent.ext)│  S  (CSRF)      │   API    │  T (SQLi) │   contas    │      ╚═══════╝
+└─────────┘  ┆ fronteira 1  ╰──────────╯           ╰─────────────╯  ═══▶ ║  log  ║ R
+              ┆                E (troca de id)            │                ╚═══════╝
+┌─────────┐  ┆                                            ▼ fluxo API→parceiro  ┆ fronteira 2
+│ parceiro │ ◀────────────────────────────────────────── I (texto claro)       ┆
+│ (ent.ext)│
+└─────────┘
+legenda: ▭ entidade externa · ╭╮ processo · ═ armazenamento · ─▶ fluxo · ┆ fronteira de confiança
+```
+
+A Figura 1 é o diagrama de fluxo de dados da API de pagamentos, com os quatro tipos de elemento de DeMarco — entidade externa, processo, fluxo e armazenamento — e o quinto que a segurança acrescenta, a fronteira de confiança, desenhada tracejada. Há duas fronteiras: entre o aplicativo, que o cliente controla, e o gateway, que nós controlamos; e entre o serviço de transferências e o parceiro externo. As letras ao lado de cada elemento são o STRIDE por elemento: no fluxo que cruza a primeira fronteira, spoofing — a requisição que parece do cliente e não é; no processo da API, elevação — o cliente que troca o identificador da conta; no fluxo entre a API e o banco, tampering — a consulta alterada por injeção; no armazenamento de log, repúdio — o registro que pode ser alterado; no fluxo para o parceiro, exposição de informação — o canal que cai para texto claro. A figura torna visível a terceira premissa: as ameaças se concentram nas duas linhas tracejadas, e o que não está desenhado — como o serviço de metadados da nuvem no caso Capital One — não recebe letra nenhuma.
+
 ## 4. Primeira pergunta — o que estamos construindo?
 
 Não se encontra o que pode dar errado em um sistema que não se consegue descrever. A primeira pergunta pede um desenho, e o desenho tem uma forma específica: o diagrama de fluxo de dados, criado por Tom DeMarco em 1979 para análise estruturada e adotado pela segurança porque mostra exatamente o que interessa — por onde o dado passa. O diagrama tem quatro tipos de elemento: a entidade externa, que está fora do nosso controle (o usuário, o aplicativo dele, um parceiro); o processo, que é código nosso em execução; o fluxo de dados, que liga processos e entidades e carrega um protocolo; e o armazenamento, onde o dado repousa — banco, fila, cache, log. A segurança acrescenta um quinto elemento que DeMarco não tinha: a fronteira de confiança, desenhada como linha tracejada cortando os fluxos onde o nível de confiança muda.

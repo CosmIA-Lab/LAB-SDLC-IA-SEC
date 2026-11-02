@@ -18,6 +18,28 @@ A segunda distinção é entre linguagens. Em C e C++, o programador controla a 
 
 Quatro premissas. **A linguagem define a classe de erro possível**: a escolha de linguagem é uma decisão de segurança, e nenhuma regra de codificação devolve a C o que a linguagem não dá — as regras reduzem a frequência, não a possibilidade. **Comportamento indefinido é contrato rompido**: compiladores modernos otimizam assumindo que ele não ocorre, de modo que uma verificação escrita pelo programador pode ser removida; o mesmo código passa em todos os testes com um compilador e é explorável com outro, e só ferramentas que tornam o indefinido visível — os sanitizadores — mostram o problema. **Toda entrada é hostil, inclusive a que parece interna**: a mensagem do parceiro autenticado, o arquivo de configuração, e sobretudo o campo de tamanho que veio junto com o dado — ele é dado do pacote, não verdade sobre ele. **[+]** E **regra verificável vence conselho**: Howard e LeBlanc, em *Writing Secure Code* (2002), e Seacord, em *Secure Coding in C and C++* (2013), escreveram livros de conselhos; o que mudou a prática foi converter conselho em regra com identificador — a regra MEM30-C do padrão CERT diz "não acesse memória liberada" — e em ferramenta que aponta a violação no pipeline. A disciplina não depende de atenção individual; depende de regra que a máquina cobra.
 
+
+## Figura 1 — A pilha durante um estouro de buffer e onde cada mitigação age
+
+> Desenhe à mão em três ou quatro minutos, com todos os elementos rotulados, e cite "a Figura 1" no texto antes e depois. A explicação abaixo é o parágrafo que a acompanha — percorra os elementos na ordem, diga o que cada um é, por que está ali e o que acontece quando falha.
+
+```
+endereços altos
+┌──────────────────────┐
+│ endereço de retorno  │ ◀── sobrescrito: salta para o shellcode / ROP   ← CFI, shadow stack
+├──────────────────────┤
+│ ponteiro de quadro   │
+├──────────────────────┤
+│ canário (aleatório)  │ ◀── verificado antes do retorno                 ← StackGuard 1998
+├──────────────────────┤
+│ buf[256]  ▲▲▲▲▲▲▲▲▲▲ │ ◀── memcpy(buf, msg, len) com len = 600 escreve para cima
+│           ▲▲▲▲▲▲▲▲▲▲ │     (ASLR: endereços aleatórios · NX: pilha não executa)
+└──────────────────────┘
+endereços baixos          regra: if (len > sizeof buf || len > recebido) return ERRO;
+```
+
+A Figura 1 mostra o quadro de pilha de uma função em C no momento de um estouro de buffer. O buffer de 256 posições está embaixo; acima dele, o canário, o ponteiro de quadro e o endereço de retorno. A cópia de 600 bytes para o buffer escreve para cima e alcança o endereço de retorno — a técnica do artigo de 1996: quando a função retorna, salta para onde o atacante mandou. As anotações à direita são as mitigações da plataforma, cada uma na posição em que age: o canário entre o buffer e o endereço de retorno, verificado antes do retorno, denuncia a escrita; a pilha não executável impede que o código injetado no buffer rode; a aleatorização de endereços impede que o atacante saiba para onde saltar; a integridade de fluxo de controle restringe para onde o retorno pode ir. A linha de baixo é a regra que torna tudo isso desnecessário: verificar o comprimento contra o buffer alocado e contra os bytes recebidos antes de copiar — a verificação que faltava no Heartbleed, ao contrário: lá a leitura, aqui a escrita.
+
 ## 4. Os erros de memória — e trinta anos de ataque e defesa
 
 O **estouro de buffer** é a escrita além do fim de um bloco alocado. Na pilha, sobrescreve variáveis locais e o endereço de retorno da função; no heap, corrompe os metadados do alocador. O verme de Morris, em 1988, explorou um estouro em um serviço de rede do Unix; em 1996, um artigo assinado como Aleph One — *Smashing the Stack for Fun and Profit* — documentou a técnica para o público: sobrescrever o endereço de retorno para apontar para código do atacante colocado no próprio buffer. A partir daí a história é uma alternância. A plataforma respondeu tornando a pilha não executável, para que o código injetado não rodasse; os atacantes responderam com a reutilização de código já existente no programa — primeiro saltando para funções da biblioteca padrão, depois encadeando pequenos trechos de código terminados em retorno, a programação orientada a retorno que Shacham formalizou em 2007. A plataforma respondeu com a aleatorização do espaço de endereços, para que o atacante não soubesse onde o código estava, e com canários — valores aleatórios entre as variáveis e o endereço de retorno, verificados antes de retornar, propostos por Cowan e coautores em 1998. Os atacantes responderam com vazamentos de endereço que desfazem a aleatorização. A plataforma respondeu com integridade de fluxo de controle, que restringe para onde saltos indiretos podem ir. Cada mitigação tornou a exploração mais cara; nenhuma corrigiu o bug.

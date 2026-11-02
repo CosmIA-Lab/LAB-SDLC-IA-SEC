@@ -18,6 +18,25 @@ Daí as quatro premissas. **A vulnerabilidade é certa; a variável é o tempo**
 
 Sem o vocabulário não se descreve o processo, e cada sigla é frequentemente confundida com a vizinha. O **CVE** é o identificador único de uma vulnerabilidade pública, mantido pelo MITRE desde 1999 com autoridades de numeração distribuídas; identifica, não avalia. A **NVD** é a base do NIST que enriquece cada identificador com nota de severidade, classe e produto afetado — não é a única base, e tem atraso. O **CWE** é a classe de fraqueza — o tipo de erro, como o cross-site scripting —, não a instância. O **CVSS**, mantido pelo FIRST, é a métrica de severidade: uma pontuação base que combina quão fácil é explorar — pela rede ou localmente, com ou sem privilégio, com ou sem interação do usuário — com o impacto em confidencialidade, integridade e disponibilidade; mais métricas de ameaça e ambientais que quase ninguém preenche. O vetor diz mais que a nota: uma falha explorável pela rede sem autenticação nem interação é outra coisa que uma que exige acesso local privilegiado. O **catálogo KEV**, da agência americana CISA desde 2021, lista vulnerabilidades com exploração confirmada em campo — o sinal mais forte de "corrija agora". O **EPSS**, do FIRST desde 2021, estima a probabilidade de exploração nos próximos trinta dias a partir de dados reais. O **SSVC**, desenvolvido na Carnegie Mellon e adotado pela CISA, substitui a nota por uma árvore de decisão: exploração conhecida ou não, automatizável ou não, impacto técnico, impacto na missão — e produz uma ação: acompanhar, atender, agir agora. **[−]** O **VEX** é a declaração do fornecedor de que uma vulnerabilidade em um componente afeta ou não o produto, com o motivo; e o **CSAF** é o formato legível por máquina dos avisos de segurança.
 
+
+## Figura 1 — A janela de exposição e o ciclo que a encurta
+
+> Desenhe à mão em três ou quatro minutos, com todos os elementos rotulados, e cite "a Figura 1" no texto antes e depois. A explicação abaixo é o parágrafo que a acompanha — percorra os elementos na ordem, diga o que cada um é, por que está ali e o que acontece quando falha.
+
+```
+nascimento   descoberta   divulgação   correção      exploit       correção APLICADA    morte
+    │            │           │  publicada   público       e verificada
+────┼────────────┼───────────┼─────┼─────────┼────────────────┼──────────────────────┼────▶ tempo
+                             ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+                             ░ janela que a organização controla ░
+                             ░ (Equifax e WannaCry: 2 meses)      ░
+ciclo que a encurta:  INVENTÁRIO ─▶ descobrir ─▶ priorizar (KEV·EPSS·exposição·impacto → prazo) ─▶ corrigir/mitigar ─▶ verificar ─▶ relatar ─┐
+                          ▲                                                                                                                │
+                          └──────────────────────── lição → requisito do próximo ciclo ◀──────────────────────────────────────────────────┘
+```
+
+A Figura 1 tem duas partes. Em cima, a linha do tempo de uma vulnerabilidade segundo Arbaugh, Fithen e McHugh: nasce, é descoberta, é divulgada, ganha correção publicada, ganha código de exploração, é corrigida em um sistema específico, e morre quando a maioria foi corrigida. A faixa sombreada é a janela que a organização controla — da correção publicada à correção aplicada e verificada — e é nela que a maioria das invasões por falha conhecida acontece; nos casos Equifax e WannaCry, essa faixa durou dois meses. Embaixo, o ciclo que existe para encurtá-la: o inventário que alimenta a descoberta; a priorização que combina exploração conhecida, probabilidade estimada, exposição e impacto para produzir um prazo; a correção ou, enquanto ela não chega, a mitigação; a verificação com evidência; o relatório com o tempo de exposição por classe; e a seta de retorno — a lição que vira requisito do próximo ciclo de desenvolvimento. A figura mostra a primeira premissa do texto: a vulnerabilidade é certa, e o que o processo governa é o comprimento da faixa sombreada.
+
 ## 4. O ciclo — cinco etapas
 
 **Descobrir.** As fontes são várias e cada uma vê uma fatia: varredura de rede e de hospedeiros com credenciais — sem credenciais, a varredura vê só o que a porta mostra e erra muito —, agentes nos ativos, varredura de imagens e artefatos, cruzamento contínuo do inventário de componentes com as bases de vulnerabilidades, varredura de configuração de nuvem, os testes de segurança do pipeline, avisos de fornecedores, relatos externos pela divulgação coordenada. Os princípios: varredura contínua ou ao menos semanal, cobertura medida contra o inventário, desduplicação entre fontes, e dono atribuído no momento da descoberta.
