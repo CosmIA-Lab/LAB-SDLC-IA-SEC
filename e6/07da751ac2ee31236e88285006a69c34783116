@@ -1,0 +1,27 @@
+10-gestao-de-vulnerabilidades/arvore.html
+  s_7cc7673de0adc8::t_1ddd2971762f61 1-233
+10-gestao-de-vulnerabilidades/arvore-memoria.md
+  s_7cc7673de0adc8::t_1ddd2971762f61 1-90
+10-gestao-de-vulnerabilidades/README.md
+  s_7cc7673de0adc8::t_71967e0b55a01e 3,5-98,109-128,137-143,146,153-161,182-299
+  s_7cc7673de0adc8::t_1ddd2971762f61 173-178
+  s_7cc7673de0adc8::t_989341d6bada3e 99-108,129-136,144-145,147-152,162-172,179-181,300-306
+00-mapa-de-estudo.md
+  s_7cc7673de0adc8::t_82a10a7f6bdbda 74-75
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "e607da751ac2ee31236e88285006a69c34783116",
+  "prompts": {},
+  "sessions": {
+    "s_7cc7673de0adc8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9ffe1f51-e813-456c-ad90-77b82c1de23c",
+        "model": "unknown"
+      },
+      "human_author": "alan <nascimentoalankst@gmail.com>"
+    }
+  }
+}
