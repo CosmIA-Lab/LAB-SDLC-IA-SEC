@@ -1,0 +1,22 @@
+01-ciclo-de-vida-seguro/README.md
+  s_7cc7673de0adc8::t_a6d2d7db3f7897 424-439,556-567,598-615,634-641
+  s_7cc7673de0adc8::t_073379b6239a35 590-597
+01-ciclo-de-vida-seguro/arvore-memoria.md
+  s_7cc7673de0adc8::t_073379b6239a35 86-110
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "159de0c6464499165582d7b59b44e2a584441adf",
+  "prompts": {},
+  "sessions": {
+    "s_7cc7673de0adc8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9ffe1f51-e813-456c-ad90-77b82c1de23c",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "alan <nascimentoalankst@gmail.com>"
+    }
+  }
+}
