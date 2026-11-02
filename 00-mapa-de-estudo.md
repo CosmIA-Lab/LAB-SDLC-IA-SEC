@@ -71,8 +71,8 @@ Para cada ponto, o par que mais cai: a âncora nomeada (com fonte) e o mecanismo
 | 6. AuthN/AuthZ/sessão | NIST SP 800-63B (2017); OAuth 2.0 (RFC 6749) + PKCE (RFC 7636) + BCP (RFC 9700); OIDC Core (2014); RBAC (Ferraiolo e Kuhn, 1992) / ABAC (NIST SP 800-162) | Argon2id, passkey/FIDO2, cookie __Host- Secure/HttpOnly/SameSite com rotação, access curto + refresh rotacionado, PDP (Cedar/OPA) + PEP |
 | 7. Testes de segurança | NIST SP 800-115 (2008) e OWASP WSTG; análise de *taint* (Livshits e Lam, 2005; Chess e West, 2007); fuzzing guiado por cobertura (Miller et al., 1990; AFL, 2013); casos de abuso (McDermott e Fox, 1999) | SAST diferencial no PR, DAST autenticado no noturno, SCA com alcançabilidade, AFL++/libFuzzer com sanitizadores, matriz de autorização |
 | 8. Cadeia de suprimentos | SLSA v1.0 (2023); SSDF (NIST SP 800-218); in-toto (2019); Sigstore (2022); TUF (2010); builds reprodutíveis (2021); SBOM + VEX | lockfile com hash, registro privado, *actions* por SHA, runner efêmero + OIDC, cosign + Rekor, política de admissão, Dependency-Track |
-| 9. APIs/micro/contêineres | OWASP API Top 10; zero trust de rede | mTLS, API gateway, imagem mínima, política |
-| 10. Gestão de vulns | CVSS; CVE; disclosure coordenado | scanner de vuln, patch management, SLA |
+| 9. APIs/micro/contêineres | OWASP API Security Top 10 (2023); NIST SP 800-204/204A/204B (malha, ABAC); NIST SP 800-190 (contêineres); Pod Security Standards; NSA/CISA Hardening Guide (2022); SPIFFE | gateway como PEP, esquema OpenAPI, rate limit, Istio mTLS + AuthorizationPolicy, SVID, Vault dinâmico, NetworkPolicy, PSA restricted, Kyverno, gVisor, Falco |
+| 10. Gestão de vulns | NIST SP 800-40 r4 (2022); CVE/NVD/CWE; CVSS 3.1/4.0 e EPSS (FIRST); KEV (CISA, 2021); SSVC (SEI, 2019); ISO/IEC 29147 e 30111; CERT/CC CVD Guide (2017); NIST SP 800-61 | inventário automático + SBOM, Dependency-Track, varredura com credencial, árvore SSVC, prazos por classe, anéis e reconstrução de imagem, virtual patching, security.txt + VDP + PSIRT, métricas de tempo de exposição |
 
 Faltando fonte na linha, é lacuna a preencher quando a pasta for construída — não invente.
 

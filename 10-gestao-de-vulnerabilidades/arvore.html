@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ponto 10 — Gestão de vulnerabilidades</title>
+<style>
+  :root{
+    --bg:#0e1116; --surface:#161b22; --line:#3a4350;
+    --fg:#e6edf3; --dim:#9aa4b0;
+    --root:#58a6ff; --base:#8b949e; --etapa:#3fb950; --surf:#d29922; --outras:#bc8cff; --ex:#f778ba;
+    --p:#79c0ff; --t:#3fb950; --m:#d29922;
+    --fs:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--bg); color:var(--fg);
+    font:var(--fs)/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;}
+
+  header{position:sticky; top:0; z-index:5; background:var(--surface);
+    border-bottom:1px solid var(--line); padding:10px 16px;
+    display:flex; align-items:center; gap:12px; flex-wrap:wrap;}
+  header h1{font-size:1rem; margin:0; font-weight:700}
+  header .hint{color:var(--dim); font-size:.78rem}
+  header .ctr{margin-left:auto; display:flex; gap:6px; flex-wrap:wrap}
+  button{border:1px solid var(--line); background:#21262d; color:var(--fg);
+    border-radius:8px; padding:6px 10px; font-weight:600; cursor:pointer; font-size:.85rem}
+  button:hover{border-color:var(--root)}
+
+  main{max-width:980px; margin:0 auto; padding:18px 16px 90px}
+  .spine{color:var(--dim); font-size:.88rem; margin:0 0 14px; padding:8px 12px;
+    border:1px dashed var(--line); border-radius:10px}
+  .spine b{color:var(--root)}
+
+  /* ---------- árvore ---------- */
+  .tree, .tree ul{list-style:none; margin:0; padding:0}
+  .tree ul{margin-left:14px; padding-left:18px; border-left:2px solid var(--line)}
+  .tree li{position:relative; margin:4px 0; padding-left:6px}
+  .tree li::before{content:""; position:absolute; left:-18px; top:.85em; width:16px; height:2px; background:var(--line)}
+  .tree > li::before{display:none}
+
+  details{margin:0}
+  summary{cursor:pointer; list-style:none; display:inline-block}
+  summary::-webkit-details-marker{display:none}
+  summary::before{content:"▸"; display:inline-block; width:1em; color:var(--dim); transition:transform .15s}
+  details[open] > summary::before{transform:rotate(90deg)}
+
+  .n{display:inline-block; padding:3px 9px; border-radius:8px; background:var(--surface);
+    border:1px solid var(--line); border-left-width:4px; font-weight:600}
+  .n small{font-weight:500; color:var(--dim); margin-left:6px; font-size:.8em}
+  .n .w{font-weight:400; color:var(--dim)}
+  .n .w::before{content:" — "}
+
+  .n.root{border-left-color:var(--root); color:var(--root); font-size:1.15em; font-weight:800}
+  .n.b1{border-left-color:var(--root); font-size:1.05em; font-weight:800}
+  .n.base{border-left-color:var(--base)}
+  .n.etapa{border-left-color:var(--etapa); font-weight:800}
+  .n.surf{border-left-color:var(--surf); color:var(--surf); font-weight:800}
+  .n.outras{border-left-color:var(--outras); color:var(--outras); font-weight:800}
+  .n.ex{border-left-color:var(--ex); color:var(--ex); font-weight:800}
+  .n.leaf{background:transparent; border-color:transparent; padding-left:0; font-weight:500}
+  .n.leaf small{margin-left:4px}
+
+  /* rótulos P / T / M / saída */
+  .k{display:inline-block; min-width:1.5em; text-align:center; font-weight:800; font-size:.78em;
+    border-radius:5px; padding:1px 4px; margin-right:6px; vertical-align:1px}
+  .k.p{background:#1b2a3d; color:var(--p)} .k.t{background:#1f3b2a; color:var(--t)}
+  .k.m{background:#2a2f1f; color:var(--m)} .k.o{background:#2b2231; color:var(--ex)}
+  .k.x{background:#3a2626; color:#ff7b72}
+
+  /* junta (ponte) */
+  li.j{list-style:none}
+  li.j::before{display:none}
+  .bridge{display:inline-block; color:var(--dim); font-style:italic; font-size:.9em; padding:2px 6px}
+  .bridge::before{content:"⟪ "} .bridge::after{content:" ⟫"}
+
+  /* grade STRIDE × elemento */
+  .grid{display:inline-grid; grid-template-columns:auto repeat(6,1.7em); gap:3px; margin:4px 0 2px 1.6em; font-size:.82rem; text-align:center}
+  .grid div{padding:2px 1px; border-radius:4px; background:#21262d}
+  .grid .h{font-weight:800; color:var(--dim)}
+  .grid .r{text-align:left; padding:2px 8px 2px 4px; font-weight:600}
+  .grid .y{background:#1f3b2a; color:var(--t); font-weight:800}
+  .grid .mm{background:#2a2f1f; color:var(--m); font-size:.7rem; font-weight:700}
+
+  @media (max-width:520px){ .tree ul{margin-left:6px; padding-left:12px} .tree li::before{left:-12px; width:10px} .n .w{display:block; margin-top:2px} .n .w::before{content:""} }
+</style>
+</head>
+<body>
+<header>
+  <h1>Ponto 10 — Gestão de vulnerabilidades <span class="hint">· árvore de conceitos</span></h1>
+  <span class="hint">clique num nó para abrir/fechar · <b style="color:var(--p)">P</b> princípio · <b style="color:var(--t)">T</b> técnica · <b style="color:var(--m)">M</b> mecanismo · <b style="color:var(--ex)">→</b> saída</span>
+  <div class="ctr">
+    <button id="l1">só espinha</button>
+    <button id="l2">até P/T/M</button>
+    <button id="l3">tudo</button>
+    <button id="out">A−</button>
+    <button id="in">A+</button>
+    <button id="full">⛶</button>
+  </div>
+</header>
+
+<main>
+<p class="spine">espinha: <b>janela de exposição → 4 fundamentos → vocabulário → ciclo (descobrir · priorizar · corrigir · verificar · relatar) → divulgação coordenada → ponte com incidente → exemplo → erros</b></p>
+
+<ul class="tree">
+<li>
+<details open data-l="0"><summary><span class="n root">Gestão de vulnerabilidades<span class="w">governar o tempo entre a falha existir e ser corrigida em produção</span></span></summary>
+<ul>
+
+<li><details open data-l="1"><summary><span class="n b1">A janela de exposição</span></summary>
+<ul>
+  <li><span class="n leaf">ciclo de vida<small>Arbaugh/Fithen/McHugh 00</small><span class="w">nascimento → descoberta → divulgação → correção publicada → exploit → morte</span></span></li>
+  <li><span class="n leaf">o tempo encurtou<span class="w">zero-days exploradas ~10 meses antes (Bilge/Dumitraș 12); exploração em dias (Mandiant 23–24); DBIR 24: vetor inicial ~3×</span></span></li>
+  <li><span class="n leaf">não dá para corrigir tudo<span class="w">>40 mil CVEs em 2024; >50% alta/crítica; <5% exploradas</span></span></li>
+  <li><span class="n leaf">o problema é a n-day<span class="w">correção publicada e não aplicada</span></span></li>
+</ul></details></li>
+
+<li class="j"><span class="bridge">antes do processo, o que ele pressupõe</span></li>
+
+<li><details open data-l="1"><summary><span class="n b1">Fundamentos<small>4 premissas</small></span></summary>
+<ul>
+  <li><span class="n base">vulnerabilidade é certa; a variável é o tempo<span class="w">medir e reduzir o tempo de exposição</span></span></li>
+  <li><span class="n base">não se gerencia o que não se conhece<span class="w">inventário em 3 camadas: ativos · software · SBOM; automático; com dono</span></span></li>
+  <li><span class="n base">nota não é risco<small>Spring et al. 21</small><span class="w">CVSS base ignora contexto e exploração</span></span></li>
+  <li><span class="n base">processo contínuo com ciclo e métrica<small>NIST 800-40 r4; BOD 19-02; BOD 22-01</small></span></li>
+</ul></details></li>
+
+<li class="j"><span class="bridge">o vocabulário sem o qual o processo não se descreve</span></li>
+
+<li><details open data-l="1"><summary><span class="n b1 surf">Vocabulário</span></summary>
+<ul>
+  <li><span class="n leaf">CVE<small>MITRE 99, CNAs</small><span class="w">identificador</span> · NVD<span class="w">enriquecimento</span> · CWE<span class="w">classe</span> · CPE<span class="w">produto; purl é melhor</span></span></li>
+  <li><span class="n leaf">CVSS<small>FIRST 3.1/4.0</small><span class="w">base (AV AC PR UI S C I A) · ameaça · ambiental → ler o vetor, não só a nota</span></span></li>
+  <li><span class="n leaf">KEV<small>CISA 21</small><span class="w">exploração confirmada → corrija agora</span> · EPSS<small>FIRST 21</small><span class="w">probabilidade em 30 dias</span></span></li>
+  <li><span class="n leaf"><span class="k t">T</span>SSVC<small>SEI 19; CISA 21</small><span class="w">árvore: exploração · automatizável · impacto técnico · missão → Track · Track* · Attend · Act</span></span></li>
+  <li><span class="n leaf">VEX<small>CISA 22</small> · CSAF<small>OASIS 22</small> · <span class="k x">✗</span>zero-day ≠ maioria</span></li>
+  <li><span class="n leaf">3 falhas de gestão<span class="w">Equifax 17 (Struts, 2 meses, inventário) · WannaCry 17 (MS17-010, 2 meses) · MOVEit 23 (zero-day: inventário + mitigação + detecção)</span></span></li>
+</ul></details></li>
+
+<li class="j"><span class="bridge">o processo, etapa por etapa</span></li>
+
+<li><details open data-l="1"><summary><span class="n etapa">O ciclo</span></summary>
+<ul>
+  <li><details open data-l="2"><summary><span class="n base">descobrir</span></summary><ul>
+    <li><span class="n leaf"><span class="k m">M</span>varredura com credencial · agente · imagens (Trivy) · SBOM × CVE contínuo (Dependency-Track) · CSPM · testes (ponto 7) · CSAF · relatos externos</span></li>
+    <li><span class="n leaf"><span class="k p">P</span>contínua ou semanal · cobertura medida · dedup · dono na descoberta</span></li>
+  </ul></details></li>
+  <li><details open data-l="2"><summary><span class="n base">priorizar</span></summary><ul>
+    <li><span class="n leaf">exploração (KEV, EPSS, exploit, logs) + exposição (internet? alcançável? VEX) + impacto + vetor → classe → prazo</span></li>
+    <li><span class="n leaf">SSVC em detalhe<span class="w">mesma CVE, duas decisões: decodificador Act; relatórios Track + VEX</span></span></li>
+    <li><span class="n leaf">prazos exemplo<span class="w">KEV/crítica exposta 48 h–7 d · crítica interna 15 d · alta interna 30 d · resto 90 d</span></span></li>
+    <li><span class="n leaf">exceção<span class="w">dono · motivo · mitigação · prazo de revisão · visibilidade; sem prazo = aceitação permanente</span></span></li>
+  </ul></details></li>
+  <li><details open data-l="2"><summary><span class="n base">corrigir</span></summary><ul>
+    <li><span class="n leaf">patch · atualizar · reconfigurar · substituir · mitigar enquanto não chega<span class="w">virtual patching, isolamento; não fecha o item</span></span></li>
+    <li><span class="n leaf"><span class="k t">T</span>NIST 800-40 r4<span class="w">teste · anéis · reversão · janela + emergência · automação · imutável: reconstruir, não remendar</span></span></li>
+    <li><span class="n leaf">por ambiente<span class="w">servidores · estações · contêineres (imagem nova + admissão) · nuvem gerenciada · dependências (SBOM → VEX → Renovate) · firmware/OT (segmentar) · terceiros (CSAF)</span></span></li>
+    <li><span class="n leaf">nuvem<span class="w">configuração é vuln sem CVE → CSPM vs CIS · corrigir em código · drift</span></span></li>
+  </ul></details></li>
+  <li><span class="n leaf">verificar<span class="w">nova varredura · SBOM novo · regressão · regra testada → fecha com evidência</span></span></li>
+  <li><span class="n leaf">relatar<span class="w">tempo de exposição por classe (mediana, p90) · conformidade · idade · cobertura · KEV = 0 · exceções · reincidência → ponto 1</span> · <span class="k x">✗</span>total de achados, total corrigido, nota média</span></li>
+  <li><span class="n leaf">programa<span class="w">papéis (dono, segurança, PSIRT, gestão) · política escrita · conformidade como piso (PCI DSS 4.0 1 mês; ISO 27001 A.8.8; CRA) · maturidade (SAMM, BSIMM)</span></span></li>
+  <li><span class="n leaf">cadência<span class="w">dia: KEV + act · semana: triagem 1 h · mês: métricas · trimestre: exceções + inventário + exercício de mesa · ano: VDP</span></span></li>
+</ul></details></li>
+
+<li class="j"><span class="bridge">a porta de entrada do mundo externo</span></li>
+
+<li><details open data-l="1"><summary><span class="n etapa">Divulgação coordenada</span></summary>
+<ul>
+  <li><span class="n leaf"><span class="k t">T</span>ISO/IEC 29147<small>18</small><span class="w">receber e publicar</span> · ISO/IEC 30111<small>19</small><span class="w">tratar por dentro</span> · CERT/CC Guide<small>Householder 17</small> · FIRST PSIRT Framework</span></li>
+  <li><span class="n leaf">debate<span class="w">full → "responsável" → coordenada (prazo acordado, publicação conjunta); Project Zero 90 dias; CISA 45; explorada → dias</span></span></li>
+  <li><span class="n leaf"><span class="k m">M</span>security.txt<small>RFC 9116</small> · VDP com safe harbor<small>BOD 20-01</small> · PSIRT (48 h) · aviso CSAF + CVE + VEX + crédito · bounty só depois do óbvio</span></li>
+  <li><span class="n leaf">como consumidor<span class="w">assinar CSAF/feeds · inventário diz se afeta · VEX do fornecedor</span></span></li>
+</ul></details></li>
+
+<li class="j"><span class="bridge">quando a correção não chegou a tempo</span></li>
+
+<li><details open data-l="1"><summary><span class="n b1 outras">Ponte com incidente<span class="w">vulnerabilidade = condição · incidente = evento</span></span></summary>
+<ul>
+  <li><span class="n leaf">NIST 800-61<small>r2 12; r3 25</small><span class="w">preparação · detecção · contenção · erradicação · recuperação · pós-incidente</span></span></li>
+  <li><span class="n leaf">detecção vem dos logs dos pontos 4, 6, 9 · contenção = mitigação pronta · pós-incidente → requisito do próximo ciclo (10 → 1)</span></li>
+</ul></details></li>
+
+<li class="j"><span class="bridge">o mesmo sistema, no dia da CVE</span></li>
+
+<li><details data-l="1"><summary><span class="n b1 ex">exemplo-fio<small>a segunda-feira da CVE</small></span></summary>
+<ul>
+  <li><span class="n leaf">9h00 → Dependency-Track abre: XML crítica em 2 imagens, dono automático</span></li>
+  <li><span class="n leaf">9h20 → SSVC: decodificador Act 48 h · relatórios Track + VEX</span></li>
+  <li><span class="n leaf">10h00 → mitigação: regra no gateway + alerta · Falco · logs · 10h30 → PR do Renovate → pipeline → build assinado → anel → admissão recusa a antiga</span></li>
+  <li><span class="n leaf">14h00 → verificação: nenhuma imagem com a versão · regressão · fecha com evidência · exposição: 5 h</span></li>
+  <li><span class="n leaf">quinta → pesquisador via security.txt: IDOR na v1 → 24 h · desliga rota · aviso · crédito · bounty → lição para 9 e 7</span></li>
+  <li><span class="n leaf">se explorada → Falco → incidente: isolar pod · revogar Vault · bloquear parceiro → lição: decodificador em C → Rust (5)</span></li>
+</ul></details></li>
+
+<li><details data-l="1"><summary><span class="n b1"><span class="k x">✗</span>erros a não cometer</span></summary>
+<ul>
+  <li><span class="n leaf">CVSS alto ≠ primeiro · varredura limpa ≠ seguro · tudo imediatamente ≠ sempre · zero-day ≠ o problema</span></li>
+  <li><span class="n leaf">WAF ≠ correção · "responsável" ≠ silêncio · CVE no componente ≠ minha app vulnerável</span></li>
+  <li><span class="n leaf">scanner ≠ gestão · corrigir contêiner rodando · exceção aprovada ≠ resolvido</span></li>
+</ul></details></li>
+
+</ul></details>
+</li>
+</ul>
+</main>
+
+<script>
+  const root = document.documentElement;
+  let fs = 16;
+  const apply = () => root.style.setProperty("--fs", fs + "px");
+  document.getElementById("in").onclick  = () => { fs = Math.min(24, fs+1); apply(); };
+  document.getElementById("out").onclick = () => { fs = Math.max(11, fs-1); apply(); };
+  document.getElementById("full").onclick = () => {
+    if(!document.fullscreenElement) document.documentElement.requestFullscreen();
+    else document.exitFullscreen();
+  };
+  // níveis: 1 = só espinha (ramos de 1º nível fechados), 2 = até P/T/M, 3 = tudo
+  const setLevel = max => document.querySelectorAll("details").forEach(d => {
+    const l = +d.dataset.l; d.open = l < max;
+  });
+  document.getElementById("l1").onclick = () => setLevel(1);
+  document.getElementById("l2").onclick = () => setLevel(3);
+  document.getElementById("l3").onclick = () => setLevel(9);
+  addEventListener("keydown", e => {
+    if(e.key==="+"||e.key==="=") document.getElementById("in").click();
+    if(e.key==="-") document.getElementById("out").click();
+    if(e.key==="f") document.getElementById("full").click();
+    if(e.key==="1") setLevel(1); if(e.key==="2") setLevel(3); if(e.key==="3") setLevel(9);
+  });
+</script>
+</body>
+</html>
