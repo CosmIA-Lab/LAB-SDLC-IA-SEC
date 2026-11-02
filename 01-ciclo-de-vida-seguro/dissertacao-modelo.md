@@ -2,6 +2,16 @@
 
 > Texto corrido, no registro de uma dissertação, com cerca de dez páginas à mão. Três fontes nomeadas, um caso real, um exemplo que atravessa o texto. **[+]** marca onde alongar; **[−]** marca o que cortar primeiro.
 
+
+## Esqueleto — o que você anota em 5 minutos antes de escrever
+
+- **Seções, na ordem:** Introdução → A ideia que sustenta o ciclo → O que vale em todas as fases → As fases e a atividade de cada uma → Os modelos nomeados → O que DevSecOps acrescenta → Exemplo → O caso que deu origem a tudo → O que não confundir → Conclusão
+- **Figura 1:** O ciclo com uma atividade de segurança por fase e um gate entre fases.
+- **Caso:** Trustworthy Computing, 2002.
+- **Três fontes:** Boehm, *Software Engineering Economics* (1981) — custo por fase; Janca, *Alice and Bob Learn Application Security* (2020) — pushing left e fundamentos; Howard e Lipner, *The Security Development Lifecycle* (2006) — o SDL.
+- **Exemplo:** a API de pagamentos (aplicativo, gateway, contas, transferências, banco, fila, parceiro).
+- **Desfecho começa com:** "Em síntese, o ciclo de vida de desenvolvimento seguro não é uma lista de boas práticas, e sim uma cadeia."
+
 ## 1. Introdução — segurança como atividade de cada fase
 
 Durante décadas, a segurança de software foi tratada como uma etapa: o sistema era especificado, desenhado, codificado e testado, e, pouco antes de entrar em produção, alguém "fazia a segurança" — uma revisão, um teste de intrusão, uma lista de verificação. O resultado era previsível. As falhas encontradas nesse momento eram as mais caras de corrigir, porque já estavam no código, na arquitetura e às vezes no contrato com o cliente; e as falhas não encontradas iam para produção, onde custavam mais ainda.
