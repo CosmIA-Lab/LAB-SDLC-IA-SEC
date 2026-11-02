@@ -33,16 +33,17 @@ A segurança se organiza em três anéis concêntricos. Na **borda**, um gateway
 
 ```mermaid
 flowchart LR
-    CL["cliente"] --> G["① gateway (borda)<br/>TLS · token · rate limit · esquema"] --> M["② malha<br/>mTLS · identidade SPIFFE · política de quem chama o quê"] --> P1["③ pod contas<br/>sem root · drop ALL · rootfs ro"] --> DEC["④ este objeto é deste sujeito?<br/>só o serviço decide"]
-    P3["⑤ pod notificações<br/>COMPROMETIDO"] -. "chamar transferências → malha recusa" .-> X1["✗"]
-    P3 -. "ler segredo do banco → não existe (credencial por identidade, curta)" .-> X2["✗"]
-    P3 -. "escapar do contêiner → sem root, sem capabilities" .-> X3["✗"]
-    P3 -. "sair para a internet → rede nega" .-> X4["✗"]
-    POL["⑥ política como código<br/>admissão · Pod Security"] -.-> G
-    POL -.-> M
-    POL -.-> P1
+    CL["cliente"] --> G["① gateway (borda)<br/>TLS · token · rate limit · esquema"] --> M["② malha<br/>mTLS · identidade por serviço<br/>política de quem chama o quê"] --> P1["③ pod contas<br/>sem root · drop ALL · rootfs ro"] --> DEC["④ este objeto é deste sujeito?<br/>só o serviço decide"]
 ```
-Na mão, desenhe os três anéis como caixas aninhadas (gateway ⊃ malha ⊃ pods) e, ao lado, o pod comprometido com quatro setas riscadas.
+```mermaid
+flowchart LR
+    P3["⑤ pod notificações<br/>COMPROMETIDO"] --> X1["✗ chamar transferências<br/>a malha recusa: não está na política"]
+    P3 --> X2["✗ ler o segredo do banco<br/>não existe: credencial por identidade, curta"]
+    P3 --> X3["✗ escapar do contêiner<br/>sem root, sem capabilities, seccomp"]
+    P3 --> X4["✗ sair para a internet<br/>a rede nega por padrão"]
+    P3 --> OK["✓ enviar mensagens<br/>só o que a política permitia"]
+```
+⑥ A política como código (admissão, Pod Security) é a moldura que torna ①, ② e ③ obrigatórios. Na mão: três caixas aninhadas (gateway ⊃ malha ⊃ pods) e, ao lado, o pod comprometido com quatro setas riscadas e uma permitida.
 **A trilha: siga uma consulta de saldo de fora para dentro — e depois siga um pod comprometido de dentro para fora.** A Figura 1 são os três anéis da plataforma, e os números percorrem os dois sentidos.
 
 1. **① A borda.** A consulta chega ao gateway: conexão segura, token verificado em assinatura, emissor, audiência, prazo e escopo, limite de taxa, esquema. Rota fora do catálogo não responde.
