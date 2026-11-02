@@ -1,0 +1,54 @@
+02-modelagem-de-ameacas/dissertacao-modelo.md
+  s_7cc7673de0adc8::t_0b2fc4d2a6c8ea 44,52,54-55,58,60,66-68,70-75
+  s_7cc7673de0adc8::t_6a23e21b84bbeb 46-51,53,56-57,59,61-64
+  s_7cc7673de0adc8::t_57ec22cb4856a8 45
+09-seguranca-de-apis/dissertacao-modelo.md
+  s_7cc7673de0adc8::t_0b2fc4d2a6c8ea 32,36,38-39,41,46-47,50-57
+  s_7cc7673de0adc8::t_6a23e21b84bbeb 34-35,37,40,42-45
+  s_7cc7673de0adc8::t_0079c5d0b8d19f 33
+04-vulnerabilidades-em-aplicacoes-web/dissertacao-modelo.md
+  s_7cc7673de0adc8::t_0b2fc4d2a6c8ea 40,44,52-59
+  s_7cc7673de0adc8::t_6a23e21b84bbeb 42-43,45-49
+  s_7cc7673de0adc8::t_0dbf0fa906d7dd 41
+07-testes-de-seguranca/dissertacao-modelo.md
+  s_7cc7673de0adc8::t_0b2fc4d2a6c8ea 36,38-46,48-56
+  s_7cc7673de0adc8::t_6a23e21b84bbeb 37,47
+03-principios-de-arquitetura-segura/dissertacao-modelo.md
+  s_7cc7673de0adc8::t_6a23e21b84bbeb 40-41,47-51
+  s_7cc7673de0adc8::t_0b2fc4d2a6c8ea 38,42-46,52,55-62
+  s_7cc7673de0adc8::t_1f18dc500b1323 39
+10-gestao-de-vulnerabilidades/dissertacao-modelo.md
+  s_7cc7673de0adc8::t_6a23e21b84bbeb 36-39,41-42,44,46-49
+  s_7cc7673de0adc8::t_0b2fc4d2a6c8ea 34,40,43,45,52-59
+  s_7cc7673de0adc8::t_11640b5bf13b93 35
+05-praticas-de-codificacao-segura/dissertacao-modelo.md
+  s_7cc7673de0adc8::t_0b2fc4d2a6c8ea 34,40,42-43,46,48-51,54-61
+  s_7cc7673de0adc8::t_6a23e21b84bbeb 36-39,41,44-45,47
+  s_7cc7673de0adc8::t_e823f88ae43bc5 35
+08-cadeia-de-suprimentos/dissertacao-modelo.md
+  s_7cc7673de0adc8::t_6a23e21b84bbeb 36-37,39
+  s_7cc7673de0adc8::t_0b2fc4d2a6c8ea 34,38,42-49
+06-autenticacao-autorizacao-sessao/dissertacao-modelo.md
+  s_7cc7673de0adc8::t_6a23e21b84bbeb 38-43,51
+  s_7cc7673de0adc8::t_0b2fc4d2a6c8ea 36,44-50,52,55-64
+  s_7cc7673de0adc8::t_90c54dc6fdae3e 37
+01-ciclo-de-vida-seguro/dissertacao-modelo.md
+  s_7cc7673de0adc8::t_0b2fc4d2a6c8ea 40,44-45,48-55
+  s_7cc7673de0adc8::t_6a23e21b84bbeb 42-43
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "fef023aef81e0634beb939b7ba49279ec68f9488",
+  "prompts": {},
+  "sessions": {
+    "s_7cc7673de0adc8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9ffe1f51-e813-456c-ad90-77b82c1de23c",
+        "model": "unknown"
+      },
+      "human_author": "alan <nascimentoalankst@gmail.com>"
+    }
+  }
+}
