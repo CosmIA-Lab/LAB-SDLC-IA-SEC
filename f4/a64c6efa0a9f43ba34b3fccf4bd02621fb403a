@@ -1,0 +1,37 @@
+10-gestao-de-vulnerabilidades/dissertacao-modelo.md
+  s_7cc7673de0adc8::t_c20bc30c2aaf56 3,10,42,48,80,82,84,94
+02-modelagem-de-ameacas/dissertacao-modelo.md
+  s_7cc7673de0adc8::t_c20bc30c2aaf56 3,10,59,107,109,111,121
+03-principios-de-arquitetura-segura/dissertacao-modelo.md
+  s_7cc7673de0adc8::t_c20bc30c2aaf56 3,10,51,91,93,95,105
+05-praticas-de-codificacao-segura/dissertacao-modelo.md
+  s_7cc7673de0adc8::t_c20bc30c2aaf56 3,10,51,79,81,83,93
+04-vulnerabilidades-em-aplicacoes-web/dissertacao-modelo.md
+  s_7cc7673de0adc8::t_c20bc30c2aaf56 3,10,50,88,90,92,102
+06-autenticacao-autorizacao-sessao/dissertacao-modelo.md
+  s_7cc7673de0adc8::t_c20bc30c2aaf56 3,10,52,78,80,82,92
+08-cadeia-de-suprimentos/dissertacao-modelo.md
+  s_7cc7673de0adc8::t_c20bc30c2aaf56 3,10,41-42,47,77,79,81,91
+09-seguranca-de-apis/dissertacao-modelo.md
+  s_7cc7673de0adc8::t_c20bc30c2aaf56 3,10,47,75,77,79,89
+01-ciclo-de-vida-seguro/dissertacao-modelo.md
+  s_7cc7673de0adc8::t_c20bc30c2aaf56 3,10,89,91,93,103
+07-testes-de-seguranca/dissertacao-modelo.md
+  s_7cc7673de0adc8::t_c20bc30c2aaf56 3,10,50,84,86,88,98
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f4a64c6efa0a9f43ba34b3fccf4bd02621fb403a",
+  "prompts": {},
+  "sessions": {
+    "s_7cc7673de0adc8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9ffe1f51-e813-456c-ad90-77b82c1de23c",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "alan <nascimentoalankst@gmail.com>"
+    }
+  }
+}
