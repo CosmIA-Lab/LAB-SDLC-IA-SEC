@@ -1,0 +1,25 @@
+00-mapa-de-estudo.md
+  s_7cc7673de0adc8::t_797b92a16bae4d 70-71
+06-autenticacao-autorizacao-sessao/README.md
+  s_7cc7673de0adc8::t_dfa1b50b325b33 3,5-306
+06-autenticacao-autorizacao-sessao/arvore-memoria.md
+  s_7cc7673de0adc8::t_13f329550b9eae 1-107
+06-autenticacao-autorizacao-sessao/arvore.html
+  s_7cc7673de0adc8::t_1ccc9d8991a9e1 1-249
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f34cf59ce0de3883a279a6b3592ee29e71acce2c",
+  "prompts": {},
+  "sessions": {
+    "s_7cc7673de0adc8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9ffe1f51-e813-456c-ad90-77b82c1de23c",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "alan <nascimentoalankst@gmail.com>"
+    }
+  }
+}
