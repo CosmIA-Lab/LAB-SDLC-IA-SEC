@@ -1,0 +1,23 @@
+05-praticas-de-codificacao-segura/README.md
+  s_7cc7673de0adc8::t_ee3f2527503b64 229-230,287,315
+05-praticas-de-codificacao-segura/arvore-memoria.md
+  s_7cc7673de0adc8::t_5856ec27160606 67-68
+05-praticas-de-codificacao-segura/arvore.html
+  s_7cc7673de0adc8::t_a93354f8d2b913 188
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "5dab1d440f21f6092a0d8fd2db3990eeb760eb76",
+  "prompts": {},
+  "sessions": {
+    "s_7cc7673de0adc8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9ffe1f51-e813-456c-ad90-77b82c1de23c",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "alan <nascimentoalankst@gmail.com>"
+    }
+  }
+}
