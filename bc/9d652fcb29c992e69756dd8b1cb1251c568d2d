@@ -1,0 +1,47 @@
+03-principios-de-arquitetura-segura/resumo.md
+  s_7cc7673de0adc8::t_d94a69dd3b0891 1-4,19-84
+  s_7cc7673de0adc8::t_bed8aed2a61cfe 5-18
+01-ciclo-de-vida-seguro/resumo.md
+  s_7cc7673de0adc8::t_bed8aed2a61cfe 5-18
+  s_7cc7673de0adc8::t_d94a69dd3b0891 1-4,19-87
+04-vulnerabilidades-em-aplicacoes-web/resumo.md
+  s_7cc7673de0adc8::t_bed8aed2a61cfe 5-18
+  s_7cc7673de0adc8::t_d94a69dd3b0891 1-4,19-70
+05-praticas-de-codificacao-segura/resumo.md
+  s_7cc7673de0adc8::t_d94a69dd3b0891 1-4,19-88
+  s_7cc7673de0adc8::t_bed8aed2a61cfe 5-18
+07-testes-de-seguranca/resumo.md
+  s_7cc7673de0adc8::t_e1875353285bfc 1-4,19-72
+  s_7cc7673de0adc8::t_bed8aed2a61cfe 5-18
+08-cadeia-de-suprimentos/resumo.md
+  s_7cc7673de0adc8::t_e1875353285bfc 1-4,19-77
+  s_7cc7673de0adc8::t_bed8aed2a61cfe 5-18
+09-seguranca-de-apis/resumo.md
+  s_7cc7673de0adc8::t_e1875353285bfc 1-4,19-94
+  s_7cc7673de0adc8::t_bed8aed2a61cfe 5-18
+06-autenticacao-autorizacao-sessao/resumo.md
+  s_7cc7673de0adc8::t_e1875353285bfc 1-4,19-92
+  s_7cc7673de0adc8::t_bed8aed2a61cfe 5-18
+02-modelagem-de-ameacas/resumo.md
+  s_7cc7673de0adc8::t_d94a69dd3b0891 1-4,19-81
+  s_7cc7673de0adc8::t_bed8aed2a61cfe 5-18
+10-gestao-de-vulnerabilidades/resumo.md
+  s_7cc7673de0adc8::t_e1875353285bfc 1-4,19-81
+  s_7cc7673de0adc8::t_bed8aed2a61cfe 5-18
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "bc9d652fcb29c992e69756dd8b1cb1251c568d2d",
+  "prompts": {},
+  "sessions": {
+    "s_7cc7673de0adc8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9ffe1f51-e813-456c-ad90-77b82c1de23c",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "alan <nascimentoalankst@gmail.com>"
+    }
+  }
+}
