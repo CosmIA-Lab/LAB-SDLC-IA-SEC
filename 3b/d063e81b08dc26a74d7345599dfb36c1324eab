@@ -1,0 +1,24 @@
+07-testes-de-seguranca/arvore-memoria.md
+  s_7cc7673de0adc8::t_16c66aa4d991a2 1-97
+07-testes-de-seguranca/arvore.html
+  s_7cc7673de0adc8::t_16c66aa4d991a2 1-244
+07-testes-de-seguranca/README.md
+  s_7cc7673de0adc8::t_9151894db88867 3,5-126,139-171,180,187-292,307-387
+  s_7cc7673de0adc8::t_b145030e3ea354 127-138,172-179,181-186,293-306,388-391
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "3bd063e81b08dc26a74d7345599dfb36c1324eab",
+  "prompts": {},
+  "sessions": {
+    "s_7cc7673de0adc8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9ffe1f51-e813-456c-ad90-77b82c1de23c",
+        "model": "unknown"
+      },
+      "human_author": "alan <nascimentoalankst@gmail.com>"
+    }
+  }
+}
