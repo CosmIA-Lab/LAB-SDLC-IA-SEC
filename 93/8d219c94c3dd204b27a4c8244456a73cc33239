@@ -1,0 +1,35 @@
+02-modelagem-de-ameacas/dissertacao-modelo.md
+  s_7cc7673de0adc8::t_ee31d6a3e00f83 5-14
+03-principios-de-arquitetura-segura/dissertacao-modelo.md
+  s_7cc7673de0adc8::t_f6280e527f3fb7 5-14
+04-vulnerabilidades-em-aplicacoes-web/dissertacao-modelo.md
+  s_7cc7673de0adc8::t_3d83cf7033c518 5-14
+05-praticas-de-codificacao-segura/dissertacao-modelo.md
+  s_7cc7673de0adc8::t_c9da28e2d67aa2 5-14
+06-autenticacao-autorizacao-sessao/dissertacao-modelo.md
+  s_7cc7673de0adc8::t_c73696d8565163 5-14
+07-testes-de-seguranca/dissertacao-modelo.md
+  s_7cc7673de0adc8::t_eea9588b891db6 5-14
+08-cadeia-de-suprimentos/dissertacao-modelo.md
+  s_7cc7673de0adc8::t_1c0a0967d0396e 5-14
+09-seguranca-de-apis/dissertacao-modelo.md
+  s_7cc7673de0adc8::t_164eb463031e27 5-14
+10-gestao-de-vulnerabilidades/dissertacao-modelo.md
+  s_7cc7673de0adc8::t_fc2bb94bd1e532 5-14
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "938d219c94c3dd204b27a4c8244456a73cc33239",
+  "prompts": {},
+  "sessions": {
+    "s_7cc7673de0adc8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9ffe1f51-e813-456c-ad90-77b82c1de23c",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "alan <nascimentoalankst@gmail.com>"
+    }
+  }
+}
