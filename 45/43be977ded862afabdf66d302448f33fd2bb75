@@ -1,0 +1,19 @@
+09-seguranca-de-apis/dissertacao-modelo.md
+  s_7cc7673de0adc8::t_ef2dd93fb72369 36,38-46
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "4543be977ded862afabdf66d302448f33fd2bb75",
+  "prompts": {},
+  "sessions": {
+    "s_7cc7673de0adc8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9ffe1f51-e813-456c-ad90-77b82c1de23c",
+        "model": "unknown"
+      },
+      "human_author": "alan <nascimentoalankst@gmail.com>"
+    }
+  }
+}
