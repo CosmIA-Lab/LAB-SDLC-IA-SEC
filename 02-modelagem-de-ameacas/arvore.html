@@ -336,6 +336,36 @@
   <li><span class="n leaf">superfície<span class="w">2 endpoints públicos + canal do parceiro + SDK; exportação sem cliente não entra</span></span></li>
 </ul></details></li>
 
+<li class="j"><span class="bridge">o artefato, a escala e os erros</span></li>
+
+<li><details data-l="1"><summary><span class="n b1">registro de ameaças<span class="w">a tabela que sai das quatro etapas</span></span></summary>
+<ul>
+  <li><span class="n leaf">colunas<span class="w">id · elemento do DFD · STRIDE · descrição (agente, ação, alvo) · propriedade · ativo · destino (+ dono se aceitar) · requisito · controle · teste · estado</span></span></li>
+  <li><span class="n leaf">exemplo<span class="w">A-07 | fluxo app→API | E | troca de id lê conta alheia | authz | saldo | mitigar | verificar dono | middleware | T-21 | verificada</span></span></li>
+  <li><span class="n leaf">vive com o código; muda quando o DFD muda; cada linha com teste = rastreabilidade (ponto 7)</span></li>
+</ul></details></li>
+
+<li><details data-l="1"><summary><span class="n b1">privacidade · ML · nuvem<span class="w">mesmo método, outras propriedades e elementos</span></span></summary>
+<ul>
+  <li><span class="n leaf">LINDDUN<small>Deng 11; GO 20</small><span class="w">7 propriedades de privacidade no mesmo DFD; par natural do STRIDE com LGPD/GDPR</span></span></li>
+  <li><span class="n leaf">ML<span class="w">conjunto de treino, pipeline, modelo e inferência como elementos; envenenamento = T, roubo de modelo = I, injeção de prompt = dado/instrução</span> · ATLAS 21 e OWASP LLM Top 10 23 = catálogos</span></li>
+  <li><span class="n leaf">nuvem<span class="w">responsabilidade compartilhada desenha a fronteira; metadados da instância é armazenamento com credenciais (Capital One 19); superfície é configuração</span></span></li>
+</ul></details></li>
+
+<li><details data-l="1"><summary><span class="n b1">modelar em escala<small>Shostack 14, cap. 17–19</small><span class="w">falha por causa organizacional: tarde, grande, sem dono, documento</span></span></summary>
+<ul>
+  <li><span class="n leaf">por história, não por sistema<span class="w">30–60 min no refinamento; gatilho: fronteira, entidade, classe de dado, authn/authz nova</span></span></li>
+  <li><span class="n leaf">do time, com facilitação<small>Manifesto 20; EoP 10</small> · como código<span class="w">pytm, Threagile; modelo no PR; pipeline falha se fluxo cruza fronteira sem controle</span></span></li>
+  <li><span class="n leaf">com tempo limitado<span class="w">DFD de contexto + STRIDE por elemento em 1 h acha a maioria das graves</span> · medir<span class="w">% funcionalidades com modelo; ameaças por idade; % com teste; escapes em produção</span></span></li>
+</ul></details></li>
+
+<li><details data-l="1"><summary><span class="n b1"><span class="k x">✗</span>erros a não cometer</span></summary>
+<ul>
+  <li><span class="n leaf">STRIDE ≠ método (é taxonomia) · modelagem ≠ pentest · ameaça ≠ vuln ≠ risco · DREAD abandonado</span></li>
+  <li><span class="n leaf">aceitar ≠ ignorar · modela-se mais de uma vez · ferramenta gera, time decide</span></li>
+  <li><span class="n leaf">superfície ≠ portas · CAPEC/ATT&amp;CK/Top 10 ≠ técnicas · "pensar como atacante" ≠ método</span></li>
+</ul></details></li>
+
 </ul></details>
 </li>
 </ul>

@@ -413,6 +413,20 @@ O método de Shostack e o STRIDE são a via principal, mas não a única. Há ab
 
 ---
 
+### O registro de ameaças — o artefato que sai das quatro etapas
+
+As quatro perguntas produzem um documento, e a prova pede que se saiba descrevê-lo. O registro de ameaças é uma tabela em que cada linha é uma ameaça e as colunas atravessam as etapas: **identificador** (`A-07`); **elemento do DFD** onde a ameaça incide (fluxo "app → API", processo "API", armazenamento "log"); **categoria STRIDE**; **descrição** em uma frase com agente, ação e alvo ("cliente autenticado altera o `id` da conta na URL e lê saldo de terceiro"); **propriedade violada** (autorização); **ativo** afetado (saldo do cliente); **destino** (mitigar, eliminar, transferir, aceitar) e, se aceitar, dono e prazo de revisão; **requisito** gerado ("toda leitura de conta verifica que o sujeito é o dono"); **controle** que o implementa (middleware de autorização por objeto); **teste** que prova ("conta de outro cliente → 404", com o identificador do caso de teste); **estado** (aberta, mitigada, verificada, aceita). Duas linhas do exemplo da seção 7, abreviadas: `A-07 | fluxo app→API | E | troca de id lê conta alheia | authz | saldo | mitigar | verificar dono em toda leitura | middleware | T-21 | verificada`; `A-12 | fluxo API→parceiro | I | canal cai para texto claro | confid. | dados de transação | mitigar + transferir | TLS obrigatório + assinatura; contrato | config TLS, HMAC | T-30 | verificada`. O registro vive junto do código (arquivo versionado ou ferramenta com exportação), muda quando o DFD muda, e é o que liga este ponto ao ponto 7: cada linha com teste é uma linha da rastreabilidade.
+
+### Modelar privacidade, aprendizado de máquina e nuvem
+
+O método é o mesmo; o que muda é a lista de propriedades e os elementos do desenho.
+
+**Privacidade.** LINDDUN (Deng et al., 2011; cartas LINDDUN GO, 2020) troca as seis propriedades de segurança por sete de privacidade — *linkability*, *identifiability*, *non-repudiation* (aqui como ameaça: o usuário não consegue negar), *detectability*, *disclosure*, *unawareness*, *non-compliance* — e as aplica ao mesmo DFD, elemento por elemento. O que o STRIDE não vê (correlacionar dois registros anônimos e identificar a pessoa) o LINDDUN vê; a saída também é requisito (minimização, pseudonimização, consentimento) e teste. Com a LGPD e o GDPR, é o par natural do STRIDE em sistemas com dado pessoal.
+
+**Sistemas com aprendizado de máquina.** O desenho ganha elementos novos — conjunto de treinamento, pipeline de treino, modelo como artefato, entrada de inferência — e cada um recebe STRIDE: envenenamento do conjunto de treinamento é *tampering* no armazenamento; roubo do modelo por consultas é *information disclosure* no processo; entrada adversária que força classificação errada é *tampering* no fluxo de inferência; injeção de instruções em modelo de linguagem é a confusão dado/instrução do ponto 4 em forma nova. MITRE ATLAS (2021) e o OWASP Top 10 para aplicações com LLM (2023) são catálogos de ameaças e ataques — bibliotecas para a etapa 2, como CAPEC e ATT&CK, não métodos. O método continua sendo o DFD com fronteiras e as quatro perguntas; o que se acrescenta é saber que o modelo e seus dados são ativos e processos.
+
+**Nuvem e serverless.** A responsabilidade compartilhada desenha a fronteira: o que o provedor opera (hardware, hipervisor, serviço gerenciado) fica fora do DFD como entidade externa confiável por contrato — e é destino "transferir"; o que a organização configura (identidade, rede, permissões, dados) fica dentro e recebe STRIDE. Elementos que aparecem: o serviço de metadados da instância (um armazenamento com credenciais — a Capital One, 2019, foi *information disclosure* nele via SSRF), papéis e políticas de identidade (processos de autorização), filas e funções (processos efêmeros com entrada hostil por evento). A superfície de ataque (seção 5) em nuvem é majoritariamente configuração, e o inventário vem da API do provedor.
+
 ## 6. Outras abordagens — e quando cada uma cabe
 
 | Abordagem | Quem | De onde parte | Quando usar |
@@ -426,6 +440,35 @@ STRIDE é taxonomia de ameaça; PASTA é processo; LINDDUN é taxonomia de outra
 O Threat Modeling Manifesto (Shostack e outros, 2020) fixa o que atravessa todas as abordagens: as quatro perguntas como estrutura mínima, modelagem como atividade contínua e do time, e preferência por "fazer modelagem" sobre "falar de modelagem".
 
 ---
+
+### Modelar em escala — no sprint, no time, na organização
+
+Shostack (2014, capítulos 17 a 19) dedica a última parte do livro ao que faz a modelagem falhar na prática, e as causas são organizacionais, não técnicas: começa tarde demais (depois do código), tenta modelar o sistema inteiro de uma vez, não tem dono, e produz documento em vez de decisão. As respostas:
+
+**Por história, não por sistema.** O modelo do sistema inteiro é feito uma vez e mantido; cada funcionalidade nova recebe um modelo pequeno — o que ela acrescenta ao DFD (elemento, fluxo, fronteira), as ameaças desse acréscimo, os destinos — em trinta a sessenta minutos, dentro do refinamento da história. O gatilho para modelar é objetivo: fronteira nova, entidade externa nova, classe de dado nova, mudança em autenticação ou autorização. Sem gatilho, a história não modela e segue.
+
+**Do time, com facilitação.** Quem modela é o time que constrói, porque é quem conhece o desenho; segurança facilita, revisa e mantém o padrão. O *Threat Modeling Manifesto* (2020) coloca isso como valor: "uma cultura de encontrar e corrigir problemas de design em vez de checklist". O jogo *Elevation of Privilege* (Shostack, 2010) existe para isso — dar ao time sem especialista um roteiro que produz ameaças em uma hora.
+
+**Como código.** pytm, Threagile e ferramentas equivalentes descrevem o DFD em arquivo versionado e geram as ameaças por elemento automaticamente; o modelo entra no *pull request* que muda a arquitetura, a revisão vê o *diff* do modelo, e o pipeline falha se um fluxo cruzou fronteira sem controle declarado. Ferramentas visuais (Threat Dragon, Microsoft Threat Modeling Tool, IriusRisk) servem para a sessão com o time; o resultado exportado vai para o repositório.
+
+**Com tempo limitado.** O modelo não precisa ser completo para ser útil: um DFD de contexto com fronteiras e STRIDE por elemento em uma hora encontra a maioria das ameaças graves de um sistema médio. O erro é esperar o modelo perfeito; o acerto é um modelo pequeno hoje e outro na próxima mudança.
+
+**Medir.** Fração de funcionalidades novas com modelo; ameaças abertas por idade; fração de ameaças com teste ligado (a rastreabilidade do ponto 7); e a métrica que importa — vulnerabilidades encontradas em produção que o modelo deveria ter antecipado, que alimentam a revisão do próprio método.
+
+### Erros frequentes — o que não confundir
+
+| Confusão | Por que está errado | Como dizer certo |
+|---|---|---|
+| "STRIDE é o método de modelagem" | STRIDE é a taxonomia da etapa 2; sem DFD com fronteiras não há onde aplicá-lo | "quatro perguntas como método; STRIDE como taxonomia da segunda" |
+| "Modelagem de ameaças é teste de intrusão" | a modelagem acontece no design, antes do código; a intrusão prova depois | "modelagem antecipa; intrusão verifica" |
+| "Ameaça, vulnerabilidade e risco são sinônimos" | ameaça é o que pode acontecer; vulnerabilidade é por onde; risco é probabilidade × impacto | distinguir sempre, com o NIST SP 800-30 |
+| "Usar DREAD para priorizar" | abandonado pela própria Microsoft por inconsistência entre avaliadores | "risco = probabilidade × impacto; bug bar para decidir" |
+| "Aceitar = ignorar" | aceitar é decisão registrada com dono e prazo; ignorar é ausência de decisão | "nenhuma ameaça sem destino" |
+| "Modela-se uma vez" | o desenho muda; modelo que não acompanha vira documento histórico | "modelo versionado com o código; gatilho por mudança de fronteira" |
+| "A ferramenta modela sozinha" | a ferramenta gera candidatos por elemento; decidir destino e requisito é do time | "ferramenta gera; time decide" |
+| "Superfície de ataque = portas abertas" | métodos, canais e itens de dado (Manadhata e Wing); inclui API, parâmetros, dependências | "superfície é tudo por onde dado entra ou sai" |
+| "CAPEC, ATT&CK e Top 10 são técnicas de modelagem" | são catálogos que detalham o que o STRIDE apontou | "bibliotecas para a etapa 2, não método" |
+| "Pensar como atacante é o método" | é conselho; sem estrutura, a cobertura depende de quem pensa | "estrutura por elemento torna a cobertura independente do revisor" |
 
 ## 7. Exemplo guiado — uma API de pagamentos
 
@@ -473,6 +516,11 @@ A cadeia inteira em uma linha: ameaça (etapa 2) → requisito (etapa 3) → con
 ---
 
 ## Referências
+- **Shostack, Adam. *Threat Modeling*, 2014, capítulos 17 a 19** — por que a modelagem falha na organização: tarde demais, grande demais, sem dono, documento em vez de decisão; modelagem no processo ágil
+- **LINDDUN GO (Wuyts, Sion, Joosen), 2020** — versão em cartas da taxonomia de privacidade para sessões com o time
+- **MITRE. *ATLAS — Adversarial Threat Landscape for AI Systems*, 2021; OWASP. *Top 10 for Large Language Model Applications*, 2023** — catálogos de ameaças a sistemas com aprendizado de máquina
+- **pytm (OWASP); Threagile; IriusRisk** — modelagem de ameaças como código e ferramentas de geração por elemento
+- **Capital One. *Information on the Capital One Cyber Incident*, 2019** — information disclosure no serviço de metadados via SSRF: o elemento de nuvem que o DFD precisa incluir
 
 - **Shostack, Adam. *Threat Modeling: Designing for Security*. Wiley, 2014** — referência principal. Cap. 1 (quatro perguntas, quatro destinos), cap. 2 (DFD e fronteiras de confiança), cap. 3 (STRIDE e STRIDE por elemento, Tabela 3-1), cap. 8 (mitigações por categoria), cap. 9 (crítica ao DREAD)
 - **Swiderski, Frank; Snyder, Window. *Threat Modeling*. Microsoft Press, 2004** — níveis de confiança como lista ordenada de privilégios atribuída a cada ponto de entrada e ativo; base do conceito de fronteira usado por Shostack

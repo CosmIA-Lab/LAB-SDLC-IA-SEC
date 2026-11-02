@@ -96,3 +96,19 @@ Espinha mínima:
 
 Molde repetido de cada etapa (decore uma vez, aplique quatro):
 **objetivo → princípios → técnicas → mecanismos → saída**.
+
+---
+
+Ramos acrescentados em 02/11 (seções novas do README):
+
+```
+REGISTRO DE AMEAÇAS  id · elemento · STRIDE · descrição (agente, ação, alvo) · propriedade · ativo · destino (+dono) · requisito · controle · teste · estado
+                     vive com o código · muda com o DFD · linha com teste = rastreabilidade (ponto 7)
+PRIVACIDADE · ML · NUVEM  LINDDUN (Deng 11; GO 20): 7 propriedades no mesmo DFD · ML: treino/pipeline/modelo/inferência como elementos (T, I, dado/instrução); ATLAS 21, LLM Top 10 23 = catálogos
+                     nuvem: responsabilidade compartilhada = fronteira · metadados = armazenamento c/ credenciais (Capital One 19) · superfície = configuração
+EM ESCALA (Shostack cap. 17–19)  falha organizacional: tarde · grande · sem dono · documento
+                     por história (30–60 min; gatilho: fronteira/entidade/dado/authn nova) · do time c/ facilitação (Manifesto 20; EoP) · como código (pytm, Threagile; no PR)
+                     1 h de DFD + STRIDE acha a maioria · medir: % c/ modelo · idade · % c/ teste · escapes
+ERROS  STRIDE ≠ método · modelagem ≠ pentest · ameaça ≠ vuln ≠ risco · DREAD · aceitar ≠ ignorar · uma vez só · ferramenta sozinha · superfície ≠ portas · catálogos ≠ técnicas · "pensar como atacante"
+```
+
