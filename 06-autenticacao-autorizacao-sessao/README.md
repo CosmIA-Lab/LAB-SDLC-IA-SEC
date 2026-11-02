@@ -116,6 +116,32 @@ Três naturezas: **algo que se sabe** (senha, PIN), **algo que se tem** (telefon
 
 O fluxo "esqueci a senha" é autenticação com outra evidência — acesso ao e-mail, código por SMS, perguntas secretas — e costuma ser o elo mais fraco: perguntas secretas são adivinháveis ou pesquisáveis; o e-mail pode ter sido o primeiro alvo. Regras: link de uso único com expiração curta; invalidar sessões existentes ao trocar a senha; exigir o segundo fator também na recuperação quando a conta o tem; notificar o usuário por outro canal.
 
+### Outros autenticadores e onde cabem
+
+Senha e MFA cobrem o usuário final em aplicação web. Há outros autenticadores com lugar próprio.
+
+**Certificado de cliente e mTLS.** O cliente prova posse de uma chave privada no aperto de mão TLS (RFC 8446 para TLS 1.3; RFC 8705 para OAuth). Resistente a *phishing* e a repetição por construção; o custo é a distribuição e a rotação de certificados. É o autenticador natural para serviço a serviço, para parceiros e para dispositivos; raramente para pessoas, por usabilidade.
+
+**Kerberos e o domínio corporativo.** Kerberos (MIT, 1988; RFC 4120) autentica usuário e serviço contra um centro de distribuição de chaves e emite *tickets* de curta duração — é o que o Active Directory usa por dentro. Ensina duas ideias que os protocolos modernos herdaram: a credencial de longa duração nunca viaja (só o *ticket*), e a sessão autenticada tem prazo. Seus ataques (*pass-the-ticket*, *Kerberoasting*) são ataques ao ciclo de vida do segredo.
+
+**Chaves de API.** Uma string longa que identifica e autentica um cliente de API. É senha sem usuário: vale enquanto não vaza, e vaza em repositório, log e cliente. Regras: gerada pelo servidor com aleatoriedade criptográfica, armazenada como hash, com escopo, prazo e rotação, enviada em cabeçalho (nunca em URL), e substituída por OAuth *client credentials* quando o cliente é um serviço com identidade própria.
+
+**Link mágico e código por e-mail.** O e-mail vira o fator ("algo que se tem": acesso à caixa). Aceitável para baixo risco; herda toda a fraqueza do e-mail (conta de e-mail comprometida, link encaminhado, *phishing*). Link de uso único, expiração de minutos, vinculado ao navegador que pediu.
+
+**Biometria.** No dispositivo (Touch ID, Windows Hello), a biometria destrava uma chave local — é o que faz uma passkey ser "algo que se é" sem que a biometria saia do aparelho. Biometria enviada ao servidor é outra coisa: um segredo que não pode ser trocado se vazar. O NIST SP 800-63B só a aceita como fator combinado com posse do dispositivo, nunca sozinha.
+
+### A cadeia de tomada de conta
+
+Os ataques de autenticação se encadeiam. Nomear a cadeia ajuda a ver onde cada controle entra.
+
+1. **Reconhecimento**: o atacante descobre que o usuário existe — pela mensagem "usuário não encontrado" versus "senha incorreta", pelo tempo de resposta diferente, pelo fluxo de recuperação que confirma o e-mail. Controle: respostas e tempos uniformes.
+2. **Obtenção da credencial**: vazamento de outro sítio (*credential stuffing*), força bruta, *phishing*, malware no dispositivo. Controle: lista de senhas vazadas, limite de tentativas, fator resistente a *phishing*.
+3. **Contorno do segundo fator**: *phishing* em tempo real do TOTP, troca de SIM, fadiga de *push*, recuperação de conta fraca, suporte convencido por engenharia social. Controle: WebAuthn, *number matching*, recuperação com o mesmo nível, procedimento de suporte que não redefine fator por telefone.
+4. **Persistência**: o atacante troca o e-mail de recuperação, adiciona um fator próprio, cria chave de API, mantém a sessão viva. Controle: toda mudança de credencial exige reautenticação recente (*step-up*), notifica pelo canal anterior, invalida outras sessões, e fica em log.
+5. **Uso**: a transferência. Controle: *step-up* por operação, limites, detecção de anomalia (dispositivo novo, geolocalização, horário), confirmação fora de banda.
+
+A cadeia mostra por que "senha forte" não é controle de tomada de conta: ela age só no passo 2, e só contra força bruta.
+
 > **Junta.** A prova foi feita. Como o sistema a lembra sem que lembrá-la vire a falha?
 
 ---
@@ -151,6 +177,18 @@ Um JSON Web Token (RFC 7519, 2015) carrega as afirmações (sujeito, emissor, ex
 - **Vinculação ao cliente.** Um *bearer token* (RFC 6750) vale para quem o apresenta; roubado, é usado. Vinculação ao cliente por mTLS (RFC 8705, 2020) ou DPoP (RFC 9449, 2023) exige que o apresentador prove posse de uma chave.
 
 **Quando usar.** Estado no servidor para sessão de usuário em aplicação web; token assinado para comunicação entre serviços e para delegação via OAuth. JWT não é "mais seguro que sessão": é outra troca, com revogação mais difícil.
+
+### Sessão além do navegador
+
+**Aplicativo móvel.** Não há cookie; o token fica no armazenamento seguro do sistema (Keychain, Keystore), nunca em preferências em texto claro. *Access token* curto e *refresh token* rotacionado; vinculação ao aparelho por DPoP ou chave no elemento seguro; *logout* revoga o *refresh* no servidor. O aplicativo é cliente público (não guarda segredo de cliente), por isso PKCE é obrigatório.
+
+**Sessões concorrentes e dispositivos.** O servidor lista as sessões ativas por usuário, com dispositivo, local e último uso; o usuário encerra qualquer uma; troca de senha e detecção de comprometimento encerram todas. Limite de sessões simultâneas para contas de alto privilégio.
+
+**Logout único (SLO).** Em federação, sair da aplicação não sai do provedor, e sair do provedor não sai das aplicações — a menos que haja *logout* federado (OIDC *Back-Channel Logout*, SAML SLO). Sem ele, a sessão da aplicação continua válida depois de o usuário "sair" no provedor. A aplicação define o que acontece: expiração curta e revalidação periódica contra o provedor são o mínimo.
+
+**Detecção de anomalia na sessão.** Mudança de endereço de rede, de *User-Agent* ou de país no meio da sessão não prova roubo, mas pede *step-up*. Token usado de dois lugares ao mesmo tempo prova. *Refresh token* reusado depois de rotacionado prova — e revoga a família inteira (RFC 9700).
+
+**Sessão em API sem estado entre serviços.** O serviço A chama B em nome do usuário: propaga o token do usuário (com `aud` de B, obtido por *token exchange*, RFC 8693) ou usa identidade própria (*client credentials*, mTLS) e carrega o sujeito original como afirmação. Nunca repassa o token original com `aud` de A — B não deveria aceitá-lo — e nunca "confia" no cabeçalho `X-User-Id` que qualquer serviço interno pode forjar.
 
 > **Junta.** Quem é, lembrado. Agora o que pode.
 
@@ -189,6 +227,18 @@ O OWASP API Security Top 10 (2023) coloca em primeiro lugar a autorização queb
 
 Em camadas, por defesa em profundidade: no gateway (escopo do token, papel grosso), no serviço (regra por objeto), no banco (*row-level security* como última rede). A decisão fina fica no serviço, que conhece o domínio; o gateway não tem como saber de quem é a conta.
 
+### Autorização em sistemas distribuídos
+
+**Propagação de identidade.** Em microsserviços, a decisão fina acontece no serviço que conhece o domínio, mas a identidade do sujeito chegou no gateway. Duas formas de propagar: o token do usuário trocado por um com `aud` do serviço de destino (*token exchange*, RFC 8693), de modo que cada serviço valida assinatura, audiência e escopo; ou o gateway autentica o usuário e os serviços confiam no gateway por mTLS, recebendo o sujeito em cabeçalho assinado. A forma proibida é o cabeçalho em texto claro que qualquer serviço interno pode escrever — é o "confiar por estar na rede" do ponto 3.
+
+**O problema do deputado confuso.** Um serviço com privilégio alto executa, em nome de um cliente de privilégio baixo, uma ação que o cliente não poderia — porque o serviço usou a própria autoridade e não a do cliente (Hardy, 1988). O ponto 4 o viu como SSRF (o servidor acessa a rede interna em nome do usuário). Em autorização, aparece quando um serviço interno aceita "faça X para o usuário U" sem verificar que quem pede tinha o direito sobre U. Regra: a autoridade que executa é a do sujeito original, propagada; privilégio do serviço é só para o que o serviço faz por si.
+
+**Autorização de dados: por linha e por coluna.** A decisão por objeto no serviço tem uma última camada no banco: *row-level security* (PostgreSQL, SQL Server) filtra linhas pela identidade da sessão do banco; *views* e mascaramento filtram colunas. Não substitui o PDP — é a rede de segurança para a consulta que esqueceu o filtro.
+
+**Política como código.** Rego (OPA), Cedar (AWS), Zanzibar (SpiceDB, OpenFGA): a política vive em arquivo versionado, com testes que afirmam "o cliente A não lê a conta de B" e rodam no pipeline. A revisão de uma mudança de permissão é um *pull request*. É a separação de deveres (ponto 3) aplicada à própria política: quem escreve a regra não é quem a aprova.
+
+**Checklist mínimo do ASVS V4 (controle de acesso).** Os requisitos de nível 1 que toda aplicação deve cumprir, em paráfrase: a aplicação aplica as regras de controle de acesso em uma camada confiável do servidor; os atributos e dados de política usados pela decisão não podem ser manipulados pelo usuário; existe negação por padrão; o princípio de menor privilégio é aplicado; o controle de acesso falha de modo seguro; dados e APIs sensíveis são protegidos contra referência direta insegura a objeto; recursos administrativos exigem autenticação adicional; registro de acesso negado existe.
+
 > **Junta.** Autenticar e autorizar dentro de um sistema. Quando a identidade vem de fora, ou quando um sistema age por outro, entram os protocolos.
 
 ---
@@ -220,6 +270,14 @@ SAML 2.0 (OASIS, 2005) resolve o mesmo problema de federação com XML: o proved
 ### O que a federação muda
 
 O ponto único de autenticação é também o ponto único de falha: o provedor de identidade comprometido compromete todas as aplicações. Exige o nível mais alto de proteção do provedor (MFA resistente a *phishing* para administradores, monitoramento, chaves de assinatura em HSM) e exige que cada aplicação valide a asserção inteira — emissor, audiência, prazo, assinatura, `nonce` — e não só "veio do provedor".
+
+### Verificar um ID token e um access token — o roteiro
+
+A dissertação ganha se disser o que o código verifica, na ordem. Para um **ID token** (OIDC): (1) a assinatura, com a chave pública do emissor obtida pelo documento de descoberta, fixando os algoritmos aceitos; (2) `iss` igual ao emissor esperado; (3) `aud` contém o identificador deste cliente; (4) `exp` no futuro, `iat` plausível, com tolerância pequena de relógio; (5) `nonce` igual ao que o cliente gerou para esta requisição; (6) `acr`/`amr` compatíveis com o nível exigido, se a aplicação exige MFA; (7) só então o `sub` identifica o usuário — e `sub` é o identificador estável, não o e-mail, que muda e pode ser reatribuído. Para um **access token** no servidor de recursos: assinatura e algoritmo fixos (ou introspecção, RFC 7662, se opaco); `iss`; `aud` igual a este recurso; `exp`; `scope` contém o necessário para a operação; e, se vinculado, a prova DPoP ou o certificado mTLS correspondem ao token. Pular qualquer passo é uma vulnerabilidade com nome: pular (3) é token de outro cliente aceito; pular (5) é CSRF no login; aceitar o algoritmo do token é `alg: none`.
+
+### SSO, federação e o que o provedor precisa ser
+
+Quando a organização centraliza a identidade, o provedor vira o ativo mais valioso do ambiente. O que se exige dele: MFA resistente a *phishing* obrigatória para administradores e para contas com acesso a dados sensíveis; chaves de assinatura em HSM com rotação e publicação pelo documento de descoberta; registro de clientes com URL de redirecionamento exata; sessão do provedor com expiração e revalidação; *logout* federado; *log* de cada emissão de token; e um plano para o dia em que o provedor cair (as aplicações negam acesso, não liberam — *fail secure*). Para a aplicação que consome: nunca criar "login local de emergência" que contorne o provedor sem o mesmo nível de controle.
 
 > **Junta.** Peças nomeadas. O mesmo sistema, redesenhado.
 
@@ -304,3 +362,9 @@ A cadeia em uma linha: evidência verificada no nível do risco → sessão que 
 - **NIST SP 800-207. *Zero Trust Architecture*, 2020** — PDP e PEP
 - **OWASP. *API Security Top 10*, 2023** — BOLA, BFLA; *ASVS* 4.0.3, capítulos V2 (autenticação), V3 (sessão), V4 (controle de acesso)
 - **IEEE Center for Secure Design. *Avoiding the Top 10 Software Security Design Flaws*, 2014** — autorizar depois de autenticar; autenticação que não pode ser contornada
+- **RFC 4120. *The Kerberos Network Authentication Service (V5)*, 2005** — tickets de curta duração; a credencial de longa duração não viaja
+- **RFC 8693. *OAuth 2.0 Token Exchange*, 2020** — troca de token para propagação de identidade entre serviços
+- **RFC 7662. *OAuth 2.0 Token Introspection*, 2015** — validação de token opaco no servidor de recursos
+- **Hardy, Norm. "The Confused Deputy (or why capabilities might have been invented)". *ACM SIGOPS Operating Systems Review*, 22(4), 1988** — o deputado confuso
+- **OpenID Foundation. *OpenID Connect Back-Channel Logout 1.0*, 2022** — logout federado
+- **RFC 8446. *The Transport Layer Security (TLS) Protocol Version 1.3*, 2018** — autenticação de cliente por certificado

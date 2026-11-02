@@ -149,6 +149,24 @@ Para cada erro: o que é, como é explorado, o CWE, e a defesa em três níveis 
 
 **Em linguagem segura.** Segurança de memória não é segurança de concorrência: Go tem corridas de dados; Java tem; Rust as impede em compilação pelo sistema de tipos (`Send`/`Sync`), e é a exceção.
 
+### Erros fora da memória que o código comete
+
+A classe de memória define a disciplina, mas não a esgota. Há erros de codificação que linguagens seguras em memória cometem igualmente, e que a prova de codificação segura precisa nomear.
+
+**Criptografia mal usada (CWE-327, CWE-330, CWE-208).** O erro raramente é o algoritmo; é o uso. Aleatoriedade de `rand()` ou `Math.random()` para token de sessão ou de recuperação de senha — previsível, portanto adivinhável (CWE-330): a regra é gerador criptográfico do sistema (`/dev/urandom`, `SecureRandom`, `crypto.randomBytes`). Comparação de segredo com `==` ou `strcmp` — o tempo de resposta varia com o número de bytes iguais e vaza o segredo byte a byte (CWE-208): a regra é comparação em tempo constante. Vetor de inicialização repetido, modo ECB, chave derivada de senha sem função lenta, assinatura verificada sem checar o algoritmo (o `alg: none` do ponto 6): todos são usos errados de primitivas certas. Técnica: usar a API de alto nível da biblioteca (que escolhe modo, IV e autenticação) e nunca a de baixo nível; mecanismo: *linter* criptográfico e revisão obrigatória de qualquer chamada a primitiva.
+
+**Negação de serviço por expressão regular (ReDoS, CWE-1333).** Expressão com quantificadores aninhados (`(a+)+$`) avaliada por motor com retrocesso leva tempo exponencial em entrada construída. Uma validação de e-mail mal escrita derruba o servidor com uma string de 30 caracteres. Regra: expressões sem aninhamento ambíguo, tamanho máximo de entrada antes da expressão, motor sem retrocesso (RE2) para entrada hostil.
+
+**Desserialização e análise de formato (CWE-502, CWE-611).** O ponto 4 as tratou pela web; no código, a regra é geral: nenhum formato que reconstrói objetos arbitrários (serialização nativa de Java, `pickle` de Python, `Marshal` de Ruby, YAML completo) recebe dado de fora da fronteira. Dado de fora chega em formato de dados (JSON, Protocol Buffers) com esquema e é convertido para tipos internos pela validação da seção 5.
+
+**Caminho e nome de arquivo (CWE-22, CWE-73).** Montar caminho com entrada do usuário e verificar depois não funciona: `..`, codificações alternativas e *links* simbólicos escapam. Regra: o servidor gera o nome; o caminho é canonicalizado e verificado contra o diretório permitido antes de abrir; a operação segue sobre o descritor aberto, com `O_NOFOLLOW`.
+
+**Segredo em log e em erro (CWE-532, CWE-209).** O log é a saída mais esquecida. Token de sessão em URL registrada pelo servidor web, senha em mensagem de erro de conexão, número de cartão em *stack trace*: a regra é mascaramento na camada de log, lista de campos sensíveis por tipo e erro ao cliente sem detalhe interno. O mesmo vale para o *crash dump* e para a mensagem de exceção que vai ao sistema de rastreamento.
+
+**Verificação de tipo e conversão implícita.** Em linguagens dinâmicas, `"1" == 1`, `null` tratado como zero e conversão automática de string para número abrem comparações que passam quando não deviam (a autorização que compara `id` como string com `id` como número e aceita). Regra: igualdade estrita, tipos verificados na borda, sem conversão implícita em decisão de segurança.
+
+O que une esses erros aos de memória: todos são o código confiando em algo que não verificou — o tamanho, o tipo, a aleatoriedade, o formato, o caminho. A regra geral vem a seguir.
+
 > **Junta.** Erros descritos, mitigações nomeadas. Falta a regra geral: o que o código faz com qualquer entrada, em qualquer linguagem.
 
 ---
@@ -179,6 +197,20 @@ Toda função que pode falhar devolve ou lança erro, e quem chama trata. CERT E
 ### Compilar com tudo ligado
 
 A plataforma oferece mitigações que não custam código: `-fstack-protector-strong` (canários), `-D_FORTIFY_SOURCE=2` (verificação de tamanho), `-fPIE -pie` (endereços aleatórios), `-Wl,-z,relro,-z,now` (tabela de símbolos somente-leitura), `-fcf-protection` (CET), `-Wall -Wextra -Werror`. Um binário sem elas está escolhendo ser explorável por técnicas de 1996. A regra é que o pipeline recusa binário sem as flags — verificável com `checksec`.
+
+### Antes e depois — quatro trechos
+
+A regra fica concreta quando se vê a linha. Quatro pares, em C, com a regra CERT que cada um aplica.
+
+**Cópia sem limite (ARR30-C, STR31-C).** Antes: `char buf[256]; memcpy(buf, msg, len);` — `len` veio do pacote. Depois: `if (len > sizeof buf || len > recebido) return ERRO_TAMANHO; memcpy(buf, msg, len);` — o tamanho é verificado contra o buffer que o código alocou *e* contra os bytes que realmente chegaram. A segunda verificação é a lição do Heartbleed: o campo de tamanho é dado do pacote, não verdade sobre ele.
+
+**String de formato (FIO47-C).** Antes: `syslog(LOG_INFO, msg);` — se `msg` contém `%x %x %n`, o atacante lê a pilha e escreve na memória. Depois: `syslog(LOG_INFO, "%s", msg);` — a entrada é argumento, nunca formato. Um caractere de diferença; uma classe inteira de exploração fechada. O compilador avisa (`-Wformat-security`); `-Werror` transforma o aviso em bloqueio.
+
+**Aritmética de tamanho (INT30-C, INT32-C).** Antes: `size_t total = n * sizeof(Item); Item *v = malloc(total);` — com `n` grande, `total` dá a volta, `malloc` aloca pouco e o laço seguinte escreve fora. Depois: `size_t total; if (__builtin_mul_overflow(n, sizeof(Item), &total)) return ERRO_TAMANHO; Item *v = malloc(total); if (!v) return ERRO_MEMORIA;` — a multiplicação é verificada e o retorno de `malloc` também (ERR33-C). Em linguagem com inteiros de precisão arbitrária ou exceção em estouro, a primeira linha não é problema; a segunda continua sendo.
+
+**Verificar e usar (FIO45-C, TOCTOU).** Antes: `if (access(caminho, R_OK) == 0) { f = fopen(caminho, "r"); }` — entre `access` e `fopen`, o atacante troca o arquivo por um *link* para `/etc/shadow`. Depois: `fd = open(caminho, O_RDONLY | O_NOFOLLOW); if (fd < 0) return ERRO; fstat(fd, &st); if (!permitido(&st)) { close(fd); return ERRO; }` — abre primeiro, verifica sobre o descritor, e o que foi verificado é o que será usado.
+
+Os quatro têm a mesma forma: o código "antes" confia em algo que não verificou (o tamanho, a string, o produto, o nome); o "depois" verifica e só então age. É a regra de validar na borda, descida ao nível da instrução.
 
 > **Junta.** Regras ditas; agora os métodos nomeados que as tornam repetíveis e as ferramentas que as cobram.
 
@@ -233,6 +265,30 @@ A plataforma oferece mitigações que não custam código: `-fstack-protector-st
 **O que é.** Revisão com roteiro: OWASP Code Review Guide (2017) e o *checklist* de Howard e LeBlanc (2002) — por onde entra dado externo, onde ele é usado, que funções perigosas aparecem, como erros são tratados, onde ficam segredos. Difere da revisão de qualidade porque segue o dado, não a estrutura.
 
 **Mecanismo.** Template de revisão no pull request; revisor de segurança obrigatório em componentes que processam entrada externa; ferramentas (SAST, ponto 7) como primeiro filtro, humano no que a ferramenta não vê (lógica, posse, fronteira).
+
+### Codificação segura em linguagens gerenciadas
+
+A migração fecha a classe de memória e abre a pergunta: o que sobra para codificar com segurança em Java, C#, Go, Python, Ruby, JavaScript? Sobra tudo da seção "Erros fora da memória" e mais três hábitos específicos.
+
+**O sistema de tipos como ferramenta de segurança.** Tipos que só existem válidos (um `Email`, um `IdDeConta`, um `Centavos`) tornam impossível passar string crua para onde o tipo é exigido; o compilador cobra a validação que o programador esqueceria. Em linguagens com tipos ricos (Rust, TypeScript estrito, Kotlin, Scala, Haskell), é a forma mais barata de aplicar "validar na borda". Em linguagens dinâmicas, o equivalente é o objeto de valor com construtor que valida e sem *setter*.
+
+**Imutabilidade e ausência de estado compartilhado.** Objeto imutável não sofre corrida de dados nem alteração depois de validado. Estruturas imutáveis por padrão (Clojure, Rust sem `mut`, `record` em Java, `frozen` em Ruby) reduzem a classe de corrida que a segurança de memória não cobre.
+
+**As armadilhas próprias de cada linguagem.** Java: desserialização nativa, `Runtime.exec` com string, XXE no parser padrão. Python: `pickle`, `eval`, `subprocess` com `shell=True`, YAML `load` sem `safe_`. Ruby: `Marshal`, `send` com nome vindo do usuário, `open` com URL. JavaScript/Node: `eval`, poluição de protótipo (CWE-1321), expressão regular com retrocesso, dependência transitiva com `postinstall`. Go: corrida de dados, `unsafe`, erro ignorado com `_`. A técnica é a mesma de C — lista de construções proibidas por linguagem, cobrada por *linter* (Semgrep, ESLint com regras de segurança, Bandit, Brakeman, gosec) — só muda o conteúdo da lista.
+
+### Como a prática entra no time
+
+Regra que ninguém aplica não é controle. Howard e Lipner (2006), no SDL, e o NIST SSDF (SP 800-218, 2022; prática PW.5, "crie código seguindo práticas de codificação segura") tratam a adoção como parte da técnica.
+
+**Treinamento com o código do time.** Treinamento genérico de "OWASP Top 10" não muda linha de código; treinamento sobre a vulnerabilidade encontrada no próprio repositório, com o *diff* da correção, muda. O SDL exige treinamento anual; o que funciona é o treinamento ancorado em achado real.
+
+**Padrão escrito e curto.** Um documento com as regras adotadas (quais regras CERT, qual lista proibida, quais flags, quais *linters*), de uma página, versionado junto com o código, e lido na integração de quem entra. O ASVS e o CERT são a fonte; o padrão do time é o recorte.
+
+**Gates automáticos antes do humano.** *Linter* e SAST no *pre-commit* ou no pull request, sanitizadores na suíte, `checksec` no build, varredura de segredos no push. O humano revisa o que a máquina não vê — posse, fronteira, lógica — e não gasta atenção com `strcpy`.
+
+**Campeões de segurança.** Um desenvolvedor por time com tempo reservado (10% a 20%) para manter o padrão, triar achados e ser o primeiro revisor de componente que processa entrada externa. É o mecanismo que o SDL e o BSIMM (McGraw et al., modelo de maturidade desde 2009) registram como o mais correlacionado com adoção.
+
+**Métricas que importam.** Número de achados por classe por trimestre (a classe que não cai indica treinamento errado); tempo entre achado e correção; fração de binários com todas as mitigações; fração de código novo em linguagem segura em memória (a métrica do roadmap da CISA).
 
 > **Junta.** Erros, regras, métodos. O mesmo sistema, na linha do código.
 
@@ -312,4 +368,7 @@ A cadeia em uma linha: entrada hostil → regra com identificador → ferramenta
 - **OWASP. *Secure Coding Practices Quick Reference Guide*, 2010; *Code Review Guide* 2.0, 2017**
 - **Provos, Niels; Friedl, Markus; Honeyman, Peter. "Preventing Privilege Escalation". *USENIX Security*, 2003** — descer privilégio no processo
 - **Saltzer, Jerome; Schroeder, Michael. "The Protection of Information in Computer Systems". *Proc. IEEE*, 1975** — padrões à prova de falha e menor privilégio aplicados ao código
+- **NIST SP 800-218. *Secure Software Development Framework (SSDF)* v1.1, 2022** — prática PW.5: codificar seguindo práticas de codificação segura; PW.6: configurar compilador e ferramentas para segurança
+- **McGraw, Gary; Migues, Sammy; West, Jacob. *Building Security In Maturity Model (BSIMM)*, desde 2009** — campeões de segurança e padrões de codificação como atividades observadas em programas maduros
+- **MITRE. CWE-327 (algoritmo fraco), CWE-330 (aleatoriedade insuficiente), CWE-208 (discrepância de tempo), CWE-1333 (ReDoS), CWE-532 (segredo em log), CWE-1321 (poluição de protótipo)** — os erros fora da memória nomeados na seção 4
 - **Janca, Tanya. *Alice and Bob Learn Application Security*. Wiley, 2020, cap. 4 ("Secure Code")** — escolha de framework (suportado, versão atual ou anterior, SCA a cada build); validação de dado não confiável com fluxograma; sete regras para código em linguagem sem segurança de memória; ASLR, DEP e canário como camada adicional
