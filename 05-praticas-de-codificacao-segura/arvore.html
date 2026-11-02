@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ponto 5 — Práticas de codificação segura e erros de memória</title>
+<style>
+  :root{
+    --bg:#0e1116; --surface:#161b22; --line:#3a4350;
+    --fg:#e6edf3; --dim:#9aa4b0;
+    --root:#58a6ff; --base:#8b949e; --etapa:#3fb950; --surf:#d29922; --outras:#bc8cff; --ex:#f778ba;
+    --p:#79c0ff; --t:#3fb950; --m:#d29922;
+    --fs:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--bg); color:var(--fg);
+    font:var(--fs)/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;}
+
+  header{position:sticky; top:0; z-index:5; background:var(--surface);
+    border-bottom:1px solid var(--line); padding:10px 16px;
+    display:flex; align-items:center; gap:12px; flex-wrap:wrap;}
+  header h1{font-size:1rem; margin:0; font-weight:700}
+  header .hint{color:var(--dim); font-size:.78rem}
+  header .ctr{margin-left:auto; display:flex; gap:6px; flex-wrap:wrap}
+  button{border:1px solid var(--line); background:#21262d; color:var(--fg);
+    border-radius:8px; padding:6px 10px; font-weight:600; cursor:pointer; font-size:.85rem}
+  button:hover{border-color:var(--root)}
+
+  main{max-width:980px; margin:0 auto; padding:18px 16px 90px}
+  .spine{color:var(--dim); font-size:.88rem; margin:0 0 14px; padding:8px 12px;
+    border:1px dashed var(--line); border-radius:10px}
+  .spine b{color:var(--root)}
+
+  /* ---------- árvore ---------- */
+  .tree, .tree ul{list-style:none; margin:0; padding:0}
+  .tree ul{margin-left:14px; padding-left:18px; border-left:2px solid var(--line)}
+  .tree li{position:relative; margin:4px 0; padding-left:6px}
+  .tree li::before{content:""; position:absolute; left:-18px; top:.85em; width:16px; height:2px; background:var(--line)}
+  .tree > li::before{display:none}
+
+  details{margin:0}
+  summary{cursor:pointer; list-style:none; display:inline-block}
+  summary::-webkit-details-marker{display:none}
+  summary::before{content:"▸"; display:inline-block; width:1em; color:var(--dim); transition:transform .15s}
+  details[open] > summary::before{transform:rotate(90deg)}
+
+  .n{display:inline-block; padding:3px 9px; border-radius:8px; background:var(--surface);
+    border:1px solid var(--line); border-left-width:4px; font-weight:600}
+  .n small{font-weight:500; color:var(--dim); margin-left:6px; font-size:.8em}
+  .n .w{font-weight:400; color:var(--dim)}
+  .n .w::before{content:" — "}
+
+  .n.root{border-left-color:var(--root); color:var(--root); font-size:1.15em; font-weight:800}
+  .n.b1{border-left-color:var(--root); font-size:1.05em; font-weight:800}
+  .n.base{border-left-color:var(--base)}
+  .n.etapa{border-left-color:var(--etapa); font-weight:800}
+  .n.surf{border-left-color:var(--surf); color:var(--surf); font-weight:800}
+  .n.outras{border-left-color:var(--outras); color:var(--outras); font-weight:800}
+  .n.ex{border-left-color:var(--ex); color:var(--ex); font-weight:800}
+  .n.leaf{background:transparent; border-color:transparent; padding-left:0; font-weight:500}
+  .n.leaf small{margin-left:4px}
+
+  /* rótulos P / T / M / saída */
+  .k{display:inline-block; min-width:1.5em; text-align:center; font-weight:800; font-size:.78em;
+    border-radius:5px; padding:1px 4px; margin-right:6px; vertical-align:1px}
+  .k.p{background:#1b2a3d; color:var(--p)} .k.t{background:#1f3b2a; color:var(--t)}
+  .k.m{background:#2a2f1f; color:var(--m)} .k.o{background:#2b2231; color:var(--ex)}
+  .k.x{background:#3a2626; color:#ff7b72}
+
+  /* junta (ponte) */
+  li.j{list-style:none}
+  li.j::before{display:none}
+  .bridge{display:inline-block; color:var(--dim); font-style:italic; font-size:.9em; padding:2px 6px}
+  .bridge::before{content:"⟪ "} .bridge::after{content:" ⟫"}
+
+  /* grade STRIDE × elemento */
+  .grid{display:inline-grid; grid-template-columns:auto repeat(6,1.7em); gap:3px; margin:4px 0 2px 1.6em; font-size:.82rem; text-align:center}
+  .grid div{padding:2px 1px; border-radius:4px; background:#21262d}
+  .grid .h{font-weight:800; color:var(--dim)}
+  .grid .r{text-align:left; padding:2px 8px 2px 4px; font-weight:600}
+  .grid .y{background:#1f3b2a; color:var(--t); font-weight:800}
+  .grid .mm{background:#2a2f1f; color:var(--m); font-size:.7rem; font-weight:700}
+
+  @media (max-width:520px){ .tree ul{margin-left:6px; padding-left:12px} .tree li::before{left:-12px; width:10px} .n .w{display:block; margin-top:2px} .n .w::before{content:""} }
+</style>
+</head>
+<body>
+<header>
+  <h1>Ponto 5 — Práticas de codificação segura e erros de memória <span class="hint">· árvore de conceitos</span></h1>
+  <span class="hint">clique num nó para abrir/fechar · <b style="color:var(--p)">P</b> princípio · <b style="color:var(--t)">T</b> técnica · <b style="color:var(--m)">M</b> mecanismo · <b style="color:var(--ex)">→</b> saída</span>
+  <div class="ctr">
+    <button id="l1">só espinha</button>
+    <button id="l2">até P/T/M</button>
+    <button id="l3">tudo</button>
+    <button id="out">A−</button>
+    <button id="in">A+</button>
+    <button id="full">⛶</button>
+  </div>
+</header>
+
+<main>
+<p class="spine">espinha: <b>bug de segurança ≠ bug comum → 4 fundamentos → erros de memória (ataque ↔ mitigação) → 8 princípios → 6 técnicas → exemplo → erros</b></p>
+
+<ul class="tree">
+<li>
+<details open data-l="0"><summary><span class="n root">Práticas de codificação segura e erros de memória<span class="w">impedir que o código traia o projeto</span></span></summary>
+<ul>
+
+<li><details open data-l="1"><summary><span class="n b1">Por que é disciplina própria</span></summary>
+<ul>
+  <li><span class="n leaf">bug de segurança ≠ bug comum<span class="w">o atacante dá ao bug probabilidade 1; teste funcional não cobre</span></span></li>
+  <li><span class="n leaf">a linguagem decide a classe<span class="w">C/C++: comportamento indefinido; Java/Go/Rust: exceção ou recusa de compilar</span></span></li>
+  <li><span class="n leaf">evidência<span class="w">~70% das vulns são de memória</span><small>Miller/Microsoft 19; Chromium 20</small> → roadmaps<small>CISA/NSA 23; ONCD 24</small></span></li>
+  <li><span class="n leaf">exemplo<span class="w">decodificador ISO 8583: memcpy de 600 bytes num buffer de 256 → endereço de retorno sobrescrito</span></span></li>
+</ul></details></li>
+
+<li class="j"><span class="bridge">antes das regras, o que elas pressupõem?</span></li>
+
+<li><details open data-l="1"><summary><span class="n b1">Fundamentos<small>4 premissas</small></span></summary>
+<ul>
+  <li><span class="n base">linguagem define a classe de erro possível<span class="w">escolha de linguagem é decisão de segurança; regra em C reduz frequência, não possibilidade</span></span></li>
+  <li><span class="n base">comportamento indefinido é contrato rompido<span class="w">o compilador assume que não acontece; "passou no teste" não prova nada sem sanitizador</span></span></li>
+  <li><span class="n base">toda entrada é hostil, inclusive a interna<span class="w">parceiro autenticado, arquivo de config, campo de tamanho do pacote</span></span></li>
+  <li><span class="n base">regra verificável vence conselho<span class="w">CERT MEM30-C é checável; "tenha cuidado" não</span></span></li>
+</ul></details></li>
+
+<li class="j"><span class="bridge">a classe que define a disciplina</span></li>
+
+<li><details open data-l="1"><summary><span class="n b1">Erros de memória<small>CWE</small><span class="w">molde: o que é → história → regra CERT → ferramenta → mitigação → em linguagem segura</span></span></summary>
+<ul>
+  <li><details open data-l="2"><summary><span class="n etapa">estouro de buffer<small>CWE-120/121/122</small></span></summary><ul>
+    <li><span class="n leaf">história<span class="w">Morris 88 (gets em fingerd) · Aleph One 96 "Smashing the Stack" · off-by-one · string de formato 134 (%n)</span></span></li>
+    <li><span class="n leaf"><span class="k p">P</span>ARR30-C · STR31-C · FIO47-C<span class="w">comprimento contra o buffer alocado; nunca entrada como formato</span></span></li>
+    <li><span class="n leaf"><span class="k t">T</span>funções proibidas<small>Howard 07</small> · strlcpy/snprintf</span></li>
+    <li><span class="n leaf"><span class="k m">M</span>ASan · fuzz · canários<small>StackGuard 98</small> · NX/DEP<small>04</small> · _FORTIFY_SOURCE</span></li>
+  </ul></details></li>
+  <li><details open data-l="2"><summary><span class="n etapa">leitura fora dos limites<small>CWE-125</small></span></summary><ul>
+    <li><span class="n leaf">Heartbleed 14<span class="w">copiou de volta o tamanho que o cliente declarou → 64 KB de memória, chaves privadas</span></span></li>
+    <li><span class="n leaf">regra<span class="w">comprimento declarado ≤ recebido antes de qualquer cópia</span></span></li>
+  </ul></details></li>
+  <li><details open data-l="2"><summary><span class="n etapa">use-after-free<small>CWE-416 · double free 415</small></span></summary><ul>
+    <li><span class="n leaf">como<span class="w">bloco realocado para outro objeto; vtable controlada → salto controlado; dominante em navegadores</span></span></li>
+    <li><span class="n leaf"><span class="k p">P</span>MEM30-C · MEM31-C<span class="w">um dono, um free; anular após liberar; smart pointers</span></span></li>
+    <li><span class="n leaf"><span class="k m">M</span>ASan com quarentena · PartitionAlloc · MiraclePtr · MTE · Rust: borrow checker recusa</span></li>
+  </ul></details></li>
+  <li><details open data-l="2"><summary><span class="n etapa">estouro de inteiro<small>CWE-190 · 195 sinal · 197 truncar</small></span></summary><ul>
+    <li><span class="n leaf">como<span class="w">n × sizeof dá a volta → malloc pequeno → laço escreve n → heap overflow; -1 vira 4294967295</span></span></li>
+    <li><span class="n leaf"><span class="k p">P</span>INT30/31/32-C<span class="w">verificar antes; __builtin_mul_overflow; size_t</span></span></li>
+    <li><span class="n leaf"><span class="k m">M</span>UBSan · análise de intervalos · no domínio: centavos negativos = fraude por aritmética</span></li>
+  </ul></details></li>
+  <li><details open data-l="2"><summary><span class="n etapa">não inicializada · nulo · corrida<small>457 · 476 · 362/367</small></span></summary><ul>
+    <li><span class="n leaf">EXP33-C · EXP34-C → MSan · inicializar na declaração, checar retorno de malloc</span></li>
+    <li><span class="n leaf">TOCTOU<span class="w">FIO45-C: opere no descritor já aberto, não no nome</span> → TSan</span></li>
+    <li><span class="n leaf"><span class="k x">✗</span>memória segura ≠ concorrência segura<span class="w">Go e Java têm corrida; Rust não (Send/Sync)</span></span></li>
+  </ul></details></li>
+  <li><details open data-l="2"><summary><span class="n base">história: ataque ↔ mitigação</span></summary><ul>
+    <li><span class="n leaf">shellcode na pilha → NX/DEP → return-to-libc<small>97</small> / ROP<small>Shacham 07</small> → ASLR<small>PaX 01</small> + canários → vazamento + ROP → CFI<small>Abadi 05</small> · shadow stack/CET · MTE</span></li>
+    <li><span class="n leaf">cada mitigação eleva o fator de trabalho; nenhuma corrige o bug → resposta estrutural: linguagem segura</span></li>
+  </ul></details></li>
+</ul></details></li>
+
+<li class="j"><span class="bridge">o que o código faz com qualquer entrada, em qualquer linguagem?</span></li>
+
+<li><details open data-l="1"><summary><span class="n b1 surf">8 princípios</span></summary>
+<ul>
+  <li><span class="n leaf"><span class="k p">P</span>validar na borda, por permissão<span class="w">"analise, não valide": tipo que só existe válido</span><small>Howard/LeBlanc 02</small></span></li>
+  <li><span class="n leaf"><span class="k p">P</span>separar dado de instrução<span class="w">printf("%s") · execve · parametrizar</span><small>IEEE CSD 14</small></span></li>
+  <li><span class="n leaf"><span class="k p">P</span>falhar fechado e sem vazar<span class="w">ERR33-C: trate todo retorno; nega, libera, log sem segredo; fail-open é A10 de 2025</span></span></li>
+  <li><span class="n leaf"><span class="k p">P</span>aritmética verificada<small>CERT INT</small></span></li>
+  <li><span class="n leaf"><span class="k p">P</span>posse e tempo de vida explícitos<small>CERT MEM</small></span></li>
+  <li><span class="n leaf"><span class="k p">P</span>menor privilégio no código<span class="w">abre como root, desce antes da 1ª mensagem</span><small>Provos 03</small></span></li>
+  <li><span class="n leaf"><span class="k p">P</span>nenhum segredo no código<span class="w">cofre em runtime; varredura no pipeline</span></span></li>
+  <li><span class="n leaf"><span class="k p">P</span>compilar com tudo ligado<span class="w">-fstack-protector-strong · -D_FORTIFY_SOURCE=2 · -fPIE · -z relro,now · -fcf-protection · -Werror · checksec</span></span></li>
+</ul></details></li>
+
+<li class="j"><span class="bridge">regra dita; método nomeado e ferramenta que cobra</span></li>
+
+<li><details open data-l="1"><summary><span class="n b1 outras">6 técnicas</span></summary>
+<ul>
+  <li><span class="n leaf"><span class="k t">T</span>padrão com regra identificada<small>SEI CERT C 08/16 · MISRA C 2012</small><span class="w">→ SAST com perfil, checklist de revisão</span></span></li>
+  <li><span class="n leaf"><span class="k t">T</span>funções proibidas<small>Howard 07 banned.h</small><span class="w">strcpy strcat sprintf gets não compilam → Anexo K, strlcpy</span></span></li>
+  <li><span class="n leaf"><span class="k t">T</span>sanitizadores em teste<small>Serebryany 12</small><span class="w">ASan UBSan MSan TSan · 2–3× · nunca em produção · falha bloqueia merge</span></span></li>
+  <li><span class="n leaf"><span class="k t">T</span>endurecimento do binário<span class="w">ASLR via PIE · canários · NX · RELRO · CFI/CET · checksec no pipeline</span></span></li>
+  <li><details open data-l="2"><summary><span class="n leaf"><span class="k t">T</span>linguagem segura por padrão<small>CISA/NSA 23</small></span></summary><ul>
+    <li><span class="n leaf">Rust onde C era obrigatório<span class="w">Linux 22; Android: vulns de memória 76% → 24% com código novo</span></span></li>
+    <li><span class="n leaf"><span class="k x">✗</span>não resolve lógica, authz, injeção, segredo, dependência; unsafe e FFI reintroduzem localmente</span></li>
+  </ul></details></li>
+  <li><span class="n leaf"><span class="k t">T</span>revisão orientada a segurança<small>OWASP Code Review Guide 17; Howard/LeBlanc 02</small><span class="w">siga o dado, não a estrutura</span></span></li>
+</ul></details></li>
+
+<li class="j"><span class="bridge">o mesmo sistema, na linha do código</span></li>
+
+<li><details data-l="1"><summary><span class="n b1 ex">exemplo-fio<small>API de pagamentos</small></span></summary>
+<ul>
+  <li><span class="n leaf">decodificador ISO 8583 em C → comprimento vs buffer E vs bytes recebidos → banned.h → flags + checksec → ASan/UBSan → primeiro a migrar para Rust, FFI em 100 linhas</span></li>
+  <li><span class="n leaf">centavos → tipo Centavos + aritmética verificada → estouro vira erro de validação, não transferência negativa</span></li>
+  <li><span class="n leaf">erro → nega, libera, log sem cartão, id de correlação · log → printf("%s") + mascaramento</span></li>
+  <li><span class="n leaf">arquivo → fstat no descritor, O_NOFOLLOW · segredo → cofre + varredura · processo → desce privilégio, seccomp</span></li>
+  <li><span class="n leaf">revisão → template: entradas · usos · funções perigosas · erros · segredos; unsafe é item obrigatório</span></li>
+</ul></details></li>
+
+<li><details data-l="1"><summary><span class="n b1"><span class="k x">✗</span>erros a não cometer</span></summary>
+<ul>
+  <li><span class="n leaf">linguagem segura ≠ segurança · ASLR/DEP ≠ correção · "passou no teste" ≠ sem UB</span></li>
+  <li><span class="n leaf">memória ≠ concorrência · strncpy ≠ seguro · validar ≠ sanitizar</span></li>
+  <li><span class="n leaf">aviso ≠ cosmético · "C com cuidado" contra 70% · sanitizador em produção</span></li>
+</ul></details></li>
+
+</ul></details>
+</li>
+</ul>
+</main>
+
+<script>
+  const root = document.documentElement;
+  let fs = 16;
+  const apply = () => root.style.setProperty("--fs", fs + "px");
+  document.getElementById("in").onclick  = () => { fs = Math.min(24, fs+1); apply(); };
+  document.getElementById("out").onclick = () => { fs = Math.max(11, fs-1); apply(); };
+  document.getElementById("full").onclick = () => {
+    if(!document.fullscreenElement) document.documentElement.requestFullscreen();
+    else document.exitFullscreen();
+  };
+  // níveis: 1 = só espinha (ramos de 1º nível fechados), 2 = até P/T/M, 3 = tudo
+  const setLevel = max => document.querySelectorAll("details").forEach(d => {
+    const l = +d.dataset.l; d.open = l < max;
+  });
+  document.getElementById("l1").onclick = () => setLevel(1);
+  document.getElementById("l2").onclick = () => setLevel(3);
+  document.getElementById("l3").onclick = () => setLevel(9);
+  addEventListener("keydown", e => {
+    if(e.key==="+"||e.key==="=") document.getElementById("in").click();
+    if(e.key==="-") document.getElementById("out").click();
+    if(e.key==="f") document.getElementById("full").click();
+    if(e.key==="1") setLevel(1); if(e.key==="2") setLevel(3); if(e.key==="3") setLevel(9);
+  });
+</script>
+</body>
+</html>
