@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ponto 9 — Segurança de APIs, microsserviços e contêineres</title>
+<style>
+  :root{
+    --bg:#0e1116; --surface:#161b22; --line:#3a4350;
+    --fg:#e6edf3; --dim:#9aa4b0;
+    --root:#58a6ff; --base:#8b949e; --etapa:#3fb950; --surf:#d29922; --outras:#bc8cff; --ex:#f778ba;
+    --p:#79c0ff; --t:#3fb950; --m:#d29922;
+    --fs:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--bg); color:var(--fg);
+    font:var(--fs)/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;}
+
+  header{position:sticky; top:0; z-index:5; background:var(--surface);
+    border-bottom:1px solid var(--line); padding:10px 16px;
+    display:flex; align-items:center; gap:12px; flex-wrap:wrap;}
+  header h1{font-size:1rem; margin:0; font-weight:700}
+  header .hint{color:var(--dim); font-size:.78rem}
+  header .ctr{margin-left:auto; display:flex; gap:6px; flex-wrap:wrap}
+  button{border:1px solid var(--line); background:#21262d; color:var(--fg);
+    border-radius:8px; padding:6px 10px; font-weight:600; cursor:pointer; font-size:.85rem}
+  button:hover{border-color:var(--root)}
+
+  main{max-width:980px; margin:0 auto; padding:18px 16px 90px}
+  .spine{color:var(--dim); font-size:.88rem; margin:0 0 14px; padding:8px 12px;
+    border:1px dashed var(--line); border-radius:10px}
+  .spine b{color:var(--root)}
+
+  /* ---------- árvore ---------- */
+  .tree, .tree ul{list-style:none; margin:0; padding:0}
+  .tree ul{margin-left:14px; padding-left:18px; border-left:2px solid var(--line)}
+  .tree li{position:relative; margin:4px 0; padding-left:6px}
+  .tree li::before{content:""; position:absolute; left:-18px; top:.85em; width:16px; height:2px; background:var(--line)}
+  .tree > li::before{display:none}
+
+  details{margin:0}
+  summary{cursor:pointer; list-style:none; display:inline-block}
+  summary::-webkit-details-marker{display:none}
+  summary::before{content:"▸"; display:inline-block; width:1em; color:var(--dim); transition:transform .15s}
+  details[open] > summary::before{transform:rotate(90deg)}
+
+  .n{display:inline-block; padding:3px 9px; border-radius:8px; background:var(--surface);
+    border:1px solid var(--line); border-left-width:4px; font-weight:600}
+  .n small{font-weight:500; color:var(--dim); margin-left:6px; font-size:.8em}
+  .n .w{font-weight:400; color:var(--dim)}
+  .n .w::before{content:" — "}
+
+  .n.root{border-left-color:var(--root); color:var(--root); font-size:1.15em; font-weight:800}
+  .n.b1{border-left-color:var(--root); font-size:1.05em; font-weight:800}
+  .n.base{border-left-color:var(--base)}
+  .n.etapa{border-left-color:var(--etapa); font-weight:800}
+  .n.surf{border-left-color:var(--surf); color:var(--surf); font-weight:800}
+  .n.outras{border-left-color:var(--outras); color:var(--outras); font-weight:800}
+  .n.ex{border-left-color:var(--ex); color:var(--ex); font-weight:800}
+  .n.leaf{background:transparent; border-color:transparent; padding-left:0; font-weight:500}
+  .n.leaf small{margin-left:4px}
+
+  /* rótulos P / T / M / saída */
+  .k{display:inline-block; min-width:1.5em; text-align:center; font-weight:800; font-size:.78em;
+    border-radius:5px; padding:1px 4px; margin-right:6px; vertical-align:1px}
+  .k.p{background:#1b2a3d; color:var(--p)} .k.t{background:#1f3b2a; color:var(--t)}
+  .k.m{background:#2a2f1f; color:var(--m)} .k.o{background:#2b2231; color:var(--ex)}
+  .k.x{background:#3a2626; color:#ff7b72}
+
+  /* junta (ponte) */
+  li.j{list-style:none}
+  li.j::before{display:none}
+  .bridge{display:inline-block; color:var(--dim); font-style:italic; font-size:.9em; padding:2px 6px}
+  .bridge::before{content:"⟪ "} .bridge::after{content:" ⟫"}
+
+  /* grade STRIDE × elemento */
+  .grid{display:inline-grid; grid-template-columns:auto repeat(6,1.7em); gap:3px; margin:4px 0 2px 1.6em; font-size:.82rem; text-align:center}
+  .grid div{padding:2px 1px; border-radius:4px; background:#21262d}
+  .grid .h{font-weight:800; color:var(--dim)}
+  .grid .r{text-align:left; padding:2px 8px 2px 4px; font-weight:600}
+  .grid .y{background:#1f3b2a; color:var(--t); font-weight:800}
+  .grid .mm{background:#2a2f1f; color:var(--m); font-size:.7rem; font-weight:700}
+
+  @media (max-width:520px){ .tree ul{margin-left:6px; padding-left:12px} .tree li::before{left:-12px; width:10px} .n .w{display:block; margin-top:2px} .n .w::before{content:""} }
+</style>
+</head>
+<body>
+<header>
+  <h1>Ponto 9 — Segurança de APIs, microsserviços e contêineres <span class="hint">· árvore de conceitos</span></h1>
+  <span class="hint">clique num nó para abrir/fechar · <b style="color:var(--p)">P</b> princípio · <b style="color:var(--t)">T</b> técnica · <b style="color:var(--m)">M</b> mecanismo · <b style="color:var(--ex)">→</b> saída</span>
+  <div class="ctr">
+    <button id="l1">só espinha</button>
+    <button id="l2">até P/T/M</button>
+    <button id="l3">tudo</button>
+    <button id="out">A−</button>
+    <button id="in">A+</button>
+    <button id="full">⛶</button>
+  </div>
+</header>
+
+<main>
+<p class="spine">espinha: <b>o sistema virou muitos → 4 fundamentos → 3 anéis → APIs (Top 10 2023) → microsserviços → contêineres e orquestração → exemplo → erros</b></p>
+
+<ul class="tree">
+<li>
+<details open data-l="0"><summary><span class="n root">Segurança de APIs, microsserviços e contêineres<span class="w">os mesmos princípios, com a fronteira multiplicada</span></span></summary>
+<ul>
+
+<li><details open data-l="1"><summary><span class="n b1">O que mudou quando o sistema virou muitos</span></summary>
+<ul>
+  <li><span class="n leaf">a fronteira se multiplicou<span class="w">toda chamada entre serviços é fronteira; o interior confiável acabou</span></span></li>
+  <li><span class="n leaf">o contrato é a superfície<span class="w">cada operação do OpenAPI é ponto de entrada, sem a tela que limitava</span></span></li>
+  <li><span class="n leaf">o contêiner é processo, não máquina<span class="w">núcleo compartilhado; runc 2019 = escape</span></span></li>
+  <li><span class="n leaf">a plataforma é código<span class="w">manifesto é superfície e é testável</span></span></li>
+</ul></details></li>
+
+<li class="j"><span class="bridge">antes das três partes, o que elas pressupõem</span></li>
+
+<li><details open data-l="1"><summary><span class="n b1">Fundamentos<small>4 premissas</small></span></summary>
+<ul>
+  <li><span class="n base">toda chamada cruza fronteira<small>BeyondProd 19; NIST 800-204</small><span class="w">identidade de carga · mTLS · authz por chamada</span></span></li>
+  <li><span class="n base">o contrato é a superfície<span class="w">o que não está não responde; esquema; authz por objeto e propriedade</span></span></li>
+  <li><span class="n base">contêiner = isolamento parcial<small>NIST 800-190</small><span class="w">namespaces · cgroups · 14 capabilities padrão · seccomp ~44 bloqueadas · núcleo compartilhado</span></span></li>
+  <li><span class="n base">plataforma é código<span class="w">Pod Security Standards · admissão · varredura de manifesto</span></span></li>
+</ul></details></li>
+
+<li class="j"><span class="bridge">três anéis</span></li>
+
+<li><details open data-l="1"><summary><span class="n b1">Três anéis</span></summary>
+<ul>
+  <li><span class="n leaf">borda<span class="w">gateway como PEP: TLS · authn · rate limit · esquema</span> → malha<span class="w">mTLS · identidade · authz por chamada</span> → pod<span class="w">sem root · sem capabilities · rootfs ro · seccomp · limites</span></span></li>
+  <li><span class="n leaf">política como código atravessa os três · identidade de carga (SPIFFE) alimenta a malha</span></li>
+</ul></details></li>
+
+<li><details open data-l="1"><summary><span class="n etapa">APIs<small>OWASP API Security Top 10, 2023</small></span></summary>
+<ul>
+  <li><span class="n leaf">a lista<span class="w">1 BOLA · 2 authn · 3 propriedade · 4 consumo · 5 BFLA · 6 fluxos · 7 SSRF · 8 config · 9 inventário · 10 consumo de APIs — 6 de 10 são fronteira e contrato</span></span></li>
+  <li><span class="n leaf"><span class="k p">P</span>contrato é a verdade · validar na borda, autorizar no serviço · listas de permissão · todo recurso tem limite · resposta de terceiro é hostil · versão tem fim</span></li>
+  <li><details open data-l="2"><summary><span class="n base">técnicas e mecanismos</span></summary><ul>
+    <li><span class="n leaf"><span class="k t">T</span>gateway = Single Access Point<span class="w">TLS · token (iss aud exp escopo) · rate limit · esquema · só catálogo · não faz objeto</span><small>Envoy, Kong</small></span></li>
+    <li><span class="n leaf"><span class="k m">M</span>esquema OpenAPI → 400 na borda · GraphQL: profundidade, custo, introspecção off, persisted queries</span></li>
+    <li><span class="n leaf"><span class="k m">M</span>token bucket · cota · tamanho · paginação · timeout · serializador por operação · HMAC + timestamp + id em webhook · idempotência · catálogo gerado do implantado</span></li>
+    <li><span class="n leaf">credencial por cliente<span class="w">usuário → código + PKCE · parceiro → client credentials + mTLS · interno → SVID · chave de API só residual · escopos por operação · GraphQL @auth por campo</span></span></li>
+  </ul></details></li>
+  <li><span class="n leaf">incidentes<span class="w">Capital One 19 (SSRF + IMDSv1 + IAM excessivo) · Tesla 18 (painel k8s sem authn) · Optus 22 / Peloton 21 (endpoint sem authn/BOLA + inventário)</span></span></li>
+</ul></details></li>
+
+<li class="j"><span class="bridge">dentro do cluster, cada conversa é uma fronteira</span></li>
+
+<li><details open data-l="1"><summary><span class="n etapa">Microsserviços<small>NIST 800-204; Newman 21</small></span></summary>
+<ul>
+  <li><span class="n leaf"><span class="k p">P</span>identidade de carga, não de rede · authn mútua em toda chamada · authz por política · segredo por identidade curto · rede nega por padrão · dado tem dono · falha contida</span></li>
+  <li><details open data-l="2"><summary><span class="n base">técnicas e mecanismos</span></summary><ul>
+    <li><span class="n leaf"><span class="k t">T</span>SPIFFE/SPIRE<span class="w">SVID X.509/JWT curto, rotacionado, atestado pelo nó/namespace/SA</span></span></li>
+    <li><span class="n leaf"><span class="k t">T</span>malha de serviços<small>800-204A/B</small><span class="w">proxy ao lado: mTLS automático · AuthorizationPolicy · telemetria; não faz objeto</span><small>Istio, Linkerd</small></span></li>
+    <li><span class="n leaf">sujeito original<span class="w">token exchange (RFC 8693) ou afirmação assinada</span> · <span class="k x">✗</span>X-User-Id em claro = deputado confuso</span></li>
+    <li><span class="n leaf"><span class="k m">M</span>Vault/KMS por identidade, credencial dinâmica de 1 h · NetworkPolicy deny-all · egress por proxy · esquema + ACL em fila · id de correlação</span></li>
+  </ul></details></li>
+  <li><span class="n leaf">serverless<span class="w">privilégio por função · evento é entrada hostil · dependências pesam · efêmero ≠ seguro</span><small>OWASP Serverless Top 10 17</small></span></li>
+  <li><span class="n leaf">multi-tenancy<span class="w">tenant do token · filtro na camada de dados · RLS · cache prefixado · namespace/node pool/gVisor quando o tenant executa código · tenant no log</span></span></li>
+</ul></details></li>
+
+<li class="j"><span class="bridge">o contêiner é a última fronteira</span></li>
+
+<li><details open data-l="1"><summary><span class="n etapa">Contêineres e orquestração<small>NIST 800-190; NSA/CISA 22; CIS</small></span></summary>
+<ul>
+  <li><span class="n leaf"><span class="k p">P</span>processo, não máquina · sem root · drop ALL · rootfs só-leitura · seccomp/AppArmor · nada do nó · limites</span></li>
+  <li><details open data-l="2"><summary><span class="n base">técnicas e mecanismos</span></summary><ul>
+    <li><span class="n leaf"><span class="k t">T</span>Pod Security Standards<span class="w">privileged · baseline · restricted (runAsNonRoot, no escalation, drop ALL, seccomp RuntimeDefault); PSA enforce/audit/warn</span></span></li>
+    <li><span class="n leaf"><span class="k t">T</span>admissão por política<small>Kyverno, Gatekeeper</small><span class="w">registro aprovado · digest · assinatura + proveniência · limites · NetworkPolicy obrigatória</span></span></li>
+    <li><span class="n leaf"><span class="k m">M</span>RBAC mínimo · cluster-admin só pessoas com MFA · automount false · tokens vinculados · <span class="k x">✗</span>SA que cria pods = escalada</span></li>
+    <li><span class="n leaf"><span class="k m">M</span>API server privado · etcd TLS + cifrado · kubelet autenticado · nó mínimo (Bottlerocket) · kube-bench</span></li>
+    <li><span class="n leaf"><span class="k t">T</span>runtimes isolados<span class="w">gVisor 18 · Kata · Firecracker 20</span> · <span class="k t">T</span>Falco<small>Sysdig 16</small><span class="w">shell em prod, escrita em /etc, conexão inesperada</span></span></li>
+    <li><span class="n leaf">audit log do API server<span class="w">metadados de tudo, corpo do sensível, para fora do cluster, alertas</span></span></li>
+  </ul></details></li>
+  <li><span class="n leaf">5 áreas NSA/CISA<span class="w">pods · rede · authn/authz · registro e detecção · atualização e verificação</span></span></li>
+  <li><span class="n leaf">escape concreto<span class="w">CVE-2019-5736 runc: root dentro sobrescreve o binário no nó → sem root + no-new-privileges + seccomp + atualizar</span></span></li>
+</ul></details></li>
+
+<li class="j"><span class="bridge">o mesmo sistema, em produção</span></li>
+
+<li><details data-l="1"><summary><span class="n b1 ex">exemplo-fio<small>API de pagamentos no cluster</small></span></summary>
+<ul>
+  <li><span class="n leaf">borda → Envoy TLS 1.2+ · token completo · 100/min e 10/min · OpenAPI do código · só catálogo · WAF atrás · GraphQL profundidade 6 + custo + persisted</span></li>
+  <li><span class="n leaf">authz → gateway decide escopo · serviço decide objeto (middleware + Cedar) · resposta de 3 campos</span></li>
+  <li><span class="n leaf">serviços → Istio STRICT · SPIFFE por SA · AuthorizationPolicy mínima · token exchange · Vault dinâmico 1 h · NetworkPolicy deny · egress só webhooks · Avro + ACL</span></li>
+  <li><span class="n leaf">webhooks → HMAC-SHA256 · janela 5 min · dedup · esquema</span></li>
+  <li><span class="n leaf">pods → distroless por digest assinado · PSA restricted · decodificador em C no gVisor · automount false · SA sem criar pods</span></li>
+  <li><span class="n leaf">cluster → Kyverno (assinatura + SLSA L3 + limites) · API privado · etcd cifrado · Bottlerocket · kube-bench · 3 admins FIDO2 · Falco → ponto 10</span></li>
+  <li><span class="n leaf">resultado<span class="w">notificações comprometido: só GET contato · não lê segredo · não escapa · não cria pod · não sai · Falco vê o shell</span></span></li>
+</ul></details></li>
+
+<li><details data-l="1"><summary><span class="n b1"><span class="k x">✗</span>erros a não cometer</span></summary>
+<ul>
+  <li><span class="n leaf">contêiner ≠ VM · mTLS ≠ authz · gateway ≠ proteção total (BOLA passa)</span></li>
+  <li><span class="n leaf">rede interna ≠ confiável · GraphQL um endpoint ≠ menos superfície · imagem limpa ≠ pod seguro</span></li>
+  <li><span class="n leaf">segredo em env · RBAC do k8s ≠ authz da app · micro ≠ mais seguro por ser pequeno</span></li>
+</ul></details></li>
+
+</ul></details>
+</li>
+</ul>
+</main>
+
+<script>
+  const root = document.documentElement;
+  let fs = 16;
+  const apply = () => root.style.setProperty("--fs", fs + "px");
+  document.getElementById("in").onclick  = () => { fs = Math.min(24, fs+1); apply(); };
+  document.getElementById("out").onclick = () => { fs = Math.max(11, fs-1); apply(); };
+  document.getElementById("full").onclick = () => {
+    if(!document.fullscreenElement) document.documentElement.requestFullscreen();
+    else document.exitFullscreen();
+  };
+  // níveis: 1 = só espinha (ramos de 1º nível fechados), 2 = até P/T/M, 3 = tudo
+  const setLevel = max => document.querySelectorAll("details").forEach(d => {
+    const l = +d.dataset.l; d.open = l < max;
+  });
+  document.getElementById("l1").onclick = () => setLevel(1);
+  document.getElementById("l2").onclick = () => setLevel(3);
+  document.getElementById("l3").onclick = () => setLevel(9);
+  addEventListener("keydown", e => {
+    if(e.key==="+"||e.key==="=") document.getElementById("in").click();
+    if(e.key==="-") document.getElementById("out").click();
+    if(e.key==="f") document.getElementById("full").click();
+    if(e.key==="1") setLevel(1); if(e.key==="2") setLevel(3); if(e.key==="3") setLevel(9);
+  });
+</script>
+</body>
+</html>
