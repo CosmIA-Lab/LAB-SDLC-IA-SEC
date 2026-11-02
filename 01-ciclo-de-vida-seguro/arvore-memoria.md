@@ -83,3 +83,28 @@ Espinha mínima:
 
 Molde repetido de cada fase (decore uma vez, aplique cinco):
 **objetivo → princípios → técnicas → saída**.
+
+---
+
+Ramos acrescentados em 02/11 (seções novas do README):
+
+```
+MODELOS NOMEADOS — natureza distinta
+    SDL (Howard/Lipner 06)  prescrição: fases + atividades obrigatórias · bug bar · Final Security Review · SD3+C
+    Touchpoints (McGraw 06) por artefato: revisão de código · análise de risco de arquitetura · intrusão · testes por risco · casos de abuso · requisitos · operações
+    SAMM (OWASP 09; v2 20)  maturidade: 5 funções · 15 práticas · 3 níveis
+    BSIMM (09)              observação: ~120 atividades · 12 práticas · 4 domínios — "o que os outros fazem"
+    SSDF (NIST 800-218, 22) resultado: PO · PS · PW · RV — alvo comum; autoatestação CISA 23
+    → SDL/SSDF dizem o quê · SAMM mede · BSIMM compara · Touchpoints organiza por artefato
+
+MEDIR — DORA (Forsgren/Humble/Kim 18): lead time · frequência · MTTR · taxa de falha
+         segurança: tempo de correção por severidade · taxa de escape · cobertura dos gates · cobertura de modelagem · dívida · tempo de atualização de dependência
+         ✗ nº de achados · nº de ferramentas · horas de treinamento
+GATES   bloqueia o NOVO e GRAVE · linha de base vira dívida com dono · exceção com prazo · política como código · reporta no PR
+CULTURA 3 vias (Kim 16): fluxo · retorno · aprendizado · campeões · responsabilidade compartilhada · treinamento por achado real · "sim com condições" (Janca 20)
+EXTERNO EO 14028 (21) · CRA (24: 24 h p/ vuln explorada) · PCI DSS 4.0 req 6 · ISO 27001 A.8.25/A.8.28 · NIST CSF 2.0 Govern → evidência, não só execução
+DEZ PONTOS = UM CICLO  requisitos (2) → design (3) → código (4, 5, 6) → testes (7) → build/entrega (8) → operação (9) → manutenção (10) → requisito do próximo (1)
+MÍNIMO VIÁVEL (time de 5) 1 h de modelagem por fronteira nova · lockfile+SCA+segredos dia 1 · SAST diferencial · revisão por roteiro · framework atual · campeão 10% · security.txt
+ERROS   DevSecOps ≠ scanners · shift-left ≠ dispensa direita · SDL ≠ só Microsoft · segurança ≠ fase · conformidade ≠ seguro · gate total ≠ gate · pushing left = estratégia, não técnica · SAMM ≠ BSIMM ≠ SSDF
+```
+

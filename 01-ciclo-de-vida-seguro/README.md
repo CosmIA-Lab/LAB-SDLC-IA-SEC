@@ -421,6 +421,22 @@ Não está no ciclo clássico de cinco fases; vem do Microsoft SDL e do NIST SSD
 
 ---
 
+### Os modelos nomeados de ciclo de vida seguro
+
+O ciclo descrito acima tem várias formulações com nome, autor e ano. Conhecê-las pelo que cada uma é — prescrição, medição ou descrição — é o que distingue a dissertação da resenha.
+
+**Microsoft SDL (Howard e Lipner, 2006).** O primeiro ciclo de vida seguro de uma grande empresa, nascido do memorando *Trustworthy Computing* de Bill Gates (2002) depois dos vermes Code Red e Nimda. Prescritivo: fases com atividades obrigatórias — treinamento, requisitos de segurança e *bug bar*, modelagem de ameaças no design, funções proibidas e análise estática no código, fuzzing e revisão de superfície nos testes, plano de resposta a incidentes antes do lançamento, e a *Final Security Review* como gate. O princípio SD3+C (seguro por design, por padrão, no deploy, e comunicação) é dele. A Microsoft mediu queda na contagem de vulnerabilidades por versão depois da adoção; o SDL virou o molde dos demais.
+
+**Touchpoints (McGraw, 2006).** Em *Software Security: Building Security In*, sete pontos de contato aplicados aos artefatos do desenvolvimento, em ordem de eficácia: revisão de código com ferramenta, análise de risco de arquitetura, testes de intrusão, testes de segurança baseados em risco, casos de abuso, requisitos de segurança, e operações de segurança. É o ciclo visto pelos artefatos (código, arquitetura, testes), não pelas fases — e a origem da tese de que metade dos defeitos é de design (ponto 3).
+
+**OWASP CLASP (2006) e OWASP SAMM (2009; versão 2 em 2020).** O CLASP foi a primeira tentativa aberta de catálogo de atividades; o SAMM (*Software Assurance Maturity Model*) o substituiu como modelo de maturidade: cinco funções de negócio (governança, design, implementação, verificação, operações), três práticas por função, quinze no total, cada uma em três níveis de maturidade, com avaliação por questionário. Não prescreve o que fazer; mede onde a organização está e oferece um caminho. É a ferramenta para dizer "estamos no nível 1 em modelagem de ameaças e queremos o 2 em um ano".
+
+**BSIMM (McGraw, Migues e West, desde 2009).** O *Building Security In Maturity Model* é descritivo: observa o que dezenas de organizações com programas de segurança de software de fato fazem e cataloga as atividades (cerca de 120, em 12 práticas e 4 domínios — governança, inteligência, pontos de contato do SDLC, implantação), com a frequência de cada uma. Não diz o que se deve fazer; diz o que os outros fazem, e com que frequência. Serve para comparação; campeões de segurança, inventário de aplicações e treinamento por função aparecem entre as atividades mais comuns.
+
+**NIST SSDF (SP 800-218, 2022).** Produzido por ordem do decreto executivo 14028 (2021), o *Secure Software Development Framework* é a lista de resultados esperados de quem produz software, em quatro grupos: preparar a organização (PO), proteger o software (PS), produzir software bem protegido (PW) e responder a vulnerabilidades (RV). Não escolhe ferramenta nem processo; cada prática referencia como SDL, SAMM, BSIMM e OWASP a atendem. Virou exigência contratual do governo americano por autoatestação (2023) e a referência comum a que os demais modelos se mapeiam.
+
+**Como se relacionam.** SDL e SSDF dizem o que fazer (prescrição e resultado); SAMM mede e planeja (maturidade); BSIMM compara (observação); Touchpoints organiza por artefato. Uma organização típica adota o SSDF como alvo, mede-se com o SAMM, compara-se com o BSIMM e executa atividades que vêm do SDL. Janca (2020), que fundamenta este laboratório, está na linhagem do SDL com a ênfase em *pushing left* e em cultura. A dissertação que cita os cinco e os distingue pela natureza mostra domínio; a que os lista como sinônimos, não.
+
 ## 5. Atividades de segurança por fase (Figura 7-1)
 
 O ciclo inteiro em uma tabela: o mapa de onde cada atividade entra.
@@ -537,6 +553,18 @@ WAF filtra requisição antes de chegar na aplicação. RASP protege de dentro d
 
 ---
 
+### Medir o programa — métricas de DevSecOps
+
+DevSecOps herda do DevOps a obsessão por medir. Forsgren, Humble e Kim (2018), em *Accelerate*, estabeleceram as quatro métricas de entrega (DORA): tempo de entrega de uma mudança, frequência de implantação, tempo de restauração após falha e taxa de falha de mudanças. A segurança entra nelas de dois jeitos: um controle que destrói a frequência de implantação será contornado; e a pesquisa mostrou que organizações de alto desempenho integram segurança no fluxo e gastam metade do tempo em retrabalho de segurança. As métricas próprias de segurança no pipeline: **tempo de correção por severidade** (do achado à correção verificada, em dias); **taxa de escape** (vulnerabilidades encontradas em produção que o pipeline deveria ter pegado); **cobertura dos gates** (fração de repositórios e pipelines com SAST, SCA e varredura de segredos ativos — a primeira a medir, porque gate que não roda não existe); **cobertura de modelagem** (fração de funcionalidades novas com modelo de ameaças revisado); **dívida de segurança** (achados aceitos e idade deles); **tempo de atualização de dependência** (dias entre a publicação da versão corrigida e a adoção). O que não medir como sucesso: número de achados (cresce quando se liga ferramenta nova), número de ferramentas, horas de treinamento.
+
+### Gates que funcionam — proporcionais, com exceção e com dono
+
+O gate é o ponto em que o pipeline recusa seguir. A regra que faz um gate sobreviver: **bloqueia o novo e grave; registra o resto**. Bloquear tudo que a ferramenta aponta, no primeiro dia, para o pipeline inteiro — o time desliga o gate na primeira entrega urgente, e o desliga para sempre. A alternativa: linha de base dos achados existentes vira dívida com dono e prazo; o gate bloqueia só achado novo acima da severidade combinada; exceção tem motivo, dono, prazo e fica visível. Política como código (OPA, Conftest) torna a regra do gate versionada, revisável e igual para todos os repositórios. E o gate reporta onde o desenvolvedor está — comentário no *pull request*, aviso na IDE — não em relatório que ninguém abre. Shift-left é isso: a regra encontra o erro no lugar e na hora em que custa menos corrigir.
+
+### Cultura — a parte do DevSecOps que não é ferramenta
+
+Kim, Humble, Debois e Willis (*The DevOps Handbook*, 2016) descrevem as "três vias": fluxo (do desenvolvimento à operação sem fila), retorno (informação de produção voltando rápido) e aprendizado contínuo (experimentar sem medo). DevSecOps é segurança aplicada às três: o controle não pode travar o fluxo; o incidente e o achado de produção voltam ao desenvolvimento como requisito; e o erro é analisado sem culpa (*blameless postmortem*) para virar regra, não punição. As práticas culturais que os modelos de maturidade mais observam: **campeões de segurança** (um por time, com tempo reservado, treinado, ponte com o time central); **segurança como responsabilidade compartilhada** (o time que constrói é dono da segurança do que constrói; o time central dá ferramenta, padrão e revisão); **treinamento ancorado em achado real** do próprio código, não em lista genérica; **segurança que diz sim com condições** em vez de não — Janca (2020) insiste: o time de segurança que só bloqueia é contornado; o que oferece o caminho seguro é procurado. O erro mais caro do DevSecOps é comprar as ferramentas e pular esta seção.
+
 ## 10. SDLC seguro vs DevSecOps
 
 ### SDLC seguro
@@ -559,6 +587,32 @@ Um não substitui o outro: o DevSecOps é a forma de executar o SDLC seguro em e
 
 ---
 
+### Os dez pontos como um só ciclo
+
+O ciclo de vida seguro é a moldura dos outros nove pontos deste laboratório, e a dissertação ganha se mostrar o encaixe. **Requisitos**: a modelagem de ameaças (ponto 2) produz os requisitos negativos — o que o sistema não pode permitir — e a análise de superfície decide o tamanho do problema. **Design**: os princípios de arquitetura (ponto 3) dizem que forma o sistema deve ter para satisfazer esses requisitos; a revisão contra as dez falhas de design é o gate da fase. **Código**: as vulnerabilidades web (ponto 4) e os erros de memória (ponto 5) são o que acontece quando o código trai o design; padrões de codificação, funções proibidas e sanitizadores são os controles da fase; autenticação, autorização e sessão (ponto 6) são o recorte do código que mais erra. **Testes**: SAST, DAST, SCA e fuzzing (ponto 7) provam, cada um por sua janela, que os requisitos negativos foram atendidos; a rastreabilidade ameaça → requisito → controle → teste fecha aqui. **Build e entrega**: a cadeia de suprimentos (ponto 8) garante que o artefato que vai a produção é o que foi revisado e testado, com proveniência e assinatura. **Deploy e operação**: APIs, microsserviços e contêineres (ponto 9) são o ambiente em que o artefato roda, com suas fronteiras multiplicadas. **Manutenção**: a gestão de vulnerabilidades (ponto 10) governa o tempo entre a falha aparecer e ser corrigida, e devolve a lição ao início — o incidente é o requisito do próximo ciclo. Lido assim, o laboratório inteiro é um ciclo de vida seguro desdobrado; cada ponto é a atividade de uma fase, com seus princípios, técnicas e mecanismos.
+
+### O mínimo viável para um time pequeno
+
+Nem toda organização tem time de segurança. O ciclo de vida seguro de um time de cinco pessoas, sem especialista, cabe em sete práticas que custam pouco e cobrem a maior parte do risco: (1) uma hora de modelagem de ameaças por funcionalidade que cruza fronteira nova, com o jogo de cartas ou o DFD no quadro; (2) *lockfile*, SCA e varredura de segredos no pipeline, ligados no primeiro dia, bloqueando só o crítico novo; (3) SAST diferencial no *pull request* com regras ajustadas em duas semanas; (4) revisão de código com roteiro de segurança para o que toca entrada externa, autenticação e autorização; (5) *framework* mantido, na versão atual, com atualização automatizada de dependências; (6) um campeão de segurança com 10% do tempo e um canal com um especialista externo quando preciso; (7) `security.txt`, política de divulgação e o hábito de corrigir vulnerabilidade reportada em dias. É o SSDF em escala pequena, e é mais do que a maioria das organizações faz.
+
+### Exigências externas que moldam o ciclo
+
+O ciclo de vida seguro deixou de ser escolha interna. O **decreto executivo americano 14028** (2021) exigiu de fornecedores do governo práticas de desenvolvimento seguro, SBOM e autoatestação (formulário da CISA, 2023) contra o SSDF. A **Cyber Resilience Act** europeia (2024) obriga fabricantes de produtos com elementos digitais a segurança por design e por padrão, tratamento de vulnerabilidades, SBOM e notificação de vulnerabilidades exploradas em 24 horas — ao longo de todo o ciclo de vida do produto, com multas. O **PCI DSS 4.0** (2022), requisito 6, exige ciclo de desenvolvimento seguro documentado, treinamento, revisão de código e gestão de vulnerabilidades para quem trata dados de cartão. A **ISO/IEC 27001:2022** (controle A.8.25, *secure development life cycle*, e A.8.28, *secure coding*) exige regras de desenvolvimento seguro estabelecidas e aplicadas. O **NIST CSF 2.0** (2024) acrescentou a função *Govern* e aponta o SSDF para a cadeia de suprimentos de software. O efeito prático: o programa precisa produzir evidência — política escrita, registro de atividades por fase, SBOM, métricas — e não só executar. O que este laboratório chama de rastreabilidade (ativo → requisito → controle → teste) é também o que o auditor pede.
+
+### Erros frequentes — o que não confundir
+
+| Confusão | Por que está errado | Como dizer certo |
+|---|---|---|
+| "DevSecOps é colocar scanners no pipeline" | ferramenta sem cultura, gate proporcional e retorno ao desenvolvimento é ruído automatizado | "ferramentas no fluxo, segurança como responsabilidade compartilhada, retorno de produção" |
+| "Shift-left dispensa o lado direito" | o que não se pode saber antes de produção (configuração real, comportamento, ataque) só se vê à direita | "pushing left para o que é decidível antes; shift-right para o que só produção mostra" |
+| "SDL é coisa da Microsoft" | o SDL é o molde do SSDF, do SAMM e da CRA; as atividades são universais | "SDL como origem; SSDF como referência atual" |
+| "Segurança é uma fase" | a fase de testes não corrige falha de design; cada fase tem sua atividade | "atividade de segurança em toda fase, com gate entre fases" |
+| "Conformidade com a norma = seguro" | normas são piso e evidência; o atacante não lê a norma | "norma como piso; modelo de ameaças como teto" |
+| "Gate bloqueia tudo que a ferramenta aponta" | é desligado na primeira urgência | "bloqueia novo e grave; o resto é dívida com dono" |
+| "Treinamento anual de OWASP Top 10 resolve" | não muda linha de código; treinamento com o achado do próprio repositório muda | "treinamento ancorado em achado real" |
+| "Pushing left é uma técnica" | é estratégia (decisão sobre onde investir); as técnicas são as de cada fase | "estratégia que organiza as técnicas" |
+| "SAMM, BSIMM e SSDF são sinônimos" | maturidade, observação e prescrição são naturezas distintas | "SSDF diz o que; SAMM mede; BSIMM compara" |
+
 ## 11. Síntese
 
 | Fase / Conceito | Objetivo | Princípio | Técnica |
@@ -577,6 +631,14 @@ Um não substitui o outro: o DevSecOps é a forma de executar o SDLC seguro em e
 ---
 
 ## Referências
+- **Howard, Michael; Lipner, Steve. *The Security Development Lifecycle*. Microsoft Press, 2006** — o SDL: fases, atividades obrigatórias, bug bar, Final Security Review, SD3+C
+- **McGraw, Gary. *Software Security: Building Security In*. Addison-Wesley, 2006** — os sete touchpoints por artefato
+- **OWASP. *Software Assurance Maturity Model (SAMM)* v2, 2020** — cinco funções, quinze práticas, três níveis de maturidade
+- **McGraw, Gary; Migues, Sammy; West, Jacob. *Building Security In Maturity Model (BSIMM)*, desde 2009** — modelo descritivo de atividades observadas
+- **NIST SP 800-218. *Secure Software Development Framework (SSDF)* v1.1, 2022; CISA. *Secure Software Development Attestation Form*, 2023**
+- **Forsgren, Nicole; Humble, Jez; Kim, Gene. *Accelerate*. IT Revolution, 2018** — as quatro métricas DORA e a relação entre desempenho de entrega e segurança integrada
+- **Kim, Gene; Humble, Jez; Debois, Patrick; Willis, John. *The DevOps Handbook*. IT Revolution, 2016** — as três vias; segurança no fluxo
+- **Executive Order 14028 (2021); União Europeia, *Cyber Resilience Act* (2024); PCI DSS v4.0 requisito 6 (2022); ISO/IEC 27001:2022 controles A.8.25 e A.8.28; NIST *Cybersecurity Framework* 2.0 (2024)** — exigências externas sobre o ciclo
 
 - **Janca, Tanya. *Alice and Bob Learn Application Security*. Wiley, 2020** — referência principal. Figura I-1 (o SDLC e suas cinco fases), Figura 7-1 (atividades de segurança por fase). Por fase: Requisitos — cap. 2; Design — cap. 3; Código — cap. 4 e 5; Testes — cap. 6; Deploy e manutenção — cap. 6 e 9 (Figura 7-1). Também: cap. 1 (conceitos de base), cap. 7 (programa de AppSec)
 - Microsoft SDL — learn.microsoft.com (procure "Security Development Lifecycle")
