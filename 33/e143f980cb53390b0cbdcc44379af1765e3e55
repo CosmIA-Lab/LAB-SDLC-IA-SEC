@@ -1,0 +1,25 @@
+09-seguranca-de-apis/README.md
+  s_7cc7673de0adc8::t_88927ba7457f23 3,5-138,155-191,196-233,246-318
+  s_7cc7673de0adc8::t_3500a643951faf 139-154,192-195,234,239-245,319-324
+  s_7cc7673de0adc8::t_28b6aa7ccac188 235-238
+09-seguranca-de-apis/arvore-memoria.md
+  s_7cc7673de0adc8::t_28b6aa7ccac188 1-93
+09-seguranca-de-apis/arvore.html
+  s_7cc7673de0adc8::t_28b6aa7ccac188 1-231
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "33e143f980cb53390b0cbdcc44379af1765e3e55",
+  "prompts": {},
+  "sessions": {
+    "s_7cc7673de0adc8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9ffe1f51-e813-456c-ad90-77b82c1de23c",
+        "model": "unknown"
+      },
+      "human_author": "alan <nascimentoalankst@gmail.com>"
+    }
+  }
+}
