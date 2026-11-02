@@ -67,8 +67,8 @@ Para cada ponto, o par que mais cai: a âncora nomeada (com fonte) e o mecanismo
 | 2. Modelagem de ameaças | quatro perguntas (Shostack, 2014) com STRIDE (Kohnfelder e Garg, 1999); attack tree (Schneier, 1999); superfície (Manadhata e Wing, 2011) | DFD com fronteiras + Threat Dragon / Threat Modeling Tool |
 | 3. Arquitetura segura | Saltzer e Schroeder, 1975 (8 princípios); monitor de referência (Anderson, 1972); arquitetura zero trust (NIST SP 800-207, 2020); revisão contra 10 flaws (IEEE CSD, 2014) | PDP/PEP no gateway, compartimentação (contêiner sem root), mTLS, ADR de arquitetura |
 | 4. Vulns web | OWASP Top 10 (2021; 2025) e CWE Top 25 para priorizar; ASVS 4.0.3 para exigir; parametrização (Halfond, Viegas e Orso, 2006); codificação por contexto + CSP (Stamm et al., 2010); token anti-CSRF (Barth, Jackson e Mitchell, 2008) | prepared statements, template com escape automático, CSP com nonce, cookie Secure/HttpOnly/SameSite, middleware de authz |
-| 5. Codificação + memória | CWE Top 25; SEI CERT | type-safe lang, bounds checking, ASLR/DEP |
-| 6. AuthN/AuthZ/sessão | OAuth 2.0; OIDC; RBAC/ABAC | token assinado, cookie HttpOnly+Secure, MFA |
+| 5. Codificação + memória | SEI CERT C (2016) com regra identificada; funções proibidas (Howard, 2007); sanitizadores (Serebryany et al., 2012); linguagem segura em memória (CISA/NSA, 2023) | ASan/UBSan no CI, flags de endurecimento + checksec, canários/ASLR/CFI, Rust onde C era obrigatório |
+| 6. AuthN/AuthZ/sessão | NIST SP 800-63B (2017); OAuth 2.0 (RFC 6749) + PKCE (RFC 7636) + BCP (RFC 9700); OIDC Core (2014); RBAC (Ferraiolo e Kuhn, 1992) / ABAC (NIST SP 800-162) | Argon2id, passkey/FIDO2, cookie __Host- Secure/HttpOnly/SameSite com rotação, access curto + refresh rotacionado, PDP (Cedar/OPA) + PEP |
 | 7. Testes de segurança | SAST, DAST, SCA, fuzzing (NIST SP 800-115) | scanner no CI, fuzzer (AFL/libFuzzer) |
 | 8. Cadeia de suprimentos | SLSA; SBOM (CycloneDX/SPDX) | assinatura (Sigstore), pin de dependência |
 | 9. APIs/micro/contêineres | OWASP API Top 10; zero trust de rede | mTLS, API gateway, imagem mínima, política |

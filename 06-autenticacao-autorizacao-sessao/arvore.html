@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ponto 6 — Autenticação, autorização e gestão de sessão</title>
+<style>
+  :root{
+    --bg:#0e1116; --surface:#161b22; --line:#3a4350;
+    --fg:#e6edf3; --dim:#9aa4b0;
+    --root:#58a6ff; --base:#8b949e; --etapa:#3fb950; --surf:#d29922; --outras:#bc8cff; --ex:#f778ba;
+    --p:#79c0ff; --t:#3fb950; --m:#d29922;
+    --fs:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--bg); color:var(--fg);
+    font:var(--fs)/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;}
+
+  header{position:sticky; top:0; z-index:5; background:var(--surface);
+    border-bottom:1px solid var(--line); padding:10px 16px;
+    display:flex; align-items:center; gap:12px; flex-wrap:wrap;}
+  header h1{font-size:1rem; margin:0; font-weight:700}
+  header .hint{color:var(--dim); font-size:.78rem}
+  header .ctr{margin-left:auto; display:flex; gap:6px; flex-wrap:wrap}
+  button{border:1px solid var(--line); background:#21262d; color:var(--fg);
+    border-radius:8px; padding:6px 10px; font-weight:600; cursor:pointer; font-size:.85rem}
+  button:hover{border-color:var(--root)}
+
+  main{max-width:980px; margin:0 auto; padding:18px 16px 90px}
+  .spine{color:var(--dim); font-size:.88rem; margin:0 0 14px; padding:8px 12px;
+    border:1px dashed var(--line); border-radius:10px}
+  .spine b{color:var(--root)}
+
+  /* ---------- árvore ---------- */
+  .tree, .tree ul{list-style:none; margin:0; padding:0}
+  .tree ul{margin-left:14px; padding-left:18px; border-left:2px solid var(--line)}
+  .tree li{position:relative; margin:4px 0; padding-left:6px}
+  .tree li::before{content:""; position:absolute; left:-18px; top:.85em; width:16px; height:2px; background:var(--line)}
+  .tree > li::before{display:none}
+
+  details{margin:0}
+  summary{cursor:pointer; list-style:none; display:inline-block}
+  summary::-webkit-details-marker{display:none}
+  summary::before{content:"▸"; display:inline-block; width:1em; color:var(--dim); transition:transform .15s}
+  details[open] > summary::before{transform:rotate(90deg)}
+
+  .n{display:inline-block; padding:3px 9px; border-radius:8px; background:var(--surface);
+    border:1px solid var(--line); border-left-width:4px; font-weight:600}
+  .n small{font-weight:500; color:var(--dim); margin-left:6px; font-size:.8em}
+  .n .w{font-weight:400; color:var(--dim)}
+  .n .w::before{content:" — "}
+
+  .n.root{border-left-color:var(--root); color:var(--root); font-size:1.15em; font-weight:800}
+  .n.b1{border-left-color:var(--root); font-size:1.05em; font-weight:800}
+  .n.base{border-left-color:var(--base)}
+  .n.etapa{border-left-color:var(--etapa); font-weight:800}
+  .n.surf{border-left-color:var(--surf); color:var(--surf); font-weight:800}
+  .n.outras{border-left-color:var(--outras); color:var(--outras); font-weight:800}
+  .n.ex{border-left-color:var(--ex); color:var(--ex); font-weight:800}
+  .n.leaf{background:transparent; border-color:transparent; padding-left:0; font-weight:500}
+  .n.leaf small{margin-left:4px}
+
+  /* rótulos P / T / M / saída */
+  .k{display:inline-block; min-width:1.5em; text-align:center; font-weight:800; font-size:.78em;
+    border-radius:5px; padding:1px 4px; margin-right:6px; vertical-align:1px}
+  .k.p{background:#1b2a3d; color:var(--p)} .k.t{background:#1f3b2a; color:var(--t)}
+  .k.m{background:#2a2f1f; color:var(--m)} .k.o{background:#2b2231; color:var(--ex)}
+  .k.x{background:#3a2626; color:#ff7b72}
+
+  /* junta (ponte) */
+  li.j{list-style:none}
+  li.j::before{display:none}
+  .bridge{display:inline-block; color:var(--dim); font-style:italic; font-size:.9em; padding:2px 6px}
+  .bridge::before{content:"⟪ "} .bridge::after{content:" ⟫"}
+
+  /* grade STRIDE × elemento */
+  .grid{display:inline-grid; grid-template-columns:auto repeat(6,1.7em); gap:3px; margin:4px 0 2px 1.6em; font-size:.82rem; text-align:center}
+  .grid div{padding:2px 1px; border-radius:4px; background:#21262d}
+  .grid .h{font-weight:800; color:var(--dim)}
+  .grid .r{text-align:left; padding:2px 8px 2px 4px; font-weight:600}
+  .grid .y{background:#1f3b2a; color:var(--t); font-weight:800}
+  .grid .mm{background:#2a2f1f; color:var(--m); font-size:.7rem; font-weight:700}
+
+  @media (max-width:520px){ .tree ul{margin-left:6px; padding-left:12px} .tree li::before{left:-12px; width:10px} .n .w{display:block; margin-top:2px} .n .w::before{content:""} }
+</style>
+</head>
+<body>
+<header>
+  <h1>Ponto 6 — Autenticação, autorização e gestão de sessão <span class="hint">· árvore de conceitos</span></h1>
+  <span class="hint">clique num nó para abrir/fechar · <b style="color:var(--p)">P</b> princípio · <b style="color:var(--t)">T</b> técnica · <b style="color:var(--m)">M</b> mecanismo · <b style="color:var(--ex)">→</b> saída</span>
+  <div class="ctr">
+    <button id="l1">só espinha</button>
+    <button id="l2">até P/T/M</button>
+    <button id="l3">tudo</button>
+    <button id="out">A−</button>
+    <button id="in">A+</button>
+    <button id="full">⛶</button>
+  </div>
+</header>
+
+<main>
+<p class="spine">espinha: <b>3 perguntas → 4 fundamentos → autenticação → sessão → autorização → protocolos (OAuth · OIDC · SAML) → exemplo → erros</b></p>
+
+<ul class="tree">
+<li>
+<details open data-l="0"><summary><span class="n root">Autenticação, autorização e gestão de sessão<span class="w">provar quem é, decidir o que pode, lembrar a prova</span></span></summary>
+<ul>
+
+<li><details open data-l="1"><summary><span class="n b1">3 perguntas que o código confunde</span></summary>
+<ul>
+  <li><span class="n leaf">autenticar<span class="w">quem é: evidência verificada, com grau de confiança</span></span></li>
+  <li><span class="n leaf">autorizar<span class="w">o que pode, com este recurso, agora: decisão por acesso</span></span></li>
+  <li><span class="n leaf">sessão<span class="w">como lembra a prova: segredo portátil = senha temporária</span></span></li>
+  <li><span class="n leaf"><span class="k x">✗</span>"logado, logo pode"<span class="w">confunde 1 com 2 — o GET /contas/{id} dos pontos anteriores</span></span></li>
+  <li><span class="n leaf">exemplo ruim<span class="w">senha única · JWT de 30 dias no localStorage · API aceita qualquer JWT · parceiro usa a senha do cliente</span></span></li>
+</ul></details></li>
+
+<li class="j"><span class="bridge">antes do desenho, o que ele pressupõe?</span></li>
+
+<li><details open data-l="1"><summary><span class="n b1">Fundamentos<small>4 premissas</small></span></summary>
+<ul>
+  <li><span class="n base">identidade é afirmação verificada, não dado<span class="w">NIST 800-63: IAL · AAL1/2/3 · FAL; nível proporcional ao risco</span></span></li>
+  <li><span class="n base">todo segredo tem ciclo de vida<span class="w">criar · transportar · armazenar · usar · rotacionar · revogar — cada fase um ataque</span></span></li>
+  <li><span class="n base">authz é decisão sobre sujeito · ação · recurso · contexto<span class="w">PDP decide, PEP aplica, nega por padrão</span></span></li>
+  <li><span class="n base">confiança delegada exige protocolo<span class="w">senha do usuário nunca vai ao cliente; reinventar = reencontrar os bugs</span></span></li>
+</ul></details></li>
+
+<li class="j"><span class="bridge">o desenho começa pela prova</span></li>
+
+<li><details open data-l="1"><summary><span class="n etapa">Autenticação</span></summary>
+<ul>
+  <li><span class="n leaf"><span class="k p">P</span>garantia proporcional · fatores de naturezas distintas · segredo não recuperável · fator de trabalho · resistência a phishing · recuperação tão forte quanto o login</span></li>
+  <li><details open data-l="2"><summary><span class="n base">senha</span></summary><ul>
+    <li><span class="n leaf">criar<span class="w">sem composição, sem troca periódica, ≥8, lista de vazadas</span><small>NIST 800-63B 17; Adams/Sasse 99</small></span></li>
+    <li><span class="n leaf">armazenar<span class="w">hash + salt (Morris/Thompson 79) → lento: bcrypt 99 · scrypt 09 · Argon2 15 · pepper</span></span></li>
+    <li><span class="n leaf"><span class="k x">✗</span>MD5/SHA com salt<span class="w">bilhões por segundo em GPU</span></span></li>
+    <li><span class="n leaf">usar<span class="w">limite de tentativas · tempo constante · erro que não enumera usuário</span></span></li>
+    <li><span class="n leaf">ataques<span class="w">credential stuffing (reuso) · phishing (política de senha não resolve)</span></span></li>
+  </ul></details></li>
+  <li><details open data-l="2"><summary><span class="n base">múltiplos fatores<span class="w">sabe · tem · é — duas naturezas</span></span></summary><ul>
+    <li><span class="n leaf">HOTP<small>RFC 4226</small> · TOTP<small>RFC 6238</small><span class="w">30 s; vulnerável a phishing em tempo real</span></span></li>
+    <li><span class="n leaf">SMS<span class="w">"restrito": SIM swap, SS7</span> · push<span class="w">fadiga de MFA (Uber 22) → number matching</span></span></li>
+    <li><span class="n leaf"><span class="k t">T</span>FIDO2/WebAuthn<small>W3C 19</small> · passkeys<small>22</small><span class="w">par de chaves por sítio; assinatura inclui a origem → resistente a phishing</span><small>CISA 22</small></span></li>
+    <li><span class="n leaf">step-up<span class="w">operação exige nível maior que a sessão → pede fator agora; acr na sessão</span></span></li>
+  </ul></details></li>
+  <li><span class="n leaf">recuperação<span class="w">é autenticação com outra evidência; elo mais fraco → link único curto · 2º fator · invalida sessões · notifica</span></span></li>
+</ul></details></li>
+
+<li class="j"><span class="bridge">a prova foi feita; como lembrar sem que lembrar vire a falha?</span></li>
+
+<li><details open data-l="1"><summary><span class="n etapa">Sessão</span></summary>
+<ul>
+  <li><span class="n leaf"><span class="k p">P</span>id vale como senha · imprevisível (≥64 bits, CSPRNG) · rotação em mudança de estado · expiração e revogação no servidor · escopo mínimo de envio</span></li>
+  <li><details open data-l="2"><summary><span class="n base">com estado<small>cookie</small></span></summary><ul>
+    <li><span class="n leaf"><span class="k m">M</span>__Host- · Secure · HttpOnly · SameSite=Lax/Strict · Path/Domain restritos · estado em repositório</span></li>
+    <li><span class="n leaf">fixação<span class="w">id antes do login mantido depois → novo id no login, sempre</span></span></li>
+    <li><span class="n leaf">expiração<span class="w">absoluta 12 h + inatividade 15–30 min (ASVS V3); logout e troca de senha invalidam no servidor</span></span></li>
+  </ul></details></li>
+  <li><details open data-l="2"><summary><span class="n base">sem estado<small>JWT RFC 7519</small></span></summary><ul>
+    <li><span class="n leaf">revogação impossível<span class="w">→ access curto (min) + refresh com estado, rotacionado</span><small>RFC 9700</small></span></li>
+    <li><span class="n leaf">alg:none · RS256→HS256<small>McLean 15</small><span class="w">→ verificador fixa alg e chave</span></span></li>
+    <li><span class="n leaf">localStorage<span class="w">XSS lê → cookie HttpOnly no navegador; Authorization em app/serviço</span></span></li>
+    <li><span class="n leaf">bearer<small>RFC 6750</small><span class="w">vale para quem apresenta → vincular: mTLS RFC 8705 · DPoP RFC 9449</span></span></li>
+    <li><span class="n leaf"><span class="k x">✗</span>JWT não é "mais seguro"<span class="w">outra troca: escala × revogação</span></span></li>
+  </ul></details></li>
+</ul></details></li>
+
+<li class="j"><span class="bridge">quem é, lembrado; agora o que pode</span></li>
+
+<li><details open data-l="1"><summary><span class="n etapa">Autorização</span></summary>
+<ul>
+  <li><span class="n leaf"><span class="k p">P</span>autorizar depois de autenticar, em toda operação<small>IEEE CSD #3</small> · negar por padrão · servidor decide · PDP único · objeto e função · menor privilégio + separação de deveres<small>Clark/Wilson 87</small></span></li>
+  <li><details open data-l="2"><summary><span class="n base">modelos</span></summary><ul>
+    <li><span class="n leaf">DAC<span class="w">dono decide: Unix, ACL</span> · MAC<span class="w">rótulos: Bell-LaPadula 73, Biba 77, SELinux</span></span></li>
+    <li><span class="n leaf"><span class="k t">T</span>RBAC<small>Ferraiolo/Kuhn 92; Sandhu 96; INCITS 359-04</small><span class="w">papéis → permissões; não expressa posse nem contexto</span></span></li>
+    <li><span class="n leaf"><span class="k t">T</span>ABAC<small>NIST 800-162, 14</small><span class="w">atributos de sujeito, recurso, ação, ambiente</span></span></li>
+    <li><span class="n leaf"><span class="k t">T</span>ReBAC<small>Zanzibar 19</small><span class="w">relações entre objetos; SpiceDB, OpenFGA</span></span></li>
+    <li><span class="n leaf"><span class="k m">M</span>papel para o grosso, atributo/relação para o fino → OPA/Rego · Cedar · Casbin; política versionada com testes</span></li>
+  </ul></details></li>
+  <li><span class="n leaf">objeto e função<small>OWASP API Top 10 23</small><span class="w">#1 BOLA · #5 BFLA → carrega o recurso, PDP(sujeito, ação, recurso), consulta filtra pelo dono, rota sem política = 404</span></span></li>
+  <li><span class="n leaf">camadas<span class="w">gateway (escopo, papel) → serviço (objeto) → banco (row-level security)</span></span></li>
+</ul></details></li>
+
+<li class="j"><span class="bridge">identidade de fora, ou agir em nome de outro: protocolos</span></li>
+
+<li><details open data-l="1"><summary><span class="n b1 outras">Protocolos</span></summary>
+<ul>
+  <li><details open data-l="2"><summary><span class="n base"><span class="k t">T</span>OAuth 2.0<small>RFC 6749, 12</small><span class="w">delegação, não autenticação</span></span></summary><ul>
+    <li><span class="n leaf">papéis<span class="w">dono do recurso · cliente · servidor de autorização · servidor de recursos → access token com escopo e prazo</span></span></li>
+    <li><span class="n leaf">fluxo<span class="w">código de autorização + PKCE (RFC 7636), obrigatório para todo cliente</span><small>RFC 9700, 25</small></span></li>
+    <li><span class="n leaf">máquina<span class="w">client credentials · device (RFC 8628)</span> · descontinuados<span class="w">implicit (token na URL) · password (senha ao cliente)</span></span></li>
+    <li><span class="n leaf">ataques<span class="w">redirect → URL exata · CSRF no retorno → state · mix-up → iss (RFC 9207) · bearer roubado → curto, rotação, DPoP/mTLS</span></span></li>
+  </ul></details></li>
+  <li><span class="n leaf"><span class="k t">T</span>OIDC Core 1.0<small>14</small><span class="w">autenticação federada sobre OAuth: ID token (sub iss aud exp auth_time acr) + nonce · UserInfo</span></span></li>
+  <li><span class="n leaf"><span class="k t">T</span>SAML 2.0<small>OASIS 05</small><span class="w">federação corporativa em XML; XML Signature Wrapping (Somorovsky 12), XXE</span></span></li>
+  <li><span class="n leaf">federação<span class="w">IdP comprometido = tudo → MFA resistente a phishing para admins · HSM · validar a asserção inteira</span></span></li>
+</ul></details></li>
+
+<li class="j"><span class="bridge">o mesmo sistema, redesenhado</span></li>
+
+<li><details data-l="1"><summary><span class="n b1 ex">exemplo-fio<small>API de pagamentos</small></span></summary>
+<ul>
+  <li><span class="n leaf">authn → passkey 1ª opção · senha + lista de vazadas + Argon2id + limite · AAL2 · step-up para transferir · sem SMS</span></li>
+  <li><span class="n leaf">sessão web → __Host-sessao Secure HttpOnly SameSite=Lax · 128 bits · rotação no login e step-up · 12 h / 20 min · JWT sai do localStorage</span></li>
+  <li><span class="n leaf">app móvel → código + PKCE · access 10 min · refresh com estado rotacionado · DPoP</span></li>
+  <li><span class="n leaf">parceiro → client credentials + mTLS · escopo antifraude:consultar · 5 min</span></li>
+  <li><span class="n leaf">authz → PEP gateway → PEP serviço → PDP Cedar: dono == sujeito; transferir exige acr ≥ 2 acima do limite; estornar ≠ quem lançou · RLS</span></li>
+  <li><span class="n leaf">operadores → OIDC corporativo com acr de MFA resistente a phishing · log de tudo sem segredo</span></li>
+</ul></details></li>
+
+<li><details data-l="1"><summary><span class="n b1"><span class="k x">✗</span>erros a não cometer</span></summary>
+<ul>
+  <li><span class="n leaf">autenticado ≠ autorizado · JWT ≠ "mais seguro" · token no localStorage · OAuth ≠ autenticação</span></li>
+  <li><span class="n leaf">SMS ≠ suficiente · MD5 + salt · composição e troca periódica · esconder rota admin</span></li>
+  <li><span class="n leaf">RBAC ≠ posse · logout ≠ apagar o cookie</span></li>
+</ul></details></li>
+
+</ul></details>
+</li>
+</ul>
+</main>
+
+<script>
+  const root = document.documentElement;
+  let fs = 16;
+  const apply = () => root.style.setProperty("--fs", fs + "px");
+  document.getElementById("in").onclick  = () => { fs = Math.min(24, fs+1); apply(); };
+  document.getElementById("out").onclick = () => { fs = Math.max(11, fs-1); apply(); };
+  document.getElementById("full").onclick = () => {
+    if(!document.fullscreenElement) document.documentElement.requestFullscreen();
+    else document.exitFullscreen();
+  };
+  // níveis: 1 = só espinha (ramos de 1º nível fechados), 2 = até P/T/M, 3 = tudo
+  const setLevel = max => document.querySelectorAll("details").forEach(d => {
+    const l = +d.dataset.l; d.open = l < max;
+  });
+  document.getElementById("l1").onclick = () => setLevel(1);
+  document.getElementById("l2").onclick = () => setLevel(3);
+  document.getElementById("l3").onclick = () => setLevel(9);
+  addEventListener("keydown", e => {
+    if(e.key==="+"||e.key==="=") document.getElementById("in").click();
+    if(e.key==="-") document.getElementById("out").click();
+    if(e.key==="f") document.getElementById("full").click();
+    if(e.key==="1") setLevel(1); if(e.key==="2") setLevel(3); if(e.key==="3") setLevel(9);
+  });
+</script>
+</body>
+</html>
